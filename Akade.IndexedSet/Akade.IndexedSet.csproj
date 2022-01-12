@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<Version>0.1.0</Version>
+		<VersionSuffix>beta</VersionSuffix>
+		<Description>Provides an In-Memory data structure, the IndexedSet, that allows to easily add indices to allow efficient querying.</Description>
+		<Copyright>Copyright © Akade 2022</Copyright>
+		<Authors>Akade</Authors>
+		<EnablePackageValidation>true</EnablePackageValidation>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+			<_Parameter1>Akade.IndexedSet.Tests</_Parameter1>
+		</AssemblyAttribute>
+	</ItemGroup>
+</Project>
