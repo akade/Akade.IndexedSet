@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akade.IndexedSet", "Akade.IndexedSet\Akade.IndexedSet.csproj", "{4AC13CC9-5822-4325-9967-8F07094C4218}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1D4D9594-0CD1-4103-AA2E-8589FBBD6EAC}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akade.IndexedSet.Tests", "Akade.IndexedSet.Tests\Akade.IndexedSet.Tests.csproj", "{E504884A-2704-4030-8B12-74FD40F7534C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4AC13CC9-5822-4325-9967-8F07094C4218}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AC13CC9-5822-4325-9967-8F07094C4218}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AC13CC9-5822-4325-9967-8F07094C4218}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AC13CC9-5822-4325-9967-8F07094C4218}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E504884A-2704-4030-8B12-74FD40F7534C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E504884A-2704-4030-8B12-74FD40F7534C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E504884A-2704-4030-8B12-74FD40F7534C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E504884A-2704-4030-8B12-74FD40F7534C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C65ABA45-764F-4D07-A2A5-800115204611}
+	EndGlobalSection
+EndGlobal
