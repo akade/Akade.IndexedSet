@@ -24,6 +24,6 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
     - name: publish
-      run: dotnet publish -c Release -o nupk
+      run: dotnet publish -c Release
     - name: upload
-      run: dotnet nuget push ./<project>/nupk/*.nupkg
+      run: dotnet nuget push ./Akade.IndexedSet/Akade.IndexedSet/Akade.IndexedSet/bin/Release/Akade.IndexedSet.*.nupkg
