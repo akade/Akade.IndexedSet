@@ -3,17 +3,17 @@
 [![CI Build](https://github.com/akade/Akade.IndexedSet/actions/workflows/ci-build.yml/badge.svg?branch=master)](https://github.com/akade/Akade.IndexedSet/actions/workflows/ci-build.yml)
 ![NuGet version (Akade.IndexedSet)](https://img.shields.io/nuget/v/Akade.IndexedSet.svg)
 
-Provides an In-Memory data structure, the IndexedSet, that allows to easily add indices to allow efficient querying. Based on seeing inifficent usage of 
+Provides an In-Memory data structure, the IndexedSet, that allows to easily add indices to allow efficient querying. Based on often seeing inefficient usage of 
 `.FirstOrDefault?`, `.Where`, `.Single` etc... and implementing such a data-structure for every project I'm on.
 
 ## Features
 This project aims to provide a data structure (*it's not a DB!*) that allows to easily setup fast access on different properties:
-### Unqiue index
+### Unique index
 Dictionary-based, O(1), access on primary and secondary keys:
 
 ```csharp
 var set = IndexedSetBuilder<Data>.Create(a => a.PrimaryKey)
-        .WithUnqueIndex(x => x.SecondaryKey)
+        .WithUniqueIndex(x => x.SecondaryKey)
         .Build();
 
 set.Add(new(primaryKey: 1, secondaryKey: 5));
@@ -79,21 +79,21 @@ IEnumerable<Data> data = set.Where(x => ComputedKey.SomeStaticMethod, 42);
 ### Reflection- & expression-free - convention-based index naming
 
 We are using the [CallerArgumentExpression](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.callerargumentexpressionattribute)-Feature 
-of .Net 6 to provide a convention based naming of the interfaces:
+of .Net 6 to provide a convention-based naming of the interfaces:
 - `set.Where(x => (x.Prop1, x.Prop2), (1, 2))` results in an index named `"x => (x.Prop1, x.Prop2), (1, 2))"`
 - `set.Where(ComputedKeys.NumberOfDays, 5)` results in an index named `"ComputedKeys.NumberOfDays"`
 - **Hence, be careful what you pass in. The convention is to always use a lambda with x as variable name or use static methods.**
 
 ### Updating key-values
-**The current implementation requires any keys of any type to never change the value while the instance is within the set**. So to update you will need to remove
-the instance, update the values and add the instance again.
+**The current implementation requires any keys of any type to never change the value while the instance is within the set**. Hence, in order to update any key you will need to remove the instance, update the keys and add the instance again.
 
 ### Roadmap
 Potential features:
 - Thread-safe version
-- Improved updating of values
+- Easier updating of keys
 - Events for changed values
 - More index types
+- Benchmarks
 
 If you have any suggestion or found a bug / unexpected behavior, open an issue!
 
