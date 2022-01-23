@@ -4,7 +4,7 @@
 ![NuGet version (Akade.IndexedSet)](https://img.shields.io/nuget/v/Akade.IndexedSet.svg)
 
 Provides an In-Memory data structure, the IndexedSet, that allows to easily add indices to allow efficient querying. Based on seeing inifficent usage of 
-`.FirstOrDefault?, `.Where`, `.Single` etc... and implementing such a data-structure for every project I'm on.
+`.FirstOrDefault?`, `.Where`, `.Single` etc... and implementing such a data-structure for every project I'm on.
 
 ## Features
 This project aims to provide a data structure (*it's not a DB!*) that allows to easily setup fast access on different properties:
