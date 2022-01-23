@@ -24,6 +24,6 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
     - name: publish
-      run: dotnet publish --no-build -c Release -o nupk
+      run: dotnet publish -c Release -o nupk
     - name: upload
       run: dotnet nuget push ./<project>/nupk/*.nupkg
