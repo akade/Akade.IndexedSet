@@ -79,7 +79,7 @@ IEnumerable<Data> data = set.Where(x => ComputedKey.SomeStaticMethod, 42);
 ### Reflection- & expression-free - convention-based index naming
 
 We are using the [CallerArgumentExpression](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.callerargumentexpressionattribute)-Feature 
-of .Net 6 to provide a convention-based naming of the interfaces:
+of .Net 6 to provide a convention-based naming of the indices:
 - `set.Where(x => (x.Prop1, x.Prop2), (1, 2))` results in an index named `"x => (x.Prop1, x.Prop2), (1, 2))"`
 - `set.Where(ComputedKeys.NumberOfDays, 5)` results in an index named `"ComputedKeys.NumberOfDays"`
 - **Hence, be careful what you pass in. The convention is to always use a lambda with x as variable name or use static methods.**
