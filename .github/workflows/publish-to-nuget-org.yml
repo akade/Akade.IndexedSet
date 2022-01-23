@@ -1,4 +1,4 @@
-name: .NET
+name: Publish to nuget.org
 
 on:
   release:
