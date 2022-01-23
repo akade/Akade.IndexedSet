@@ -12,6 +12,8 @@
 		<Copyright>Copyright © Akade 2022</Copyright>
 		<Authors>Akade</Authors>
 		<EnablePackageValidation>true</EnablePackageValidation>
+		<RepositoryUrl>https://github.com/akade/Akade.IndexedSet</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 
 	<ItemGroup>

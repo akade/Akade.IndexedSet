@@ -1,0 +1,29 @@
+name: .NET
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.x
+      env:
+        NUGET_AUTH_TOKEN: ${{SECRETS.NUGETORGAPIKEY}}
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+    - name: publish
+      run: dotnet publish --no-build -c Release -o nupk
+    - name: upload
+      run: dotnet nuget push ./<project>/nupk/*.nupkg
