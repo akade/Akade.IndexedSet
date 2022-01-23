@@ -26,4 +26,4 @@ jobs:
     - name: publish
       run: dotnet publish -c Release
     - name: upload
-      run: dotnet nuget push ./Akade.IndexedSet/Akade.IndexedSet/Akade.IndexedSet/bin/Release/Akade.IndexedSet.*.nupkg --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./Akade.IndexedSet/bin/Release/Akade.IndexedSet.*.nupkg --source https://api.nuget.org/v3/index.json
