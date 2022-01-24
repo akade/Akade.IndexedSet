@@ -131,9 +131,8 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     }
 
     /// <summary>
-    /// Returns
+    /// Returns all values by fully enumerating the entire set.
     /// </summary>
-    /// <returns></returns>
     public IEnumerable<TElement> FullScan()
     {
         return _data.Values;
