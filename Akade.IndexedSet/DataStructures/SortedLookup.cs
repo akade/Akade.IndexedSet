@@ -53,9 +53,9 @@ internal class SortedLookup<TKey, TValue>
 
     }
 
-    public IEnumerable<TValue> GetValuesInRange(TKey inclusiveStart, TKey exclusiveEnd)
+    public IEnumerable<TValue> GetValuesInRange(TKey start, TKey end, bool inclusiveStart, bool inclusiveEnd)
     {
-        Range range = _sortedKeys.GetRange(inclusiveStart, exclusiveEnd);
+        Range range = _sortedKeys.GetRange(start, end, inclusiveStart, inclusiveEnd);
         return GetValues(range);
     }
 

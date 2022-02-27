@@ -1,34 +1,33 @@
 ﻿namespace Akade.IndexedSet.Indices;
 
 /// <summary>
-/// Nonunique index implementation based on <see cref="Lookup{TKey, TElement}"/>
+/// Multivalue index implementation based on <see cref="Lookup{TKey, TElement}"/> where
+/// the key accessor can return multilpe keys per elements. Use full for fast contains queries.
 /// </summary>
 internal class MultiValueIndex<TPrimaryKey, TElement, TIndexKey> : TypedIndex<TPrimaryKey, TElement, TIndexKey>
     where TPrimaryKey : notnull
     where TIndexKey : notnull
 {
     private readonly DataStructures.Lookup<TIndexKey, TElement> _data = new();
+    private readonly Func<TElement, IEnumerable<TIndexKey>> _keyAccessor;
 
-    public MultiValueIndex(Func<TElement, TIndexKey> keyAccessor, string name) : base(keyAccessor, name)
+    public MultiValueIndex(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, string name) : base(name)
     {
+        _keyAccessor = keyAccessor;
     }
 
     public override void Add(TElement value)
     {
-        TIndexKey key = _keyAccessor(value);
-        _ = _data.Add(key, value);
+        foreach (TIndexKey key in _keyAccessor(value))
+            _ = _data.Add(key, value);
     }
 
     public override void Remove(TElement value)
     {
-        TIndexKey key = _keyAccessor(value);
-        _ = _data.Remove(key, value);
+        foreach (TIndexKey key in _keyAccessor(value))
+            _ = _data.Remove(key, value);
     }
 
-    internal override IEnumerable<TElement> Range(TIndexKey inclusiveStart, TIndexKey exclusiveStart)
-    {
-        throw new NotSupportedException($"Range queries are not supported on {nameof(MultiValueIndex<TPrimaryKey, TElement, TIndexKey>)}-indices. Use a range index to support this scenario.");
-    }
 
     internal override TElement Single(TIndexKey indexKey)
     {

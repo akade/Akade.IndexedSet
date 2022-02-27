@@ -109,25 +109,80 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     }
 
     /// <summary>
-    /// Searches for multiple elements that are within a range via an index.
+    /// Searches for multiple elements via an index.
+    /// </summary>
+    /// <typeparam name="TIndexKey">The type of the index key</typeparam>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="indexKey">The key within the index.</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
+    public IEnumerable<TElement> Where<TIndexKey>(
+        Func<TElement, IEnumerable<TIndexKey>> indexAccessor,
+        TIndexKey indexKey,
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        return typedIndex.Where(indexKey);
+    }
+
+    /// <summary>
+    /// Searches for multiple elements that are within a range via an index. You can specify whether the start/end are inclusive or exclusive
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
     /// Hence, the convention is to always use x as an identifier in case a lambda expression is used. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
-    /// <param name="inclusiveStart">The inclusive start "key" </param>
-    /// <param name="exclusiveEnd">The key within the index.</param>
+    /// <param name="start">The start "key", use <paramref name="inclusiveStart"/> to control whether the result should include the start or not </param>
+    /// <param name="end">The end "key", use <paramref name="inclusiveEnd"/> to control whether the result should include the end or not </param>
+    /// <param name="inclusiveStart">True, if the query should include the start, otherwise false.</param>
+    /// <param name="inclusiveEnd">True, if the query should include the end, otherwise false.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
     public IEnumerable<TElement> Range<TIndexKey>(
         Func<TElement, TIndexKey> indexAccessor,
-        TIndexKey inclusiveStart,
-        TIndexKey exclusiveEnd,
+        TIndexKey start,
+        TIndexKey end,
+        bool inclusiveStart = true,
+        bool inclusiveEnd = false,
         [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
         TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
-        return typedIndex.Range(inclusiveStart, exclusiveEnd);
+        return typedIndex.Range(start, end, inclusiveStart, inclusiveEnd);
+    }
+
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
+    public IEnumerable<TElement> LessThan<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        return typedIndex.LessThan(value);
+    }
+
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
+    public IEnumerable<TElement> LessThanOrEqual<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        return typedIndex.LessThanOrEqual(value);
+    }
+
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
+    public IEnumerable<TElement> GreaterThan<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        return typedIndex.GreaterThan(value);
+    }
+
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
+    public IEnumerable<TElement> GreaterThanOrEqual<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        return typedIndex.GreaterThanOrEqual(value);
     }
 
     /// <summary>

@@ -75,38 +75,40 @@ internal class BinaryHeap<TValue> : ICollection<TValue>
             start = ~start;
         }
         int actualStart = GetFirstIndexWithValue(value, start);
-        int end = GetLastIndexWithValue(value, start);
+        int end = GetFirstIndexWithDifferentValue(value, start);
 
-        return new Range(actualStart, end + 1);
+        return new Range(actualStart, end);
     }
 
-    public Range GetRange(TValue inclusiveStart, TValue exclusiveEnd)
+    public Range GetRange(TValue start, TValue end, bool inclusiveStart = true, bool inclusiveEnd = false)
     {
-        if (_comparer.Compare(inclusiveStart, exclusiveEnd) >= 0)
+        if (_comparer.Compare(start, end) >= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(exclusiveEnd));
+            throw new ArgumentOutOfRangeException(nameof(end));
         }
 
-        int start = _data.BinarySearch(inclusiveStart, _comparer);
-        if (start < 0)
+        int startIndex = _data.BinarySearch(start, _comparer);
+        if (startIndex < 0)
         {
-            start = ~start;
+            startIndex = ~startIndex;
         }
 
-        start = GetFirstIndexWithValue(inclusiveStart, start);
+        startIndex = inclusiveStart ? GetFirstIndexWithValue(start, startIndex) : GetFirstIndexWithDifferentValue(start, startIndex);
 
-        int end = _data.BinarySearch(start, _data.Count - start, exclusiveEnd, _comparer);
-        if (end < 0)
+
+        int endIndex = _data.BinarySearch(startIndex, _data.Count - startIndex, end, _comparer);
+        
+        if (endIndex < 0)
         {
-            end = ~end;
+            endIndex = ~endIndex;
         }
 
-        if (end < _data.Count)
+        if (endIndex < _data.Count)
         {
-            end = GetFirstIndexWithValue(exclusiveEnd, end);
+            endIndex = inclusiveEnd ? GetFirstIndexWithDifferentValue(end, endIndex) : GetFirstIndexWithValue(end, endIndex);
         }
 
-        return new Range(start, end);
+        return new Range(startIndex, endIndex);
     }
 
     private int GetFirstIndexWithValue(TValue value, int start)
@@ -124,7 +126,7 @@ internal class BinaryHeap<TValue> : ICollection<TValue>
         return start + 1;
     }
 
-    private int GetLastIndexWithValue(TValue value, int start)
+    private int GetFirstIndexWithDifferentValue(TValue value, int start)
     {
         if (_comparer.Compare(_data[start], value) != 0)
         {
@@ -136,7 +138,7 @@ internal class BinaryHeap<TValue> : ICollection<TValue>
             start++;
         }
 
-        return start - 1;
+        return start;
     }
 
     void ICollection<TValue>.Add(TValue item)

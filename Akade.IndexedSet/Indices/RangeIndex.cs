@@ -11,7 +11,7 @@ internal class RangeIndex<TPrimaryKey, TElement, TIndexKey> : TypedIndex<TPrimar
 {
     private readonly SortedLookup<TIndexKey, TElement> _lookup;
 
-    public RangeIndex(Func<TElement, TIndexKey> keyAccessor, string name) : base(keyAccessor, name)
+    public RangeIndex(Func<TElement, TIndexKey> keyAccessor, string name) : base(name)
     {
         _lookup = new SortedLookup<TIndexKey, TElement>(keyAccessor);
     }
@@ -26,9 +26,9 @@ internal class RangeIndex<TPrimaryKey, TElement, TIndexKey> : TypedIndex<TPrimar
         _ = _lookup.Remove(value);
     }
 
-    internal override IEnumerable<TElement> Range(TIndexKey inclusiveStart, TIndexKey exclusiveStart)
+    internal override IEnumerable<TElement> Range(TIndexKey start, TIndexKey end, bool inclusiveStart, bool inclusiveEnd)
     {
-        return _lookup.GetValuesInRange(inclusiveStart, exclusiveStart);
+        return _lookup.GetValuesInRange(start, end, inclusiveStart, inclusiveEnd);
     }
 
     internal override TElement Single(TIndexKey indexKey)
