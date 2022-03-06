@@ -6,6 +6,9 @@ namespace Akade.IndexedSet.Tests.Samples.Appointments;
 [TestClass]
 public class AppointmentSample
 {
+    private readonly DateTime _todayDateTime;
+    private readonly DateOnly _today;
+
     private static TimeSpan Duration(Appointment appointment)
     {
         return appointment.End - appointment.Start;
@@ -20,7 +23,10 @@ public class AppointmentSample
 
     public AppointmentSample()
     {
-        DateOnly[] days = Enumerable.Range(0, 5).Select(offset => DateOnly.FromDateTime(DateTime.Today).AddDays(offset)).ToArray();
+        _todayDateTime = DateTime.Today;
+        _today = DateOnly.FromDateTime(_todayDateTime);
+
+        DateOnly[] days = Enumerable.Range(0, 5).Select(offset => _today.AddDays(offset)).ToArray();
         int id = 1;
 
         foreach (DateOnly day in days)
@@ -53,7 +59,7 @@ public class AppointmentSample
     public void get_all_meetings_today_or_tomorrow()
     {
         // Range query with exlusive end
-        string[] meetings = _appointments.Range(x => x.Start, DateTime.Today, DateTime.Today.AddDays(2))
+        string[] meetings = _appointments.Range(x => x.Start, _todayDateTime, _todayDateTime.AddDays(2))
                                          .OrderBy(x => x.Start) // This call is not necessary at the moment but the order is not part of the spec and might change depending on the index implementation
                                          .Select(x => x.Subject)
                                          .ToArray();
@@ -64,15 +70,13 @@ public class AppointmentSample
     [TestMethod]
     public void check_for_conflicting_meetings()
     {
-        var today = DateOnly.FromDateTime(DateTime.Today);
+        DateTime plannedStart = _today.AddDays(2).WithDayTime(09, 00);
+        DateTime plannedEnd = _today.AddDays(2).WithDayTime(09, 30);
 
-        DateTime plannedStart = today.AddDays(2).WithDayTime(09, 00);
-        DateTime plannedEnd = today.AddDays(2).WithDayTime(09, 30);
-
-        // Note that the end of ranges are always exclusive at the moment, so the semantic is not exactly the same for adjacent meetings before or after.
-        // However, for this sample, it does not matter
-        IEnumerable<Appointment> viaStart = _appointments.Range(x => x.Start, plannedStart, plannedEnd);
-        IEnumerable<Appointment> viaEnd = _appointments.Range(x => x.End, plannedStart, plannedEnd);
+        // Note that you can specify if the start and end of ranges are inclusive or exclusive. Here we do not want adjacent meetings and
+        // for the sample data, it does in fact not matter...
+        IEnumerable<Appointment> viaStart = _appointments.Range(x => x.Start, plannedStart, plannedEnd, inclusiveStart: false, inclusiveEnd: false);
+        IEnumerable<Appointment> viaEnd = _appointments.Range(x => x.End, plannedStart, plannedEnd, inclusiveStart: false, inclusiveEnd: false);
 
         string[] meetings = viaStart.Union(viaEnd)
                                     .OrderBy(x => x.Start)

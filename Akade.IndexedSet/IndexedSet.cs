@@ -90,7 +90,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     }
 
     /// <summary>
-    /// Searches for multiple elements via an index.
+    /// Searches for multiple elements via an index. See <see cref="IndexedSetBuilder{TPrimaryKey, TElement}.WithIndex{TIndexKey}(Func{TElement, TIndexKey}, string?)"/>.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
@@ -109,7 +109,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     }
 
     /// <summary>
-    /// Searches for multiple elements via an index.
+    /// Searches for multiple elements via an index within "denormalized keys". See <see cref="IndexedSetBuilder{TPrimaryKey, TElement}.WithIndex{TIndexKey}(Func{TElement, IEnumerable{TIndexKey}}, string?)"/>.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
@@ -153,6 +153,14 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
         return typedIndex.Range(start, end, inclusiveStart, inclusiveEnd);
     }
 
+    /// <summary>
+    /// Searches for elements that have keys that are less than the supplied value.
+    /// </summary>
+    /// <typeparam name="TIndexKey">The type of the index key</typeparam>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="value">The key value to compare other keys with.</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
     public IEnumerable<TElement> LessThan<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
@@ -161,6 +169,14 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
         return typedIndex.LessThan(value);
     }
 
+    /// <summary>
+    /// Searches for elements that have keys that are less or equal than the supplied value.
+    /// </summary>
+    /// <typeparam name="TIndexKey">The type of the index key</typeparam>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="value">The key value to compare other keys with.</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
     public IEnumerable<TElement> LessThanOrEqual<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
@@ -169,6 +185,14 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
         return typedIndex.LessThanOrEqual(value);
     }
 
+    /// <summary>
+    /// Searches for elements that have keys that are greator than the supplied value.
+    /// </summary>
+    /// <typeparam name="TIndexKey">The type of the index key</typeparam>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="value">The key value to compare other keys with.</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
     public IEnumerable<TElement> GreaterThan<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
@@ -177,12 +201,112 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
         return typedIndex.GreaterThan(value);
     }
 
+    /// <summary>
+    /// Searches for elements that have keys that are greator or equal than the supplied value.
+    /// </summary>
+    /// <typeparam name="TIndexKey">The type of the index key</typeparam>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="value">The key value to compare other keys with.</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
     public IEnumerable<TElement> GreaterThanOrEqual<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
         TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
         return typedIndex.GreaterThanOrEqual(value);
+    }
+
+    /// <summary>
+    /// Searches for the maximum key value within an index.
+    /// </summary>
+    /// <typeparam name="TIndexKey">The type of the index key</typeparam>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
+    public TIndexKey Max<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        return typedIndex.Max();
+    }
+
+    /// <summary>
+    /// Searches for the minimum key value within an index.
+    /// </summary>
+    /// <typeparam name="TIndexKey">The type of the index key</typeparam>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
+    public TIndexKey Min<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        return typedIndex.Min();
+    }
+
+    /// <summary>
+    /// Searches for elements that have the maximum key value within an index.
+    /// </summary>
+    /// <typeparam name="TIndexKey">The type of the index key</typeparam>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
+    public IEnumerable<TElement> MaxBy<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        return typedIndex.MaxBy();
+    }
+
+    /// <summary>
+    /// Searches for elements that have the minimum key value within an index.
+    /// </summary>
+    /// <typeparam name="TIndexKey">The type of the index key</typeparam>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
+    public IEnumerable<TElement> MinBy<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        return typedIndex.MinBy();
+    }
+
+    /// <summary>
+    /// Returns the elements in the order defined by the index.
+    /// </summary>
+    /// <typeparam name="TIndexKey">The type of the index key</typeparam>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="skip">Allows to efficiently skip a number of elements. Default is 0</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
+    public IEnumerable<TElement> OrderBy<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, int skip = 0, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        return typedIndex.OrderBy(skip);
+    }
+
+    /// <summary>
+    /// Returns the elements in the descending order defined by the index.
+    /// </summary>
+    /// <typeparam name="TIndexKey">The type of the index key</typeparam>
+    /// <param name="skip">Allows to efficiently skip a number of elements. Default is 0</param>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
+    public IEnumerable<TElement> OrderByDescending<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, int skip = 0, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        return typedIndex.OrderByDescending(skip);
     }
 
     /// <summary>

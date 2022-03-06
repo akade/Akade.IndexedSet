@@ -40,7 +40,7 @@ public class BinaryHeapTests
     }
 
     [TestMethod]
-    public void querying_single_values_returns_correct_ranges()
+    public void querying_by_single_values_returns_correct_ranges()
     {
         _heap.AddRange(new[] { 1, 2, 4, 4, 4, 4, 6, 6, 8, 9 });
 
@@ -52,8 +52,38 @@ public class BinaryHeapTests
         Assert.AreEqual(9..10, _heap.GetRange(9));
     }
 
+
+
     [TestMethod]
-    public void querying_multiple_values_returns_correct_ranges()
+    public void querying_by_single_values_returns_correct_position_with_zero_length_when_emptyd()
+    {
+        Assert.AreEqual(0..0, _heap.GetRange(2));
+    }
+
+    [TestMethod]
+    public void querying_by_single_values_returns_correct_position_with_zero_length_when_no_matching_value_is_found()
+    {
+        _ = _heap.Add(5);
+        _ = _heap.Add(8);
+        Assert.AreEqual(1..1, _heap.GetRange(6));
+    }
+
+    [TestMethod]
+    public void querying_by_range_returns_empty_range_when_empty()
+    {
+        Assert.AreEqual(0..0, _heap.GetRange(3, 7, inclusiveStart: true, inclusiveEnd: true));
+    }
+
+    [TestMethod]
+    public void querying_by_range_values_returns_correct_position_with_zero_length_when_no_matching_value_is_found()
+    {
+        _ = _heap.Add(5);
+        _ = _heap.Add(8);
+        Assert.AreEqual(1..1, _heap.GetRange(6, 7));
+    }
+
+    [TestMethod]
+    public void querying_by_range_returns_correct_ranges()
     {
         //                     0  1  2  3  4  5  6  7  8  9
         _heap.AddRange(new[] { 1, 2, 4, 4, 4, 4, 6, 6, 8, 9 });
@@ -70,7 +100,7 @@ public class BinaryHeapTests
     }
 
     [TestMethod]
-    public void querying_multiple_values_returns_correct_ranges_respecting_inclusive_or_exclusive_boundaries_when_boundaries_are_elements()
+    public void querying_by_range_returns_correct_ranges_respecting_inclusive_or_exclusive_boundaries_when_boundaries_are_elements()
     {
         //                     0  1  2  3  4  5  6  7  8  9  10
         _heap.AddRange(new[] { 1, 2, 4, 4, 4, 4, 5, 6, 6, 8, 9 });
@@ -86,7 +116,7 @@ public class BinaryHeapTests
     }
 
     [TestMethod]
-    public void querying_multiple_values_returns_correct_ranges_respecting_inclusive_or_exclusive_boundaries_when_boundaries_are_not_elements()
+    public void querying_by_range_returns_correct_ranges_respecting_inclusive_or_exclusive_boundaries_when_boundaries_are_not_elements()
     {
         //                     0  1  2  3  4  5  6  7  8  9  10
         _heap.AddRange(new[] { 1, 2, 4, 4, 4, 4, 5, 6, 6, 8, 9 });

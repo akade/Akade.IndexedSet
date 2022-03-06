@@ -111,7 +111,7 @@ IEnumerable<GraphNode> nodesThatConnectTo1 = set.FullScan().Where(x => x.Connect
 ```
 
 ### Range index
-Binary-heap based O(log(n)) access for range based, smaller than (or equals) or bigger than (or equals) queries.
+Binary-heap based O(log(n)) access for range based, smaller than (or equals) or bigger than (or equals) and orderby queries. Also useful to do paging sorted on exactly one property.
 
 ```csharp
 var set = IndexedSetBuilder<Data>.Create(a => a.PrimaryKey)
@@ -123,6 +123,13 @@ set.Add(new(primaryKey: 2, secondaryKey: 4));
 
 // fast access via range query
 IEnumerable<Data> data = set.Range(x => x.SecondaryKey, 1, 5);
+
+// fast max & min key value or elements
+int maxKey = set.Max(x => x.SecondaryKey);
+data = set.MaxBy(x => x.SecondaryKey);
+
+// fast larger or smaller than
+
 ```
 For more samples, checkout the unit tests.
 
@@ -167,7 +174,9 @@ Potential features:
 - Thread-safe version
 - Easier updating of keys
 - Events for changed values
-- More index types
+- More index types (Trie)
+- Tree-based range index for better insertion performance
+
 - Benchmarks
 
 If you have any suggestion or found a bug / unexpected behavior, open an issue!

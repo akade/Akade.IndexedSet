@@ -40,4 +40,90 @@ internal class RangeIndex<TPrimaryKey, TElement, TIndexKey> : TypedIndex<TPrimar
     {
         return _lookup.GetValues(indexKey);
     }
+
+    internal override IEnumerable<TElement> GreaterThan(TIndexKey value)
+    {
+        if (_lookup.Count == 0)
+        {
+            return Enumerable.Empty<TElement>();
+        }
+
+        TIndexKey maxKey = _lookup.GetMaximumKey();
+
+        return Comparer<TIndexKey>.Default.Compare(value, maxKey) >= 0
+            ? Enumerable.Empty<TElement>()
+            : _lookup.GetValuesInRange(value, maxKey, false, true);
+    }
+
+    internal override IEnumerable<TElement> GreaterThanOrEqual(TIndexKey value)
+    {
+        if (_lookup.Count == 0)
+        {
+            return Enumerable.Empty<TElement>();
+        }
+
+        TIndexKey maxKey = _lookup.GetMaximumKey();
+
+        return Comparer<TIndexKey>.Default.Compare(value, maxKey) > 0
+            ? Enumerable.Empty<TElement>()
+            : _lookup.GetValuesInRange(value, maxKey, true, true);
+    }
+
+    internal override IEnumerable<TElement> LessThan(TIndexKey value)
+    {
+        if (_lookup.Count == 0)
+        {
+            return Enumerable.Empty<TElement>();
+        }
+
+        TIndexKey minKey = _lookup.GetMinimumKey();
+
+        return Comparer<TIndexKey>.Default.Compare(value, minKey) <= 0
+            ? Enumerable.Empty<TElement>()
+            : _lookup.GetValuesInRange(minKey, value, true, false);
+    }
+
+    internal override IEnumerable<TElement> LessThanOrEqual(TIndexKey value)
+    {
+        if (_lookup.Count == 0)
+        {
+            return Enumerable.Empty<TElement>();
+        }
+
+        TIndexKey? minKey = _lookup.GetMinimumKey();
+
+        return Comparer<TIndexKey>.Default.Compare(value, minKey) < 0
+            ? Enumerable.Empty<TElement>()
+            : _lookup.GetValuesInRange(minKey, value, true, true);
+    }
+
+    internal override TIndexKey Max()
+    {
+        return _lookup.GetMaximumKey();
+    }
+
+    internal override TIndexKey Min()
+    {
+        return _lookup.GetMinimumKey();
+    }
+
+    internal override IEnumerable<TElement> MaxBy()
+    {
+        return _lookup.GetMaximumValues();
+    }
+
+    internal override IEnumerable<TElement> MinBy()
+    {
+        return _lookup.GetMinimumValues();
+    }
+
+    internal override IEnumerable<TElement> OrderBy(int skip)
+    {
+        return _lookup.GetValues(skip..);
+    }
+
+    internal override IEnumerable<TElement> OrderByDescending(int skip)
+    {
+        return _lookup.GetValuesDescending(skip..);
+    }
 }
