@@ -4,7 +4,7 @@
 ![NuGet version (Akade.IndexedSet)](https://img.shields.io/nuget/v/Akade.IndexedSet.svg)
 
 Provides an In-Memory data structure, the IndexedSet, that allows to easily add indices to allow efficient querying. Based on often seeing inefficient usage of 
-`.FirstOrDefault`, `.Where`, `.Single` etc... and implementing a data-structure to improve those queries for every project I'm on.
+`.FirstOrDefault`, `.Where`, `.Single` etc... and implementing data-structures to improve those queries for every project I'm on.
 
 ## Overview
 
@@ -13,13 +13,14 @@ Performance / Operation-Support of the different indices:
 - n: total number of elements
 - m: number of elements in the return set
 
-| Query  | Unique-Index | NonUnique-Index | Range-Index     |
-| ------ | ------------ | --------------- | --------------- |
-| Single | ✔ O(1)      | ⚠ O(1)         | ⚠ O(1)         |
-| Where  | ❌           | ✔ O(m)         | ✔ O(log n + m) |
-| Range  | ❌           | ❌             | ✔ O(log n + m) |
-| < / <= | ❌           | ❌             | ✔ O(log n + m) |
-| > / >= | ❌           | ❌             | ✔ O(log n + m) |
+| Query   | Unique-Index | NonUnique-Index | Range-Index     |
+| ------  | ------------ | --------------- | --------------- |
+| Single  | ✔ O(1)      | ⚠ O(1)         | ⚠ O(1)         |
+| Where   | ❌           | ✔ O(m)         | ✔ O(log n + m) |
+| Range   | ❌           | ❌             | ✔ O(log n + m) |
+| < / <=  | ❌           | ❌             | ✔ O(log n + m) |
+| > / >=  | ❌           | ❌             | ✔ O(log n + m) |
+| OrderBy | ❌           | ❌             | ✔ O(m)         |
 
 ## FAQs
 
@@ -129,9 +130,12 @@ int maxKey = set.Max(x => x.SecondaryKey);
 data = set.MaxBy(x => x.SecondaryKey);
 
 // fast larger or smaller than
+data = set.LessThan(x => x.SecondaryKey, 4);
 
+// fast ordering & paging
+data = set.OrderBy(x => x.SecondaryKey, skip: 10).Take(10); // second page of 10 elements
 ```
-For more samples, checkout the unit tests.
+For more samples, take a look at the unit tests.
 
 ### Computed or compound key
 
