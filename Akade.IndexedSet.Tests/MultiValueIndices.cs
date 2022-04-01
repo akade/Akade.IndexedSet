@@ -81,5 +81,11 @@ public class MultiValueIndices
         _indexedSet.AssertMultipleItems(x => (x.IntProperty, x.StringProperty), expectedElements: new[] { _d, _e });
     }
 
-
+    [TestMethod]
+    public void Removal()
+    {
+        Assert.IsTrue(_indexedSet.Remove(0));
+        Assert.IsFalse(_indexedSet.Remove(0));
+        Assert.IsFalse(_indexedSet.Contains(0));
+    }
 }

@@ -55,7 +55,7 @@ public class BinaryHeapTests
 
 
     [TestMethod]
-    public void querying_by_single_values_returns_correct_position_with_zero_length_when_emptyd()
+    public void querying_by_single_values_returns_correct_position_with_zero_length_when_empty()
     {
         Assert.AreEqual(0..0, _heap.GetRange(2));
     }

@@ -195,4 +195,12 @@ public class RangeIndices
         _ = Assert.ThrowsException<InvalidOperationException>(() => _indexedSet.Min(x => x.IntProperty));
         _ = Assert.ThrowsException<InvalidOperationException>(() => _indexedSet.Max(x => x.IntProperty));
     }
+
+    [TestMethod]
+    public void Removal()
+    {
+        Assert.IsTrue(_indexedSet.Remove(0));
+        Assert.IsFalse(_indexedSet.Remove(0));
+        Assert.IsFalse(_indexedSet.Contains(0));
+    }
 }

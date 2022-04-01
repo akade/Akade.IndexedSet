@@ -79,4 +79,12 @@ public class UniqueIndices
     {
         _indexedSet.Add(new TestData(5, 10, Guid.NewGuid(), "ew"));
     }
+
+    [TestMethod]
+    public void Removal()
+    {
+        Assert.IsTrue(_indexedSet.Remove(0));
+        Assert.IsFalse(_indexedSet.Remove(0));
+        Assert.IsFalse(_indexedSet.Contains(0));
+    }
 }
