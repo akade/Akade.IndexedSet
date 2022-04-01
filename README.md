@@ -21,6 +21,7 @@ Performance / Operation-Support of the different indices:
 | < / <=  | ❌           | ❌             | ✔ O(log n + m) |
 | > / >=  | ❌           | ❌             | ✔ O(log n + m) |
 | OrderBy | ❌           | ❌             | ✔ O(m)         |
+| Max/Min | ❌           | ❌             | ✔ O(1)         |
 
 ## FAQs
 
@@ -51,7 +52,7 @@ var inRange = set.Range(x => x.SecondaryKey, 1, 10) // Uses the range index
 
 ## Features
 This project aims to provide a data structure (*it's not a DB!*) that allows to easily setup fast access on different properties:
-### Unique index (single entity, singkle key)
+### Unique index (single entity, single key)
 Dictionary-based, O(1), access on primary and secondary keys:
 
 ```csharp
@@ -68,7 +69,7 @@ var data = set[1];
 var data = set.Single(x => x.SecondaryKey, 5);
 ```
 
-### Non-unqiue index (multiple entities, single key)
+### Non-unique index (multiple entities, single key)
 Dictionary-based, O(1), access on keys (single value) with multiple values (multiple keys):
 
 ```csharp
@@ -112,7 +113,7 @@ IEnumerable<GraphNode> nodesThatConnectTo1 = set.FullScan().Where(x => x.Connect
 ```
 
 ### Range index
-Binary-heap based O(log(n)) access for range based, smaller than (or equals) or bigger than (or equals) and orderby queries. Also useful to do paging sorted on exactly one property.
+Binary-heap based O(log(n)) access for range based, smaller than (or equals) or bigger than (or equals) and orderby queries. Also useful to do paging sorted on exactly one index.
 
 ```csharp
 var set = IndexedSetBuilder<Data>.Create(a => a.PrimaryKey)
@@ -139,7 +140,7 @@ For more samples, take a look at the unit tests.
 
 ### Computed or compound key
 
-The data structure also allows to use computed or compund keys:
+The data structure also allows to use computed or compound keys:
 
 ```csharp
 var set = IndexedSetBuilder<Data>.Create(a => a.PrimaryKey)
@@ -166,7 +167,7 @@ of .Net 6/C# 10 to provide convention-based naming of the indices:
 
 Reasons
 - Simple and yet effective:
-  - Allows computed, compund, custom values to be indexed...
+  - Allows computed, compound, custom values to be indexed...
 - Performance: No reflection at work and no (runtime) code-gen necessary
 - AOT-friendly
 
