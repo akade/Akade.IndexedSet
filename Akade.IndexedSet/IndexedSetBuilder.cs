@@ -78,6 +78,31 @@ public class IndexedSetBuilder<TPrimaryKey, TElement> where TPrimaryKey : notnul
             throw new ArgumentNullException(nameof(indexName));
         }
 
+        _result.AddIndex(new NonUniqueIndex<TPrimaryKey, TElement, TIndexKey>(keyAccessor, indexName));
+
+        return this;
+    }
+
+    /// <summary>
+    /// Configures the <see cref="IndexedSet{TPrimaryKey, TElement}"/> to have a nonunique index based on a secondary key.
+    /// The secondary key can be any expression that does not change while the element is within the indexed set, even
+    /// tuples or calculated expressions. The name of the index is based on the string representation of the expression
+    /// and passed by the compiler to <paramref name="indexName"/>. The convention is to always use x as a lambda parameter:
+    /// x => (x.Prop1, x.Prop2, x.Prop3). Alternativly, you can also always use the same method from a static class.
+    /// </summary>
+    /// <typeparam name="TIndexKey">The type of the key within the index</typeparam>
+    /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
+    /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="keyAccessor"/> is automatically passed by the compiler.</param>
+    /// <returns>The instance on which this method is called is returned to support the fluent syntax.</returns>
+    public IndexedSetBuilder<TPrimaryKey, TElement> WithIndex<TIndexKey>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        if (indexName is null)
+        {
+            throw new ArgumentNullException(nameof(indexName));
+        }
+
         _result.AddIndex(new MultiValueIndex<TPrimaryKey, TElement, TIndexKey>(keyAccessor, indexName));
 
         return this;

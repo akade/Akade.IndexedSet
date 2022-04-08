@@ -53,13 +53,21 @@ internal static class IndexAssert
         }
     }
 
-    public static void AssertMultipleItemsViaRange<TPrimaryKey, TElement, TIndexKey>(this IndexedSet<TPrimaryKey, TElement> indexedSet, Func<TElement, TIndexKey> indexAccessor, TIndexKey inclusiveStart, TIndexKey exclusiveEnd, [CallerArgumentExpression("indexAccessor")] string? indexName = null, params TElement[] expectedElements)
+    public static void AssertMultipleItemsViaRange<TPrimaryKey, TElement, TIndexKey>
+        (this IndexedSet<TPrimaryKey, TElement> indexedSet,
+        Func<TElement, TIndexKey> indexAccessor,
+        TIndexKey start,
+        TIndexKey end,
+        bool inclusiveStart,
+        bool inclusiveEnd,
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null,
+        params TElement[] expectedElements)
         where TPrimaryKey : notnull
         where TIndexKey : notnull
     {
         Assert.IsNotNull(indexName);
 
-        IEnumerable<TElement> actualElements = indexedSet.Range(indexAccessor, inclusiveStart, exclusiveEnd, indexName);
+        IEnumerable<TElement> actualElements = indexedSet.Range(indexAccessor, start, end, inclusiveStart, inclusiveEnd, indexName);
 
         CollectionAssert.AreEqual(expectedElements.Select(indexAccessor).ToArray(), actualElements.Select(indexAccessor).ToArray());
         CollectionAssert.AreEquivalent(expectedElements, actualElements.ToArray());

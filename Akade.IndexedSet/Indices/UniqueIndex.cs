@@ -8,10 +8,11 @@ internal class UniqueIndex<TPrimaryKey, TElement, TIndexKey> : TypedIndex<TPrima
     where TIndexKey : notnull
 {
     private readonly Dictionary<TIndexKey, TElement> _data = new();
+    private readonly Func<TElement, TIndexKey> _keyAccessor;
 
-    public UniqueIndex(Func<TElement, TIndexKey> keyAccessor, string name) : base(keyAccessor, name)
+    public UniqueIndex(Func<TElement, TIndexKey> keyAccessor, string name) : base(name)
     {
-
+        _keyAccessor = keyAccessor;
     }
 
     public override void Add(TElement value)
@@ -31,11 +32,6 @@ internal class UniqueIndex<TPrimaryKey, TElement, TIndexKey> : TypedIndex<TPrima
     {
         TIndexKey key = _keyAccessor(value);
         _ = _data.Remove(key);
-    }
-
-    internal override IEnumerable<TElement> Range(TIndexKey inclusiveStart, TIndexKey exclusiveStart)
-    {
-        throw new NotSupportedException($"Range queries are not supported on {nameof(MultiValueIndex<TPrimaryKey, TElement, TIndexKey>)}-indices. Use a range index to support this scenario.");
     }
 
     internal override TElement Single(TIndexKey indexKey)

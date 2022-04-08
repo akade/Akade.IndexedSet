@@ -33,28 +33,37 @@ public class RangeIndices
     [TestMethod]
     public void range_query_on_ints_returns_correct_items()
     {
-        _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 3, 25, expectedElements: new[] { _a, _b, _c, _d, _e });
-        _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 8, 12, expectedElements: new[] { _a, _b, _c });
-        _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 11, 14, expectedElements: new[] { _c, _d, _e });
-        _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 12, 14, expectedElements: new[] { _d, _e });
+        _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 3, 25, inclusiveStart: true, inclusiveEnd: false, expectedElements: new[] { _a, _b, _c, _d, _e });
+        _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 8, 12, inclusiveStart: true, inclusiveEnd: false, expectedElements: new[] { _a, _b, _c });
+        _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 11, 14, inclusiveStart: true, inclusiveEnd: false, expectedElements: new[] { _c, _d, _e });
+        _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 12, 14, inclusiveStart: true, inclusiveEnd: false, expectedElements: new[] { _d, _e });
+    }
+
+    [TestMethod]
+    public void range_query_on_ints_correctly_respects_inclusive_or_exclusive_boundaries()
+    {
+        _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 10, 13, inclusiveStart: false, inclusiveEnd: false, expectedElements: new[] { _c });
+        _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 10, 13, inclusiveStart: true, inclusiveEnd: false, expectedElements: new[] { _a, _b, _c });
+        _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 10, 13, inclusiveStart: false, inclusiveEnd: true, expectedElements: new[] { _c, _d, _e });
+        _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 10, 13, inclusiveStart: true, inclusiveEnd: true, expectedElements: new[] { _a, _b, _c, _d, _e });
     }
 
     [TestMethod]
     public void range_query_on_strings_returns_correct_items()
     {
-        _indexedSet.AssertMultipleItemsViaRange(x => x.StringProperty, "A", "F", expectedElements: new[] { _a, _b, _c, _d, _e });
-        _indexedSet.AssertMultipleItemsViaRange(x => x.StringProperty, "A", "D", expectedElements: new[] { _a, _b });
-        _indexedSet.AssertMultipleItemsViaRange(x => x.StringProperty, "D", "Z", expectedElements: new[] { _c, _d, _e });
-        _indexedSet.AssertMultipleItemsViaRange(x => x.StringProperty, "E", "Z", expectedElements: new[] { _c, _d, _e });
+        _indexedSet.AssertMultipleItemsViaRange(x => x.StringProperty, "A", "F", inclusiveStart: true, inclusiveEnd: false, expectedElements: new[] { _a, _b, _c, _d, _e });
+        _indexedSet.AssertMultipleItemsViaRange(x => x.StringProperty, "A", "D", inclusiveStart: true, inclusiveEnd: false, expectedElements: new[] { _a, _b });
+        _indexedSet.AssertMultipleItemsViaRange(x => x.StringProperty, "D", "Z", inclusiveStart: true, inclusiveEnd: false, expectedElements: new[] { _c, _d, _e });
+        _indexedSet.AssertMultipleItemsViaRange(x => x.StringProperty, "E", "Z", inclusiveStart: true, inclusiveEnd: false, expectedElements: new[] { _c, _d, _e });
     }
 
     [TestMethod]
     public void range_query_on_guids_returns_correct_items()
     {
-        _indexedSet.AssertMultipleItemsViaRange(x => x.GuidProperty, GuidGen.Get(0), GuidGen.Get(12), expectedElements: new[] { _a, _b, _c, _d, _e });
-        _indexedSet.AssertMultipleItemsViaRange(x => x.GuidProperty, GuidGen.Get(0), GuidGen.Get(4), expectedElements: new[] { _a, _b, _c });
-        _indexedSet.AssertMultipleItemsViaRange(x => x.GuidProperty, GuidGen.Get(4), GuidGen.Get(8), expectedElements: new[] { _d, _e });
-        _indexedSet.AssertMultipleItemsViaRange(x => x.GuidProperty, GuidGen.Get(5), GuidGen.Get(8), expectedElements: new[] { _d, _e });
+        _indexedSet.AssertMultipleItemsViaRange(x => x.GuidProperty, GuidGen.Get(0), GuidGen.Get(12), inclusiveStart: true, inclusiveEnd: false, expectedElements: new[] { _a, _b, _c, _d, _e });
+        _indexedSet.AssertMultipleItemsViaRange(x => x.GuidProperty, GuidGen.Get(0), GuidGen.Get(4), inclusiveStart: true, inclusiveEnd: false, expectedElements: new[] { _a, _b, _c });
+        _indexedSet.AssertMultipleItemsViaRange(x => x.GuidProperty, GuidGen.Get(4), GuidGen.Get(8), inclusiveStart: true, inclusiveEnd: false, expectedElements: new[] { _d, _e });
+        _indexedSet.AssertMultipleItemsViaRange(x => x.GuidProperty, GuidGen.Get(5), GuidGen.Get(8), inclusiveStart: true, inclusiveEnd: false, expectedElements: new[] { _d, _e });
     }
 
 
@@ -84,13 +93,11 @@ public class RangeIndices
         _indexedSet.AssertMultipleItems(x => x.StringProperty, expectedElements: new[] { _c, _d, _e });
     }
 
-
-
     [TestMethod]
     public void retrieval_via_compound_key_returns_correct_items()
     {
         _indexedSet = new IndexedSetBuilder<int, TestData>(x => x.PrimaryKey)
-            .WithIndex(x => (x.IntProperty, x.StringProperty))
+            .WithRangeIndex(x => (x.IntProperty, x.StringProperty))
             .Build();
 
         _indexedSet.Add(_a);
@@ -105,5 +112,95 @@ public class RangeIndices
         _indexedSet.AssertMultipleItems(x => (x.IntProperty, x.StringProperty), expectedElements: new[] { _d, _e });
     }
 
+    [TestMethod]
+    public void min_and_max_return_correct_key_values()
+    {
+        Assert.AreEqual(10, _indexedSet.Min(x => x.IntProperty));
+        Assert.AreEqual(13, _indexedSet.Max(x => x.IntProperty));
 
+        Assert.AreEqual(GuidGen.Get(1), _indexedSet.Min(x => x.GuidProperty));
+        Assert.AreEqual(GuidGen.Get(5), _indexedSet.Max(x => x.GuidProperty));
+
+        Assert.AreEqual("B", _indexedSet.Min(x => x.StringProperty));
+        Assert.AreEqual("E", _indexedSet.Max(x => x.StringProperty));
+    }
+
+    [TestMethod]
+    public void minby_and_maxby_return_correct_elements()
+    {
+        CollectionAssert.AreEquivalent(new[] { _a, _b }, _indexedSet.MinBy(x => x.IntProperty).ToArray());
+        CollectionAssert.AreEquivalent(new[] { _d, _e }, _indexedSet.MaxBy(x => x.IntProperty).ToArray());
+
+        CollectionAssert.AreEquivalent(new[] { _a }, _indexedSet.MinBy(x => x.GuidProperty).ToArray());
+        CollectionAssert.AreEquivalent(new[] { _d, _e }, _indexedSet.MaxBy(x => x.GuidProperty).ToArray());
+
+        CollectionAssert.AreEquivalent(new[] { _a, }, _indexedSet.MinBy(x => x.StringProperty).ToArray());
+        CollectionAssert.AreEquivalent(new[] { _c, _d, _e }, _indexedSet.MaxBy(x => x.StringProperty).ToArray());
+    }
+
+    [TestMethod]
+    public void LessThan_and_LessThanOrEquals_return_correct_elements()
+    {
+        CollectionAssert.AreEquivalent(new[] { _a, _b }, _indexedSet.LessThan(x => x.IntProperty, 11).ToArray());
+        CollectionAssert.AreEquivalent(new[] { _a, _b, _c }, _indexedSet.LessThanOrEqual(x => x.IntProperty, 11).ToArray());
+    }
+
+    [TestMethod]
+    public void GreaterThan_and_GreaterThanOrEquals_return_correct_elements()
+    {
+        CollectionAssert.AreEquivalent(new[] { _d, _e }, _indexedSet.GreaterThan(x => x.IntProperty, 11).ToArray());
+        CollectionAssert.AreEquivalent(new[] { _c, _d, _e }, _indexedSet.GreaterThanOrEqual(x => x.IntProperty, 11).ToArray());
+    }
+
+    [TestMethod]
+    public void Comparison_queries_return_empty_set_if_out_of_bounds()
+    {
+        Assert.IsFalse(_indexedSet.LessThan(x => x.IntProperty, 5).Any());
+        Assert.IsFalse(_indexedSet.LessThanOrEqual(x => x.IntProperty, 5).Any());
+
+        Assert.IsFalse(_indexedSet.GreaterThan(x => x.IntProperty, 20).Any());
+        Assert.IsFalse(_indexedSet.GreaterThanOrEqual(x => x.IntProperty, 20).Any());
+    }
+
+    [TestMethod]
+    public void All_queries_return_empty_enumerable_for_empty_set()
+    {
+        _indexedSet = new IndexedSetBuilder<int, TestData>(x => x.PrimaryKey)
+           .WithRangeIndex(x => x.IntProperty)
+           .Build();
+
+        Assert.IsFalse(_indexedSet.Where(x => x.IntProperty, 5).Any());
+        Assert.IsFalse(_indexedSet.Range(x => x.IntProperty, 5, 10).Any());
+
+        Assert.IsFalse(_indexedSet.LessThan(x => x.IntProperty, 5).Any());
+        Assert.IsFalse(_indexedSet.LessThanOrEqual(x => x.IntProperty, 5).Any());
+
+        Assert.IsFalse(_indexedSet.GreaterThan(x => x.IntProperty, 5).Any());
+        Assert.IsFalse(_indexedSet.GreaterThanOrEqual(x => x.IntProperty, 5).Any());
+
+        Assert.IsFalse(_indexedSet.MaxBy(x => x.IntProperty).Any());
+        Assert.IsFalse(_indexedSet.MinBy(x => x.IntProperty).Any());
+
+        Assert.IsFalse(_indexedSet.OrderBy(x => x.IntProperty).Any());
+        Assert.IsFalse(_indexedSet.OrderByDescending(x => x.IntProperty).Any());
+    }
+
+    [TestMethod]
+    public void Min_and_max_throws_for_empty_set()
+    {
+        _indexedSet = new IndexedSetBuilder<int, TestData>(x => x.PrimaryKey)
+           .WithRangeIndex(x => x.IntProperty)
+           .Build();
+
+        _ = Assert.ThrowsException<InvalidOperationException>(() => _indexedSet.Min(x => x.IntProperty));
+        _ = Assert.ThrowsException<InvalidOperationException>(() => _indexedSet.Max(x => x.IntProperty));
+    }
+
+    [TestMethod]
+    public void Removal()
+    {
+        Assert.IsTrue(_indexedSet.Remove(0));
+        Assert.IsFalse(_indexedSet.Remove(0));
+        Assert.IsFalse(_indexedSet.Contains(0));
+    }
 }

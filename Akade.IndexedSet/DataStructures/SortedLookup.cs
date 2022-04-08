@@ -53,19 +53,67 @@ internal class SortedLookup<TKey, TValue>
 
     }
 
-    public IEnumerable<TValue> GetValuesInRange(TKey inclusiveStart, TKey exclusiveEnd)
+    public IEnumerable<TValue> GetValuesInRange(TKey start, TKey end, bool inclusiveStart, bool inclusiveEnd)
     {
-        Range range = _sortedKeys.GetRange(inclusiveStart, exclusiveEnd);
+        Range range = _sortedKeys.GetRange(start, end, inclusiveStart, inclusiveEnd);
         return GetValues(range);
     }
 
-    private IEnumerable<TValue> GetValues(Range range)
+    public IEnumerable<TValue> GetValues(Range range)
     {
         (int offset, int length) = range.GetOffsetAndLength(_sortedKeys.Count);
 
         for (int i = 0; i < length; i++)
         {
             yield return _sortedValues[i + offset];
+        }
+    }
+
+    public IEnumerable<TValue> GetMaximumValues()
+    {
+        if (_sortedKeys.Count == 0)
+        {
+            return Enumerable.Empty<TValue>();
+        }
+
+        Range maximumRange = _sortedKeys.GetRange(GetMaximumKey());
+        return GetValues(maximumRange);
+    }
+
+    public IEnumerable<TValue> GetMinimumValues()
+    {
+        if (_sortedKeys.Count == 0)
+        {
+            return Enumerable.Empty<TValue>();
+        }
+
+        Range maximumRange = _sortedKeys.GetRange(GetMinimumKey());
+        return GetValues(maximumRange);
+    }
+
+    public TKey GetMaximumKey()
+    {
+        return _sortedKeys.Count == 0
+            ? throw new InvalidOperationException("Cannot retrieve the maximum value when the set is empty.")
+            : _sortedKeys[^1];
+    }
+
+    public TKey GetMinimumKey()
+    {
+        return _sortedKeys.Count == 0
+           ? throw new InvalidOperationException("Cannot retrieve the minimum value when the set is empty.")
+           : _sortedKeys[0];
+    }
+
+    public int Count => _sortedKeys.Count;
+
+    public IEnumerable<TValue> GetValuesDescending(Range range)
+    {
+        (int offset, int length) = range.GetOffsetAndLength(_sortedKeys.Count);
+
+        for (int i = 1; i <= length; i++)
+        {
+            yield return _sortedValues[_sortedValues.Count - offset - i];
         }
     }
 }
