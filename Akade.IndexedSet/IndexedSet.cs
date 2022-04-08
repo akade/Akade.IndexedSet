@@ -74,7 +74,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     /// Searches for an element via an index.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
-    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexKey">The key within the index.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
@@ -90,10 +90,29 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     }
 
     /// <summary>
+    /// Searches for an element via an index  within "denormalized keys". See <see cref="IndexedSetBuilder{TPrimaryKey, TElement}.WithIndex{TIndexKey}(Func{TElement, IEnumerable{TIndexKey}}, string?)"/>.
+    /// </summary>
+    /// <typeparam name="TIndexKey">The type of the index key</typeparam>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="contains">The key within the index. The convention is to write the parameter name for increased readability i.e. .Single(x => x.Prop, contains: value).</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
+    public TElement Single<TIndexKey>(
+        Func<TElement, IEnumerable<TIndexKey>> indexAccessor,
+        TIndexKey contains,
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        return typedIndex.Single(contains);
+    }
+
+    /// <summary>
     /// Searches for multiple elements via an index. See <see cref="IndexedSetBuilder{TPrimaryKey, TElement}.WithIndex{TIndexKey}(Func{TElement, TIndexKey}, string?)"/>.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
-    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexKey">The key within the index.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
@@ -112,19 +131,19 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     /// Searches for multiple elements via an index within "denormalized keys". See <see cref="IndexedSetBuilder{TPrimaryKey, TElement}.WithIndex{TIndexKey}(Func{TElement, IEnumerable{TIndexKey}}, string?)"/>.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
-    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
-    /// <param name="indexKey">The key within the index.</param>
+    /// <param name="contains">The key within the index. The convention is to write the parameter name for increased readability i.e. .Where(x => x.Prop, contains: value).</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
     public IEnumerable<TElement> Where<TIndexKey>(
         Func<TElement, IEnumerable<TIndexKey>> indexAccessor,
-        TIndexKey indexKey,
+        TIndexKey contains,
         [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
         TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
-        return typedIndex.Where(indexKey);
+        return typedIndex.Where(contains);
     }
 
     /// <summary>
@@ -157,7 +176,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     /// Searches for elements that have keys that are less than the supplied value.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
-    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="value">The key value to compare other keys with.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
@@ -173,7 +192,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     /// Searches for elements that have keys that are less or equal than the supplied value.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
-    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="value">The key value to compare other keys with.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
@@ -189,7 +208,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     /// Searches for elements that have keys that are greator than the supplied value.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
-    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="value">The key value to compare other keys with.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
@@ -205,7 +224,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     /// Searches for elements that have keys that are greator or equal than the supplied value.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
-    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="value">The key value to compare other keys with.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
@@ -221,7 +240,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     /// Searches for the maximum key value within an index.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
-    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
@@ -236,7 +255,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     /// Searches for the minimum key value within an index.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
-    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
@@ -251,7 +270,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     /// Searches for elements that have the maximum key value within an index.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
-    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
@@ -266,7 +285,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     /// Searches for elements that have the minimum key value within an index.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
-    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
@@ -281,7 +300,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     /// Returns the elements in the order defined by the index.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
-    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="skip">Allows to efficiently skip a number of elements. Default is 0</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
@@ -298,7 +317,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
     /// <param name="skip">Allows to efficiently skip a number of elements. Default is 0</param>
-    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identiefer. 
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]

@@ -19,7 +19,7 @@ public class GraphSample
         _graph.Add(new Node(id: 4, connectedTo: ImmutableArray.Create(2, 3, 1)));
 
         // fast variant via index
-        var fastResult = _graph.Where(x => x.ConnectedTo, 4)
+        var fastResult = _graph.Where(x => x.ConnectedTo, contains: 4)
                                .Select(x => x.Id)
                                .ToList();
 

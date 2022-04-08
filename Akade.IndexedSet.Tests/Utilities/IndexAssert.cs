@@ -55,9 +55,9 @@ internal static class IndexAssert
 
     public static void AssertMultipleItemsViaRange<TPrimaryKey, TElement, TIndexKey>
         (this IndexedSet<TPrimaryKey, TElement> indexedSet,
-        Func<TElement, TIndexKey> indexAccessor, 
+        Func<TElement, TIndexKey> indexAccessor,
         TIndexKey start,
-        TIndexKey end, 
+        TIndexKey end,
         bool inclusiveStart,
         bool inclusiveEnd,
         [CallerArgumentExpression("indexAccessor")] string? indexName = null,

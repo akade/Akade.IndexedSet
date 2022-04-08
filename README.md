@@ -15,13 +15,18 @@ Performance / Operation-Support of the different indices:
 
 | Query   | Unique-Index | NonUnique-Index | Range-Index     |
 | ------  | ------------ | --------------- | --------------- |
-| Single  | ✔ O(1)      | ⚠ O(1)         | ⚠ O(1)         |
-| Where   | ❌           | ✔ O(m)         | ✔ O(log n + m) |
-| Range   | ❌           | ❌             | ✔ O(log n + m) |
-| < / <=  | ❌           | ❌             | ✔ O(log n + m) |
-| > / >=  | ❌           | ❌             | ✔ O(log n + m) |
-| OrderBy | ❌           | ❌             | ✔ O(m)         |
-| Max/Min | ❌           | ❌             | ✔ O(1)         |
+| Single  | ⚠ O(1)      | ⚠ O(1)         | ⚠ O(log n)    |
+| Where   | ✔ O(1)       | ✔ O(m)         | ✔ O(log n + m) |
+| Range   | ❌           | ❌             | ✔ O(log n + m)  |
+| < / <=  | ❌           | ❌             | ✔ O(log n + m)  |
+| > / >=  | ❌           | ❌             | ✔ O(log n + m)  |
+| OrderBy | ❌           | ❌             | ✔ O(m)          |
+| Max/Min | ❌           | ❌             | ✔ O(1)          |
+
+✔: Supported
+⚠: Supported but throws if not exactly 1 item was found
+❌: Not-supported
+
 
 ## FAQs
 
@@ -103,10 +108,10 @@ set.Add(new(Id: 2, connectsTo: new[]{ 3 }));
 set.Add(new(Id: 3, connectsTo: new[]{ 1, 2 , 3 }));
 set.Add(new(Id: 4, connectsTo: new[]{ 1, 3 }));
 
-// fast access via secondary key
-// TODO: Should maybe be named contains, even if it is technically the same (or just an alias?)
-IEnumerable<GraphNode> nodesThatConnectTo1 = set.Where(x => x.ConnectsTo, 1); // returns nodes 3 & 4
-IEnumerable<GraphNode> nodesThatConnectTo3 = set.Where(x => x.ConnectsTo, 1); // returns nodes 1 & 2 & 3
+// fast access via denormalized index
+// For readability, it is recommended to write the name for the parameter contains
+IEnumerable<GraphNode> nodesThatConnectTo1 = set.Where(x => x.ConnectsTo, contains: 1); // returns nodes 3 & 4
+IEnumerable<GraphNode> nodesThatConnectTo3 = set.Where(x => x.ConnectsTo, contains: 1); // returns nodes 1 & 2 & 3
 
 // Optimizes a Where(x => x.Contains(...)) query:
 IEnumerable<GraphNode> nodesThatConnectTo1 = set.FullScan().Where(x => x.ConnectsTo.Contains(1)); // returns nodes 3 & 4, but enumerates through the entire set
@@ -175,13 +180,15 @@ Reasons
 **The current implementation requires any keys of any type to never change the value while the instance is within the set**. Hence, in order to update any key you will need to remove the instance, update the keys and add the instance again.
 
 ### Roadmap
-Potential features:
+Potential features (not ordered):
 - Thread-safe version
 - Easier updating of keys
 - Events for changed values
 - More index types (Trie)
 - Tree-based range index for better insertion performance
+- Analyzers to help with best practices
+- Range insertion and corresponding `.ToIndexedSet().WithIndex(x => ...).[...].Build()`
 
 - Benchmarks
 
-If you have any suggestion or found a bug / unexpected behavior, open an issue!
+If you have any suggestion or found a bug / unexpected behavior, open an issue! I will also review and willing to integrate PRs if they fit the project.
