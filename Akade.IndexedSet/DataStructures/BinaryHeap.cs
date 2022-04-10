@@ -45,6 +45,11 @@ internal class BinaryHeap<TValue> : ICollection<TValue>
         return _data.BinarySearch(value);
     }
 
+    public int EnsureCapacity(int capacity)
+    {
+        return _data.EnsureCapacity(capacity);
+    }
+
     public bool Contains(TValue value)
     {
         return IndexOf(value) >= 0;

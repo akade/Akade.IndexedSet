@@ -17,17 +17,12 @@ public class RangeIndices
     [TestInitialize]
     public void Init()
     {
-        _indexedSet = new IndexedSetBuilder<int, TestData>(x => x.PrimaryKey)
-            .WithRangeIndex(x => x.IntProperty)
-            .WithRangeIndex(x => x.GuidProperty)
-            .WithRangeIndex(x => x.StringProperty)
-            .Build();
-
-        _indexedSet.Add(_a);
-        _indexedSet.Add(_b);
-        _indexedSet.Add(_c);
-        _indexedSet.Add(_d);
-        _indexedSet.Add(_e);
+        TestData[] data = new[] {_a, _b, _c, _d, _e};
+        _indexedSet = data.ToIndexedSet(x => x.PrimaryKey)
+                          .WithRangeIndex(x => x.IntProperty)
+                          .WithRangeIndex(x => x.GuidProperty)
+                          .WithRangeIndex(x => x.StringProperty)
+                          .Build();
     }
 
     [TestMethod]
@@ -96,15 +91,10 @@ public class RangeIndices
     [TestMethod]
     public void retrieval_via_compound_key_returns_correct_items()
     {
-        _indexedSet = new IndexedSetBuilder<int, TestData>(x => x.PrimaryKey)
-            .WithRangeIndex(x => (x.IntProperty, x.StringProperty))
-            .Build();
-
-        _indexedSet.Add(_a);
-        _indexedSet.Add(_b);
-        _indexedSet.Add(_c);
-        _indexedSet.Add(_d);
-        _indexedSet.Add(_e);
+        TestData[] data = new[] {_a, _b, _c, _d, _e};
+        _indexedSet = data.ToIndexedSet(x => x.PrimaryKey)
+                          .WithRangeIndex(x => (x.IntProperty, x.StringProperty))
+                          .Build();
 
         _indexedSet.AssertSingleItem(x => (x.IntProperty, x.StringProperty), _a);
         _indexedSet.AssertSingleItem(x => (x.IntProperty, x.StringProperty), _b);
@@ -165,9 +155,9 @@ public class RangeIndices
     [TestMethod]
     public void All_queries_return_empty_enumerable_for_empty_set()
     {
-        _indexedSet = new IndexedSetBuilder<int, TestData>(x => x.PrimaryKey)
-           .WithRangeIndex(x => x.IntProperty)
-           .Build();
+        _indexedSet = IndexedSetBuilder<TestData>.Create(x => x.PrimaryKey)
+                                                 .WithRangeIndex(x => x.IntProperty)
+                                                 .Build();
 
         Assert.IsFalse(_indexedSet.Where(x => x.IntProperty, 5).Any());
         Assert.IsFalse(_indexedSet.Range(x => x.IntProperty, 5, 10).Any());
@@ -188,9 +178,9 @@ public class RangeIndices
     [TestMethod]
     public void Min_and_max_throws_for_empty_set()
     {
-        _indexedSet = new IndexedSetBuilder<int, TestData>(x => x.PrimaryKey)
-           .WithRangeIndex(x => x.IntProperty)
-           .Build();
+        _indexedSet = IndexedSetBuilder<TestData>.Create(x => x.PrimaryKey)
+                                                 .WithRangeIndex(x => x.IntProperty)
+                                                 .Build();
 
         _ = Assert.ThrowsException<InvalidOperationException>(() => _indexedSet.Min(x => x.IntProperty));
         _ = Assert.ThrowsException<InvalidOperationException>(() => _indexedSet.Max(x => x.IntProperty));

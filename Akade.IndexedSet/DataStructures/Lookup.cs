@@ -54,4 +54,9 @@ internal class Lookup<TKey, TValue>
     }
 
     public int Count { get; private set; }
+
+    public int EnsureCapacity(int capacity)
+    {
+        return _values.EnsureCapacity(capacity);
+    }
 }

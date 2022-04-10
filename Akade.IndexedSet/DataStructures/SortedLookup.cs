@@ -26,6 +26,20 @@ internal class SortedLookup<TKey, TValue>
         _sortedValues.Insert(targetIndex, value);
     }
 
+    public void AddRange(IEnumerable<TValue> elementsToAdd)
+    {
+        if (elementsToAdd.TryGetNonEnumeratedCount(out int count))
+        {
+            _ = _sortedValues.EnsureCapacity(_sortedValues.Count + count);
+            _ = _sortedKeys.EnsureCapacity(_sortedKeys.Count + count);
+        }
+
+        foreach (TValue element in elementsToAdd.OrderBy(_keyFunction))
+        {
+            Add(element);
+        }
+    }
+
     public bool Remove(TValue value)
     {
         TKey key = _keyFunction(value);

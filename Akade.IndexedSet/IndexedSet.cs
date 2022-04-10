@@ -36,7 +36,8 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     public int Count => _data.Count;
 
     /// <summary>
-    /// Adds a new item to the set.
+    /// Adds a new item to the set. Use <see cref="AddRange(IEnumerable{TElement})"/> if you
+    /// want to add multiple items at once.
     /// </summary>
     /// <param name="element">The new element to add</param>
     public void Add(TElement element)
@@ -47,6 +48,28 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
         foreach (Index<TPrimaryKey, TElement> index in _indices.Values)
         {
             index.Add(element);
+        }
+    }
+
+    /// <summary>
+    /// Adds multiple elements at once. In contrast to <see cref="Add(TElement)"/>, this method
+    /// allows indices to perform the insertion in a preferable way, for example, by ordering
+    /// the elements prior to insertion.
+    /// </summary>
+    /// <param name="elements">THe elements to insert</param>
+    public void AddRange(IEnumerable<TElement> elements)
+    {
+        List<TElement> elementsToAdd = elements.TryGetNonEnumeratedCount(out int count) ? new(count) : new();
+
+        foreach(TElement element in elements)
+        {
+            _data.Add(_primaryKeyAccessor(element), element);
+            elementsToAdd.Add(element);
+        }
+
+        foreach (Index<TPrimaryKey, TElement> index in _indices.Values)
+        {
+            index.AddRange(elementsToAdd);
         }
     }
 
