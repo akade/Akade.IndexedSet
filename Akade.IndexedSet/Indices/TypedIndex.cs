@@ -3,8 +3,7 @@
 /// <summary>
 /// Fully-generic index including on the index key
 /// </summary>
-internal abstract class TypedIndex<TPrimaryKey, TElement, TIndexKey> : Index<TPrimaryKey, TElement>
-    where TPrimaryKey : notnull
+internal abstract class TypedIndex<TElement, TIndexKey> : Index<TElement>
     where TIndexKey : notnull
 {
     protected TypedIndex(string name) : base(name)
@@ -70,4 +69,6 @@ internal abstract class TypedIndex<TPrimaryKey, TElement, TIndexKey> : Index<TPr
     {
         throw new NotSupportedException($"OrderByDescending queries are not supported on {GetType().Name}-indices. Use a range index to support this scenario.");
     }
+
+    internal abstract bool TryGetSingle(TIndexKey indexKey, out TElement? element);
 }

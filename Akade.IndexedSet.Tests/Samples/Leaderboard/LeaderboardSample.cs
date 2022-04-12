@@ -21,7 +21,7 @@ public class LeaderboardSample
             int daysInPast = i / 24;
             int hour = i % 24;
 
-            _leaderboard.Add(new LeaderboardEntry(i, i * i, _now.AddDays(-daysInPast).AddHours(hour)));
+            _ = _leaderboard.Add(new LeaderboardEntry(i, i * i, _now.AddDays(-daysInPast).AddHours(hour)));
         }
     }
 

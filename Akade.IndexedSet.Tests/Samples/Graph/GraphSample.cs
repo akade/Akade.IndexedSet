@@ -13,10 +13,10 @@ public class GraphSample
                                                               .WithIndex<int>(x => x.ConnectedTo) // for special collections such as immutable arrays: make sure the correct overload has been selected by providing generic arguments
                                                               .Build();
 
-        _graph.Add(new Node(id: 1, connectedTo: ImmutableArray.Create(2, 3, 4)));
-        _graph.Add(new Node(id: 2, connectedTo: ImmutableArray.Create(1, 2)));
-        _graph.Add(new Node(id: 3, connectedTo: ImmutableArray.Create(2, 4)));
-        _graph.Add(new Node(id: 4, connectedTo: ImmutableArray.Create(2, 3, 1)));
+        _ = _graph.Add(new Node(id: 1, connectedTo: ImmutableArray.Create(2, 3, 4)));
+        _ = _graph.Add(new Node(id: 2, connectedTo: ImmutableArray.Create(1, 2)));
+        _ = _graph.Add(new Node(id: 3, connectedTo: ImmutableArray.Create(2, 4)));
+        _ = _graph.Add(new Node(id: 4, connectedTo: ImmutableArray.Create(2, 3, 1)));
 
         // fast variant via index
         var fastResult = _graph.Where(x => x.ConnectedTo, contains: 4)

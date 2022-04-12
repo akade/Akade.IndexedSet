@@ -3,8 +3,7 @@
 /// <summary>
 /// Non-generic on the index key to have a strongly typed base class for an index
 /// </summary>
-internal abstract class Index<TPrimaryKey, TElement>
-    where TPrimaryKey : notnull
+internal abstract class Index<TElement>
 {
     public string Name { get; }
 
@@ -18,6 +17,8 @@ internal abstract class Index<TPrimaryKey, TElement>
     public virtual void AddRange(IEnumerable<TElement> elementsToAdd)
     {
         foreach (TElement element in elementsToAdd)
+        {
             Add(element);
+        }
     }
 }

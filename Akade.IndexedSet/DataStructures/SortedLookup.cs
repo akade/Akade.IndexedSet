@@ -64,7 +64,12 @@ internal class SortedLookup<TKey, TValue>
     {
         Range range = _sortedKeys.GetRange(key);
         return GetValues(range);
+    }
 
+    public int CountValues(TKey key)
+    {
+        Range range = _sortedKeys.GetRange(key);
+        return range.GetOffsetAndLength(_sortedKeys.Count).Length;
     }
 
     public IEnumerable<TValue> GetValuesInRange(TKey start, TKey end, bool inclusiveStart, bool inclusiveEnd)

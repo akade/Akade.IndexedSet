@@ -5,30 +5,22 @@ using System.Runtime.CompilerServices;
 namespace Akade.IndexedSet;
 
 /// <summary>
-/// Indexable data structure that provides O(1) access to elements via the primary key and allows
-/// to additionaly index other properties. Use <see cref="IndexedSetBuilder{TElement}.Create{TPrimaryKey}(Func{TElement, TPrimaryKey})" /> to
+/// Indexable data structure that allows to add different properties. Use <see cref="IndexedSetBuilder" /> and <see cref="IndexedSetBuilder{TElement}" /> to
 /// create an instance. The set is not thread-safe.
 /// </summary>
-public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
+public class IndexedSet<TElement>
 {
-    private readonly Dictionary<TPrimaryKey, TElement> _data = new();
-    private readonly Dictionary<string, Index<TPrimaryKey, TElement>> _indices = new();
-    private readonly Func<TElement, TPrimaryKey> _primaryKeyAccessor;
+    private readonly HashSet<TElement> _data = new();
+    private readonly Dictionary<string, Index<TElement>> _indices = new();
 
     /// <summary>
-    /// Creates a new, empty instance of an <see cref="IndexedSet{TPrimaryKey, TElement}"/>. 
+    /// Creates a new, empty instance of an <see cref="IndexedSet{TElement}"/>. 
     /// </summary>
-    /// <param name="primaryKeyAccessor">Returns the primary key for a given item. The primary key should not be changed while the element is within the set.</param>
-    public IndexedSet(Func<TElement, TPrimaryKey> primaryKeyAccessor)
+    protected internal IndexedSet()
     {
-        _primaryKeyAccessor = primaryKeyAccessor;
     }
 
-    /// <summary>
-    /// Returns the element associated to the given primary key.
-    /// Short-hand for <see cref="Single(TPrimaryKey)"/>.
-    /// </summary>
-    public TElement this[TPrimaryKey key] => Single(key);
+
 
     /// <summary>
     /// Returns the number of elements currently within the set.
@@ -40,15 +32,19 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     /// want to add multiple items at once.
     /// </summary>
     /// <param name="element">The new element to add</param>
-    public void Add(TElement element)
+    public bool Add(TElement element)
     {
-        TPrimaryKey key = _primaryKeyAccessor(element);
-        _data.Add(key, element);
+        if (!_data.Add(element))
+        {
+            return false;
+        }
 
-        foreach (Index<TPrimaryKey, TElement> index in _indices.Values)
+        foreach (Index<TElement> index in _indices.Values)
         {
             index.Add(element);
         }
+
+        return true;
     }
 
     /// <summary>
@@ -56,21 +52,36 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     /// allows indices to perform the insertion in a preferable way, for example, by ordering
     /// the elements prior to insertion.
     /// </summary>
-    /// <param name="elements">THe elements to insert</param>
-    public void AddRange(IEnumerable<TElement> elements)
+    /// <param name="elements">The elements to insert</param>
+    /// <returns>Returns the number of inserted elements</returns>
+    public int AddRange(IEnumerable<TElement> elements)
     {
-        List<TElement> elementsToAdd = elements.TryGetNonEnumeratedCount(out int count) ? new(count) : new();
+        List<TElement> elementsToAdd;
 
-        foreach(TElement element in elements)
+        if (elements.TryGetNonEnumeratedCount(out int count))
         {
-            _data.Add(_primaryKeyAccessor(element), element);
-            elementsToAdd.Add(element);
+            elementsToAdd = new(count);
+            _ = _data.EnsureCapacity(_data.Count + count);
+        }
+        else
+        {
+            elementsToAdd = new();
         }
 
-        foreach (Index<TPrimaryKey, TElement> index in _indices.Values)
+        foreach (TElement element in elements)
+        {
+            if (_data.Add(element))
+            {
+                elementsToAdd.Add(element);
+            }
+        }
+
+        foreach (Index<TElement> index in _indices.Values)
         {
             index.AddRange(elementsToAdd);
         }
+
+        return elementsToAdd.Count;
     }
 
     /// <summary>
@@ -80,17 +91,37 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     /// <returns>True if an element was removed otherwise, false.</returns>
     public bool Remove(TElement element)
     {
-        TPrimaryKey key = _primaryKeyAccessor(element);
-        return Remove(key);
+        if (!_data.Remove(element))
+        {
+            return false;
+        }
+
+        foreach (Index<TElement> index in _indices.Values)
+        {
+            index.Remove(element);
+        }
+        return true;
     }
 
     /// <summary>
-    /// Returns the element associated to the given primary key.
+    /// Searches for an element via an index.
     /// </summary>
-    /// <param name="key">The primary key to obtain the item for</param>
-    public TElement Single(TPrimaryKey key)
+    /// <typeparam name="TIndexKey">The type of the index key</typeparam>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="indexKey">The key within the index.</param>
+    /// <param name="element">The element if found, otherwise null.</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
+    public bool TryGetSingle<TIndexKey>(
+        Func<TElement, TIndexKey> indexAccessor,
+        TIndexKey indexKey,
+        [NotNullWhen(true)] out TElement? element,
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        where TIndexKey : notnull
     {
-        return _data[key];
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        return typedIndex.TryGetSingle(indexKey, out element);
     }
 
     /// <summary>
@@ -108,7 +139,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
         [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
         return typedIndex.Single(indexKey);
     }
 
@@ -127,7 +158,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
         [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
         return typedIndex.Single(contains);
     }
 
@@ -146,7 +177,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
         [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
         return typedIndex.Where(indexKey);
     }
 
@@ -165,7 +196,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
         [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
         return typedIndex.Where(contains);
     }
 
@@ -191,7 +222,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
         [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
         return typedIndex.Range(start, end, inclusiveStart, inclusiveEnd);
     }
 
@@ -207,7 +238,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     public IEnumerable<TElement> LessThan<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
         return typedIndex.LessThan(value);
     }
 
@@ -223,7 +254,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     public IEnumerable<TElement> LessThanOrEqual<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
         return typedIndex.LessThanOrEqual(value);
     }
 
@@ -239,7 +270,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     public IEnumerable<TElement> GreaterThan<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
         return typedIndex.GreaterThan(value);
     }
 
@@ -255,7 +286,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     public IEnumerable<TElement> GreaterThanOrEqual<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
         return typedIndex.GreaterThanOrEqual(value);
     }
 
@@ -270,7 +301,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     public TIndexKey Max<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
         return typedIndex.Max();
     }
 
@@ -285,7 +316,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     public TIndexKey Min<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
         return typedIndex.Min();
     }
 
@@ -300,7 +331,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     public IEnumerable<TElement> MaxBy<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
         return typedIndex.MaxBy();
     }
 
@@ -315,7 +346,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     public IEnumerable<TElement> MinBy<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
         return typedIndex.MinBy();
     }
 
@@ -331,7 +362,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     public IEnumerable<TElement> OrderBy<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, int skip = 0, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
         return typedIndex.OrderBy(skip);
     }
 
@@ -347,7 +378,7 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     public IEnumerable<TElement> OrderByDescending<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, int skip = 0, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        TypedIndex<TPrimaryKey, TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
         return typedIndex.OrderByDescending(skip);
     }
 
@@ -356,12 +387,10 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
     /// </summary>
     public IEnumerable<TElement> FullScan()
     {
-        return _data.Values;
+        return _data;
     }
 
-
-
-    private TypedIndex<TPrimaryKey, TElement, TIndexKey> GetIndex<TIndexKey>(string? indexName)
+    private TypedIndex<TElement, TIndexKey> GetIndex<TIndexKey>(string? indexName)
         where TIndexKey : notnull
     {
         if (indexName is null)
@@ -369,56 +398,24 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
             throw new ArgumentNullException(nameof(indexName));
         }
 
-        if (!_indices.TryGetValue(indexName, out Index<TPrimaryKey, TElement>? index))
+        if (!_indices.TryGetValue(indexName, out Index<TElement>? index))
         {
             throw new IndexNotFoundException(indexName);
         }
 
-        var typedIndex = (TypedIndex<TPrimaryKey, TElement, TIndexKey>)index;
+        var typedIndex = (TypedIndex<TElement, TIndexKey>)index;
         return typedIndex;
     }
 
     /// <summary>
-    /// Attempts to remove an item with the given primary key and returns true, if one was found and removed. Otherwise, false.
-    /// </summary>
-    public bool Remove(TPrimaryKey key)
-    {
-        if (_data.TryGetValue(key, out TElement? element))
-        {
-            _ = _data.Remove(key);
-            foreach (Index<TPrimaryKey, TElement> index in _indices.Values)
-            {
-                index.Remove(element);
-            }
-
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    /// <summary>
-    /// Returns true if the element is present in the current set, otherwise, false. Note: This is equivalent to
-    /// calling <see cref="Contains(TPrimaryKey)"/> with the primary key and does not perform
-    /// an equality check on <paramref name="element"/>!
+    /// Returns true if the element is present in the current set, otherwise, false.
     /// </summary>
     public bool Contains(TElement element)
     {
-        TPrimaryKey key = _primaryKeyAccessor(element);
-        return Contains(key);
+        return _data.Contains(element);
     }
 
-    /// <summary>
-    /// Returns true if an element with the given primary key is present in the current set, otherwise, false.
-    /// </summary>
-    public bool Contains(TPrimaryKey key)
-    {
-        return _data.ContainsKey(key);
-    }
-
-    internal void AddIndex(Index<TPrimaryKey, TElement> index)
+    internal void AddIndex(Index<TElement> index)
     {
         ThrowIfNonEmpty();
         _indices.Add(index.Name, index);
@@ -430,5 +427,62 @@ public class IndexedSet<TPrimaryKey, TElement> where TPrimaryKey : notnull
         {
             throw new InvalidOperationException("The operation is not allowed if the set is not empty.");
         }
+    }
+}
+
+
+/// <summary>
+/// Additionaly provides convienience access to a "primary key" unique index.
+/// Functionally the same as manually adding a unique index on the primary key property.
+/// </summary>
+public class IndexedSet<TPrimaryKey, TElement> : IndexedSet<TElement>
+    where TPrimaryKey : notnull
+{
+    private readonly Func<TElement, TPrimaryKey> _primaryKeyAccessor;
+    private readonly string _primaryKeyIndexName;
+
+    /// <summary>
+    /// Creates a new, empty instance of an <see cref="IndexedSet{TPrimaryKey, TElement}"/>. 
+    /// </summary>
+    /// <param name="primaryKeyAccessor">Returns the primary key for a given item. The primary key should not be changed while the element is within the set. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
+    /// Is passed to <paramref name="primaryKeyIndexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="primaryKeyIndexName">The name for the primary index. Usually, you should not specify this as the expression in <paramref name="primaryKeyIndexName"/> is automatically passed by the compiler.</param>
+    protected internal IndexedSet(Func<TElement, TPrimaryKey> primaryKeyAccessor, [CallerArgumentExpression("primaryKeyAccessor")] string primaryKeyIndexName = "")
+    {
+        _primaryKeyAccessor = primaryKeyAccessor;
+        _primaryKeyIndexName = primaryKeyIndexName;
+
+        AddIndex(new UniqueIndex<TElement, TPrimaryKey>(_primaryKeyAccessor, primaryKeyIndexName));
+    }
+
+    /// <summary>
+    /// Returns the element associated to the given primary key.
+    /// Short-hand for <see cref="Single(TPrimaryKey)"/>.
+    /// </summary>
+    public TElement this[TPrimaryKey key] => Single(key);
+
+    /// <summary>
+    /// Attempts to remove an item with the given primary key and returns true, if one was found and removed. Otherwise, false.
+    /// </summary>
+    public bool Remove(TPrimaryKey key)
+    {
+        return TryGetSingle(_primaryKeyAccessor, key, out TElement? result, _primaryKeyIndexName) && Remove(result);
+    }
+
+    /// <summary>
+    /// Returns the element associated to the given primary key.
+    /// </summary>
+    /// <param name="key">The primary key to obtain the item for</param>
+    public TElement Single(TPrimaryKey key)
+    {
+        return Single(_primaryKeyAccessor, key, _primaryKeyIndexName);
+    }
+
+    /// <summary>
+    /// Returns true if an element with the given primary key is present in the current set, otherwise, false.
+    /// </summary>
+    public bool Contains(TPrimaryKey key)
+    {
+        return Where(_primaryKeyAccessor, key, _primaryKeyIndexName).Any();
     }
 }

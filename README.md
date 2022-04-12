@@ -188,7 +188,7 @@ Potential features (not ordered):
 - [ ] Tree-based range index for better insertion performance
 - [ ] Analyzers to help with best practices
 - [x] Range insertion and corresponding `.ToIndexedSet().WithIndex(x => ...).[...].Build()`
-- [ ] Refactoring to allow a primarykey-less set: this is an artifical restriction that is not necessary
+- [x] Refactoring to allow a primarykey-less set: this was an artifical restriction that is not necessary
 - [ ] Aggregates (i.e. sum or average: interface based on state & add/removal state update functions)
 - [ ] Benchmarks
 
