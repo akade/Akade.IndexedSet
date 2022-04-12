@@ -4,18 +4,43 @@ using System.Runtime.CompilerServices;
 namespace Akade.IndexedSet;
 
 /// <summary>
+/// Helper class to support type inference for element and primary key type for <see cref="IndexedSetBuilder{TPrimaryKey, TElement}"/>
+/// </summary>
+public static class IndexedSetBuilder
+{
+    /// <summary>
+    /// Creates a new builder instance with the given initial content
+    /// </summary>
+    public static IndexedSetBuilder<TPrimaryKey, TElement> Create<TPrimaryKey, TElement>(IEnumerable<TElement> initialContent, Func<TElement, TPrimaryKey> primaryKeyAccessor)
+        where TPrimaryKey : notnull
+    {
+        return new IndexedSetBuilder<TPrimaryKey, TElement>(primaryKeyAccessor, initialContent);
+    }
+
+    /// <summary>
+    /// Creates a new builder instance with the given initial content
+    /// </summary>
+    public static IndexedSetBuilder<TPrimaryKey, TElement> ToIndexedSet<TPrimaryKey, TElement>(this IEnumerable<TElement> initialContent, Func<TElement, TPrimaryKey> primaryKeyAccessor)
+        where TPrimaryKey : notnull
+    {
+        return new IndexedSetBuilder<TPrimaryKey, TElement>(primaryKeyAccessor, initialContent);
+    }
+}
+
+/// <summary>
 /// Helper class to support type inference for the primary key type for <see cref="IndexedSetBuilder{TPrimaryKey, TElement}"/>
 /// </summary>
 public static class IndexedSetBuilder<TElement>
 {
     /// <summary>
-    /// Creates a new builder instance
+    /// Creates a new builder instance. 
+    /// Use <see cref="IndexedSetBuilder.Create{TPrimaryKey, TElement}(IEnumerable{TElement}, Func{TElement, TPrimaryKey})" /> if you
+    /// want to include initial content
     /// </summary>
-    /// <param name="primaryKeyAccessor"></param>
     public static IndexedSetBuilder<TPrimaryKey, TElement> Create<TPrimaryKey>(Func<TElement, TPrimaryKey> primaryKeyAccessor)
         where TPrimaryKey : notnull
     {
-        return new IndexedSetBuilder<TPrimaryKey, TElement>(primaryKeyAccessor);
+        return new IndexedSetBuilder<TPrimaryKey, TElement>(primaryKeyAccessor, null);
     }
 }
 
@@ -26,11 +51,12 @@ public static class IndexedSetBuilder<TElement>
 public class IndexedSetBuilder<TPrimaryKey, TElement> where TPrimaryKey : notnull
 {
     private readonly IndexedSet<TPrimaryKey, TElement> _result;
+    private readonly IEnumerable<TElement>? _initialContent;
 
-
-    internal IndexedSetBuilder(Func<TElement, TPrimaryKey> primaryKeyAccessor)
+    internal IndexedSetBuilder(Func<TElement, TPrimaryKey> primaryKeyAccessor, IEnumerable<TElement>? initialContent)
     {
         _result = new(primaryKeyAccessor);
+        _initialContent = initialContent;
     }
 
     /// <summary>
@@ -138,6 +164,11 @@ public class IndexedSetBuilder<TPrimaryKey, TElement> where TPrimaryKey : notnul
     /// </summary>
     public IndexedSet<TPrimaryKey, TElement> Build()
     {
+        if(_initialContent is not null)
+        {
+            _result.AddRange(_initialContent);
+        }
+
         return _result;
     }
 }

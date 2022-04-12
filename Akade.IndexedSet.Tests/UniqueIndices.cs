@@ -15,15 +15,12 @@ public class UniqueIndices
     [TestInitialize]
     public void Init()
     {
-        _indexedSet = new IndexedSetBuilder<int, TestData>(x => x.PrimaryKey)
-            .WithUniqueIndex(x => x.IntProperty)
-            .WithUniqueIndex(x => x.GuidProperty)
-            .WithUniqueIndex(x => x.StringProperty)
-            .Build();
-
-        _indexedSet.Add(_a);
-        _indexedSet.Add(_b);
-        _indexedSet.Add(_c);
+        TestData[] data = new[] { _a, _b, _c };
+        _indexedSet = data.ToIndexedSet(x => x.PrimaryKey)
+                          .WithUniqueIndex(x => x.IntProperty)
+                          .WithUniqueIndex(x => x.GuidProperty)
+                          .WithUniqueIndex(x => x.StringProperty)
+                          .Build();
     }
 
     [TestMethod]
@@ -53,13 +50,10 @@ public class UniqueIndices
     [TestMethod]
     public void retrieval_via_compound_key_returns_correct_items()
     {
-        _indexedSet = new IndexedSetBuilder<int, TestData>(x => x.PrimaryKey)
-            .WithUniqueIndex(x => (x.IntProperty, x.StringProperty))
-            .Build();
-
-        _indexedSet.Add(_a);
-        _indexedSet.Add(_b);
-        _indexedSet.Add(_c);
+        TestData[] data = new[] { _a, _b, _c };
+        _indexedSet = data.ToIndexedSet(x => x.PrimaryKey)
+                          .WithUniqueIndex(x => (x.IntProperty, x.StringProperty))
+                          .Build();
 
         _indexedSet.AssertSingleItem(x => (x.IntProperty, x.StringProperty), _a);
         _indexedSet.AssertSingleItem(x => (x.IntProperty, x.StringProperty), _b);

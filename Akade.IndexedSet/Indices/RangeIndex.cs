@@ -21,6 +21,11 @@ internal class RangeIndex<TPrimaryKey, TElement, TIndexKey> : TypedIndex<TPrimar
         _lookup.Add(value);
     }
 
+    public override void AddRange(IEnumerable<TElement> elementsToAdd)
+    {
+        _lookup.AddRange(elementsToAdd);
+    }
+
     public override void Remove(TElement value)
     {
         _ = _lookup.Remove(value);

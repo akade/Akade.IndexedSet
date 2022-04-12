@@ -22,6 +22,14 @@ internal class MultiValueIndex<TPrimaryKey, TElement, TIndexKey> : TypedIndex<TP
             _ = _data.Add(key, value);
     }
 
+    public override void AddRange(IEnumerable<TElement> elementsToAdd)
+    {
+        if (elementsToAdd.TryGetNonEnumeratedCount(out int count))
+            _ = _data.EnsureCapacity(_data.Count + count);
+
+        base.AddRange(elementsToAdd);
+    }
+
     public override void Remove(TElement value)
     {
         foreach (TIndexKey key in _keyAccessor(value))

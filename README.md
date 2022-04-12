@@ -181,14 +181,15 @@ Reasons
 
 ### Roadmap
 Potential features (not ordered):
-- Thread-safe version
-- Easier updating of keys
-- Events for changed values
-- More index types (Trie)
-- Tree-based range index for better insertion performance
-- Analyzers to help with best practices
-- Range insertion and corresponding `.ToIndexedSet().WithIndex(x => ...).[...].Build()`
-
-- Benchmarks
+- [ ] Thread-safe version
+- [ ] Easier updating of keys
+- [ ] Events for changed values
+- [ ] More index types (Trie)
+- [ ] Tree-based range index for better insertion performance
+- [ ] Analyzers to help with best practices
+- [x] Range insertion and corresponding `.ToIndexedSet().WithIndex(x => ...).[...].Build()`
+- [ ] Refactoring to allow a primarykey-less set: this is an artifical restriction that is not necessary
+- [ ] Aggregates (i.e. sum or average: interface based on state & add/removal state update functions)
+- [ ] Benchmarks
 
 If you have any suggestion or found a bug / unexpected behavior, open an issue! I will also review and willing to integrate PRs if they fit the project.

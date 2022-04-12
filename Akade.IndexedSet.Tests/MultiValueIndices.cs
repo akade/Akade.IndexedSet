@@ -15,14 +15,9 @@ public class MultiValueIndices
     [TestInitialize]
     public void Init()
     {
-        _indexedSet = IndexedSetBuilder<DenormalizedTestData>.Create(x => x.PrimaryKey)
-            .WithIndex(x => x.IntList)
-            .Build();
-
-        _indexedSet.Add(_a);
-        _indexedSet.Add(_b);
-        _indexedSet.Add(_c);
-        _indexedSet.Add(_d);
+        _indexedSet = new[] { _a, _b, _c, _d }.ToIndexedSet(x => x.PrimaryKey)
+                                              .WithIndex(x => x.IntList)
+                                              .Build();
     }
 
     [TestMethod]

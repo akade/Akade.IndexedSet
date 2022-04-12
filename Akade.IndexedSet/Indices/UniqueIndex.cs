@@ -28,6 +28,14 @@ internal class UniqueIndex<TPrimaryKey, TElement, TIndexKey> : TypedIndex<TPrima
         }
     }
 
+    public override void AddRange(IEnumerable<TElement> elementsToAdd)
+    {
+        if (elementsToAdd.TryGetNonEnumeratedCount(out int count))
+            _ = _data.EnsureCapacity(_data.Count + count);
+
+        base.AddRange(elementsToAdd);
+    }
+
     public override void Remove(TElement value)
     {
         TIndexKey key = _keyAccessor(value);

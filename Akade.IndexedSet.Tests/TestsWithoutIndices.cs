@@ -14,10 +14,8 @@ public class TestsWithoutIndices
     [TestInitialize]
     public void Init()
     {
-        _indexedSet = new IndexedSetBuilder<int, TestData>(x => x.PrimaryKey)
-            .Build();
-
-
+        _indexedSet = IndexedSetBuilder<TestData>.Create(x => x.PrimaryKey)
+                                                 .Build();
     }
 
     [TestMethod]

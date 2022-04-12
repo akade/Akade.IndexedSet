@@ -17,17 +17,12 @@ public class NonUniqueIndices
     [TestInitialize]
     public void Init()
     {
-        _indexedSet = IndexedSetBuilder<TestData>.Create(x => x.PrimaryKey)
-            .WithIndex(x => x.IntProperty)
-            .WithIndex(x => x.GuidProperty)
-            .WithIndex(x => x.StringProperty)
-            .Build();
-
-        _indexedSet.Add(_a);
-        _indexedSet.Add(_b);
-        _indexedSet.Add(_c);
-        _indexedSet.Add(_d);
-        _indexedSet.Add(_e);
+        TestData[] data = new[] {_a, _b, _c, _d, _e};
+        _indexedSet = data.ToIndexedSet(x => x.PrimaryKey)
+                          .WithIndex(x => x.IntProperty)
+                          .WithIndex(x => x.GuidProperty)
+                          .WithIndex(x => x.StringProperty)
+                          .Build();
     }
 
     [TestMethod]
@@ -65,15 +60,10 @@ public class NonUniqueIndices
     [TestMethod]
     public void retrieval_via_compound_key_returns_correct_items()
     {
-        _indexedSet = new IndexedSetBuilder<int, TestData>(x => x.PrimaryKey)
-            .WithIndex(x => (x.IntProperty, x.StringProperty))
-            .Build();
-
-        _indexedSet.Add(_a);
-        _indexedSet.Add(_b);
-        _indexedSet.Add(_c);
-        _indexedSet.Add(_d);
-        _indexedSet.Add(_e);
+        TestData[] data = new[] {_a, _b, _c, _d, _e};
+        _indexedSet = data.ToIndexedSet(x => x.PrimaryKey)
+                          .WithIndex(x => (x.IntProperty, x.StringProperty))
+                          .Build();
 
         _indexedSet.AssertSingleItem(x => (x.IntProperty, x.StringProperty), _a);
         _indexedSet.AssertSingleItem(x => (x.IntProperty, x.StringProperty), _b);
