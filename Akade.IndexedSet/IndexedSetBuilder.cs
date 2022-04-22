@@ -43,7 +43,7 @@ public static class IndexedSetBuilder
     /// <summary>
     /// Creates a new builder instance with the given initial content
     /// </summary>
-    public static IndexedSetBuilder<TElement> ToIndexedSet<TPrimaryKey, TElement>(this IEnumerable<TElement> initialContent)
+    public static IndexedSetBuilder<TElement> ToIndexedSet<TElement>(this IEnumerable<TElement> initialContent)
     {
         return new IndexedSetBuilder<TElement>(null, initialContent);
     }

@@ -8,6 +8,33 @@ Provides an In-Memory data structure, the IndexedSet, that allows to easily add 
 
 ## Overview
 
+A sample showing different queries as you might want do for a report:
+
+```csharp
+// typically, you would query this from the db
+var data = new Purchase[] {
+        new(Id: 1, ProductId: 1, Amount: 1, UnitPrice: 5),
+        new(Id: 2, ProductId: 1, Amount: 2, UnitPrice: 5),
+        new(Id: 6, ProductId: 4, Amount: 3, UnitPrice: 12),
+        new(Id: 7, ProductId: 4, Amount: 8, UnitPrice: 10) // discounted price
+        };
+
+IndexedSet<int, Purchase> set = data.ToIndexedSet(x => x.Id)
+                                    .WithIndex(x => x.ProductId)
+                                    .WithRangeIndex(x => x.Amount)
+                                    .WithRangeIndex(x => x.UnitPrice)
+                                    .WithRangeIndex(x => x.Amount * x.UnitPrice)
+                                    .WithIndex(x => (x.ProductId, x.UnitPrice))
+                                    .Build();
+
+// efficient queries on configured indices
+_ = set.Where(x => x.ProductId, 4);
+_ = set.Range(x => x.Amount, 1, 3, inclusiveStart: true, inclusiveEnd: true);
+_ = set.GreaterThanOrEqual(x => x.UnitPrice, 10);
+_ = set.MaxBy(x => x.Amount * x.UnitPrice);
+_ = set.Where(x => (x.ProductId, x.UnitPrice), (4, 10));
+```
+
 Performance / Operation-Support of the different indices:
 
 - n: total number of elements
@@ -27,63 +54,36 @@ Performance / Operation-Support of the different indices:
 ⚠: Supported but throws if not exactly 1 item was found
 ❌: Not-supported
 
-
-## FAQs
-
-### How do I use multiple index types for the same property?
-
-Use "named" indices by using static methods:
-
-```csharp
-record Data(int Id, int SecondaryKey);
-
-static sealed class DataIndices
-{
-        public int UniqueIndex(Data x) => x.SecondaryKey;
-}
-
-var set = IndexedSetBuilder<Data>.Create(x => x.PrimaryKey)
-           .WithUniqueIndex(DataIndices.UniqueIndex)
-           .WithRangeIndex(x => x.SecondaryKey)
-           .Build();
-
-// querying unique index:
-var data = set.Single(DataIndices.UniqueIndex, 4); // Uses the unique index
-var data2 = set.Range(x => x.SecondaryKey, 4); // Uses the range index
-var inRange = set.Range(x => x.SecondaryKey, 1, 10) // Uses the range index
-```
-
-> ℹ We recommend using the lambda syntax for "simple" properties and static methods for more complicated ones. It's easy to read, resembles "normal" LINQ-Queries and all the magic strings are compiler generated.
-
 ## Features
 This project aims to provide a data structure (*it's not a DB!*) that allows to easily setup fast access on different properties:
 ### Unique index (single entity, single key)
-Dictionary-based, O(1), access on primary and secondary keys:
+Dictionary-based, O(1), access on keys:
 
 ```csharp
-var set = IndexedSetBuilder<Data>.Create(a => a.PrimaryKey)
-        .WithUniqueIndex(x => x.SecondaryKey)
-        .Build();
+IndexedSet<int, Data> set = IndexedSetBuilder<Data>.Create(a => a.PrimaryKey)
+                                                   .WithUniqueIndex(x => x.SecondaryKey)
+                                                   .Build();
 
-set.Add(new(primaryKey: 1, secondaryKey: 5));
+_ = set.Add(new(PrimaryKey: 1, SecondaryKey: 5));
 
 // fast access via primary key
-var data = set[1];
+Data data = set[1];
 
 // fast access via secondary key
-var data = set.Single(x => x.SecondaryKey, 5);
+data = set.Single(x => x.SecondaryKey, 5);
 ```
+
+> ℹ Entities do not require a primary key. `IndexedSet<TPrimaryKey, TData>` inherits from `IndexedSet<TData>` but provides convenient access to the automatically added unique index: `set[primaryKey]` instead of `set.Single(x => x.PrimaryKey, primaryKey)`.
+
 
 ### Non-unique index (multiple entities, single key)
 Dictionary-based, O(1), access on keys (single value) with multiple values (multiple keys):
 
 ```csharp
-var set = IndexedSetBuilder<Data>.Create(a => a.PrimaryKey)
+IndexedSet<int, Data> set = new Data[] { new(PrimaryKey: 1, SecondaryKey: 5), new(PrimaryKey: 2, SecondaryKey: 5) }
+        .ToIndexedSet(x => x.PrimaryKey)
         .WithIndex(x => x.SecondaryKey)
         .Build();
-
-set.Add(new(primaryKey: 1, secondaryKey: 5));
-set.Add(new(primaryKey: 2, secondaryKey: 5));
 
 // fast access via secondary key
 IEnumerable<Data> data = set.Where(x => x.SecondaryKey, 5);
@@ -93,9 +93,9 @@ IEnumerable<Data> data = set.Where(x => x.SecondaryKey, 5);
 Dictionary-based, O(1), access on denormalized keys i.e. multiple keys for multiple entities:
 ```csharp
 
-var set = IndexedSetBuilder<GraphNode>.Create(a => a.Id)
-        .WithIndex(x => x.ConnectsTo) // Where ConnectsTo returns an IEnumerable<int>
-        .Build();
+IndexedSet<int, GraphNode> set = IndexedSetBuilder<GraphNode>.Create(a => a.Id)
+                                                                .WithIndex(x => x.ConnectsTo) // Where ConnectsTo returns an IEnumerable<int>
+                                                                .Build();
 
 //   1   2
 //   |\ /
@@ -103,30 +103,26 @@ var set = IndexedSetBuilder<GraphNode>.Create(a => a.Id)
 //    \|
 //     4
 
-set.Add(new(Id: 1, connectsTo: new[]{ 3, 4 }));
-set.Add(new(Id: 2, connectsTo: new[]{ 3 }));
-set.Add(new(Id: 3, connectsTo: new[]{ 1, 2 , 3 }));
-set.Add(new(Id: 4, connectsTo: new[]{ 1, 3 }));
+_ = set.Add(new(Id: 1, ConnectsTo: new[] { 3, 4 }));
+_ = set.Add(new(Id: 2, ConnectsTo: new[] { 3 }));
+_ = set.Add(new(Id: 3, ConnectsTo: new[] { 1, 2, 3 }));
+_ = set.Add(new(Id: 4, ConnectsTo: new[] { 1, 3 }));
 
-// fast access via denormalized index
 // For readability, it is recommended to write the name for the parameter contains
 IEnumerable<GraphNode> nodesThatConnectTo1 = set.Where(x => x.ConnectsTo, contains: 1); // returns nodes 3 & 4
 IEnumerable<GraphNode> nodesThatConnectTo3 = set.Where(x => x.ConnectsTo, contains: 1); // returns nodes 1 & 2 & 3
 
-// Optimizes a Where(x => x.Contains(...)) query:
-IEnumerable<GraphNode> nodesThatConnectTo1 = set.FullScan().Where(x => x.ConnectsTo.Contains(1)); // returns nodes 3 & 4, but enumerates through the entire set
+// Non-optimized Where(x => x.Contains(...)) query:
+nodesThatConnectTo1 = set.FullScan().Where(x => x.ConnectsTo.Contains(1)); // returns nodes 3 & 4, but enumerates through the entire set
 ```
 
 ### Range index
 Binary-heap based O(log(n)) access for range based, smaller than (or equals) or bigger than (or equals) and orderby queries. Also useful to do paging sorted on exactly one index.
 
 ```csharp
-var set = IndexedSetBuilder<Data>.Create(a => a.PrimaryKey)
-        .WithRangeIndex(x => x.SecondaryKey)
-        .Build();
-
-set.Add(new(primaryKey: 1, secondaryKey: 3));
-set.Add(new(primaryKey: 2, secondaryKey: 4));
+IndexedSet<Data> set = IndexedSetBuilder.Create(new Data[] { new(1, SecondaryKey: 3), new(2, SecondaryKey: 4) })
+                                        .WithRangeIndex(x => x.SecondaryKey)
+                                        .Build();
 
 // fast access via range query
 IEnumerable<Data> data = set.Range(x => x.SecondaryKey, 1, 5);
@@ -141,26 +137,24 @@ data = set.LessThan(x => x.SecondaryKey, 4);
 // fast ordering & paging
 data = set.OrderBy(x => x.SecondaryKey, skip: 10).Take(10); // second page of 10 elements
 ```
-For more samples, take a look at the unit tests.
 
 ### Computed or compound key
 
 The data structure also allows to use computed or compound keys:
 
 ```csharp
-var set = IndexedSetBuilder<Data>.Create(a => a.PrimaryKey)
-        .WithIndex(x => (x.start, x.end))
-        .WithIndex(x => x.end - x.start)
-        .WithIndex(ComputedKey.SomeStaticMethod)
-        .Build();
-
-set.Add(new(primaryKey: 1, start: 2, end: 10));
-
+var data = new RangeData[] { new(Start: 2, End: 10) };
+IndexedSet<RangeData> set = data.ToIndexedSet()
+                                .WithIndex(x => (x.Start, x.End))
+                                .WithIndex(x => x.End - x.Start)
+                                .WithIndex(ComputedKey.SomeStaticMethod)
+                                .Build();
 // fast access via indices
-IEnumerable<Data> data = set.Where(x => (x.start, x.end), (2, 10));
-IEnumerable<Data> data = set.Where(x => x.end - x.start, 8);
-IEnumerable<Data> data = set.Where(x => ComputedKey.SomeStaticMethod, 42);
+IEnumerable<RangeData> result = set.Where(x => (x.Start, x.End), (2, 10));
+result = set.Where(x => x.End - x.Start, 8);
+result = set.Where(ComputedKey.SomeStaticMethod, 42);
 ```
+> ℹ For more samples, take a look at the unit tests.
 
 ### Reflection- & expression-free - convention-based index naming
 
@@ -172,14 +166,36 @@ of .Net 6/C# 10 to provide convention-based naming of the indices:
 
 Reasons
 - Simple and yet effective:
-  - Allows computed, compound, custom values to be indexed...
+  - Allows computed, compound, custom values etc. to be indexed without adding complexity...
 - Performance: No reflection at work and no (runtime) code-gen necessary
-- AOT-friendly
+- AOT-friendly including full trimming support
 
 ### Updating key-values
 **The current implementation requires any keys of any type to never change the value while the instance is within the set**. Hence, in order to update any key you will need to remove the instance, update the keys and add the instance again.
 
-### Roadmap
+## FAQs
+
+### How do I use multiple index types for the same property?
+
+Use "named" indices by using static methods:
+
+```csharp
+record Data(int PrimaryKey, int SecondaryKey);
+
+IndexedSet<int, Data> set = IndexedSetBuilder<Data>.Create(x => x.PrimaryKey)
+                                                        .WithUniqueIndex(DataIndices.UniqueIndex)
+                                                        .WithRangeIndex(x => x.SecondaryKey)
+                                                        .Build();
+_ = set.Add(new(1, 4));
+// querying unique index:
+Data data = set.Single(DataIndices.UniqueIndex, 4); // Uses the unique index
+Data data2 = set.Single(x => x.SecondaryKey, 4); // Uses the range index
+IEnumerable<Data> inRange = set.Range(x => x.SecondaryKey, 1, 10); // Uses the range index
+```
+
+> ℹ We recommend using the lambda syntax for "simple" properties and static methods for more complicated ones. It's easy to read, resembles "normal" LINQ-Queries and all the magic strings are compiler generated.
+
+## Roadmap
 Potential features (not ordered):
 - [ ] Thread-safe version
 - [ ] Easier updating of keys
@@ -192,4 +208,4 @@ Potential features (not ordered):
 - [ ] Aggregates (i.e. sum or average: interface based on state & add/removal state update functions)
 - [ ] Benchmarks
 
-If you have any suggestion or found a bug / unexpected behavior, open an issue! I will also review and willing to integrate PRs if they fit the project.
+If you have any suggestion or found a bug / unexpected behavior, open an issue! I will also review PRs and integrate them if they fit the project.
