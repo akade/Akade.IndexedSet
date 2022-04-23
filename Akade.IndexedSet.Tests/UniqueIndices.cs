@@ -71,7 +71,7 @@ public class UniqueIndices
     [ExpectedException(typeof(ArgumentException))]
     public void adding_duplicate_key_throws()
     {
-        _indexedSet.Add(new TestData(5, 10, Guid.NewGuid(), "ew"));
+        _ = _indexedSet.Add(new TestData(5, 10, Guid.NewGuid(), "ew"));
     }
 
     [TestMethod]

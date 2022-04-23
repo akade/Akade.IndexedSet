@@ -3,8 +3,7 @@
 /// <summary>
 /// Unique index providing O(1) retrieval and insertion as well as enforcing unqueness
 /// </summary>
-internal class UniqueIndex<TPrimaryKey, TElement, TIndexKey> : TypedIndex<TPrimaryKey, TElement, TIndexKey>
-    where TPrimaryKey : notnull
+internal class UniqueIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
     where TIndexKey : notnull
 {
     private readonly Dictionary<TIndexKey, TElement> _data = new();
@@ -31,7 +30,9 @@ internal class UniqueIndex<TPrimaryKey, TElement, TIndexKey> : TypedIndex<TPrima
     public override void AddRange(IEnumerable<TElement> elementsToAdd)
     {
         if (elementsToAdd.TryGetNonEnumeratedCount(out int count))
+        {
             _ = _data.EnsureCapacity(_data.Count + count);
+        }
 
         base.AddRange(elementsToAdd);
     }
@@ -45,6 +46,11 @@ internal class UniqueIndex<TPrimaryKey, TElement, TIndexKey> : TypedIndex<TPrima
     internal override TElement Single(TIndexKey indexKey)
     {
         return _data[indexKey];
+    }
+
+    internal override bool TryGetSingle(TIndexKey indexKey, out TElement? element)
+    {
+        return _data.TryGetValue(indexKey, out element);
     }
 
     internal override IEnumerable<TElement> Where(TIndexKey indexKey)

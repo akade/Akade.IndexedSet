@@ -31,16 +31,16 @@ public class AppointmentSample
 
         foreach (DateOnly day in days)
         {
-            _appointments.Add(new(id++, "Daily", "Lancelot", day.WithDayTime(09, 00), day.WithDayTime(09, 15)));
+            _ = _appointments.Add(new(id++, "Daily", "Lancelot", day.WithDayTime(09, 00), day.WithDayTime(09, 15)));
         }
-        _appointments.Add(new(id++, "Weekly", "Cinderella", days[0].WithDayTime(10, 00), days[0].WithDayTime(11, 15)));
+        _ = _appointments.Add(new(id++, "Weekly", "Cinderella", days[0].WithDayTime(10, 00), days[0].WithDayTime(11, 15)));
 
-        _appointments.Add(new(id++, "Iteration Planning", "Esmeralda", days[2].WithDayTime(09, 15), days[2].WithDayTime(16, 15)));
+        _ = _appointments.Add(new(id++, "Iteration Planning", "Esmeralda", days[2].WithDayTime(09, 15), days[2].WithDayTime(16, 15)));
 
-        _appointments.Add(new(id++, "Discuss Technical Debt #42", "Lancelot", days[3].WithDayTime(11, 00), days[3].WithDayTime(11, 45)));
+        _ = _appointments.Add(new(id++, "Discuss Technical Debt #42", "Lancelot", days[3].WithDayTime(11, 00), days[3].WithDayTime(11, 45)));
 
 
-        _appointments.Add(new(id++, "Discuss Issue #1234", "Esmeralda", days[4].WithDayTime(09, 15), days[4].WithDayTime(10, 00)));
+        _ = _appointments.Add(new(id++, "Discuss Issue #1234", "Esmeralda", days[4].WithDayTime(09, 15), days[4].WithDayTime(10, 00)));
 
     }
 

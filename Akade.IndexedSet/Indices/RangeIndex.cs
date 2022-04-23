@@ -5,8 +5,7 @@ namespace Akade.IndexedSet.Indices;
 /// <summary>
 /// O(log(n)) range queries based on <see cref="SortedLookup{TKey, TValue}"/>.
 /// </summary>
-internal class RangeIndex<TPrimaryKey, TElement, TIndexKey> : TypedIndex<TPrimaryKey, TElement, TIndexKey>
-    where TPrimaryKey : notnull
+internal class RangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
     where TIndexKey : notnull
 {
     private readonly SortedLookup<TIndexKey, TElement> _lookup;
@@ -39,6 +38,19 @@ internal class RangeIndex<TPrimaryKey, TElement, TIndexKey> : TypedIndex<TPrimar
     internal override TElement Single(TIndexKey indexKey)
     {
         return _lookup.GetValues(indexKey).Single();
+    }
+
+    internal override bool TryGetSingle(TIndexKey indexKey, out TElement? element)
+    {
+        element = default;
+
+        if (_lookup.CountValues(indexKey) == 1)
+        {
+            element = _lookup.GetValues(indexKey).Single();
+            return true;
+        }
+
+        return false;
     }
 
     internal override IEnumerable<TElement> Where(TIndexKey indexKey)

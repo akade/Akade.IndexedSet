@@ -23,13 +23,13 @@ public class TestsWithoutIndices
     {
         Assert.AreEqual(0, _indexedSet.Count);
 
-        _indexedSet.Add(_a);
+        _ = _indexedSet.Add(_a);
         Assert.AreEqual(1, _indexedSet.Count);
 
-        _indexedSet.Add(_b);
+        _ = _indexedSet.Add(_b);
         Assert.AreEqual(2, _indexedSet.Count);
 
-        _indexedSet.Add(_c);
+        _ = _indexedSet.Add(_c);
         Assert.AreEqual(3, _indexedSet.Count);
     }
 
@@ -88,17 +88,24 @@ public class TestsWithoutIndices
     }
 
     [TestMethod]
+    public void adding_duplicate_item_returns_false()
+    {
+        AddAll();
+        Assert.IsFalse(_indexedSet.Add(_a));
+    }
+
+    [TestMethod]
     [ExpectedException(typeof(ArgumentException))]
     public void adding_duplicate_primary_key_throws()
     {
         AddAll();
-        _indexedSet.Add(_a);
+        _ = _indexedSet.Add(new TestData(0, 0, Guid.Empty, ""));
     }
 
     private void AddAll()
     {
-        _indexedSet.Add(_a);
-        _indexedSet.Add(_b);
-        _indexedSet.Add(_c);
+        _ = _indexedSet.Add(_a);
+        _ = _indexedSet.Add(_b);
+        _ = _indexedSet.Add(_c);
     }
 }

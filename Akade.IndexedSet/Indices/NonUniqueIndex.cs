@@ -3,8 +3,7 @@
 /// <summary>
 /// Nonunique index implementation based on <see cref="Lookup{TKey, TElement}"/>
 /// </summary>
-internal class NonUniqueIndex<TPrimaryKey, TElement, TIndexKey> : TypedIndex<TPrimaryKey, TElement, TIndexKey>
-    where TPrimaryKey : notnull
+internal class NonUniqueIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
     where TIndexKey : notnull
 {
     private readonly DataStructures.Lookup<TIndexKey, TElement> _data = new();
@@ -40,6 +39,19 @@ internal class NonUniqueIndex<TPrimaryKey, TElement, TIndexKey> : TypedIndex<TPr
     internal override TElement Single(TIndexKey indexKey)
     {
         return _data.GetValues(indexKey).Single();
+    }
+
+    internal override bool TryGetSingle(TIndexKey indexKey, out TElement? element)
+    {
+        element = default;
+
+        if (_data.CountValues(indexKey) == 1)
+        {
+            element = _data.GetValues(indexKey).Single();
+            return true;
+        }
+
+        return false;
     }
 
     internal override IEnumerable<TElement> Where(TIndexKey indexKey)
