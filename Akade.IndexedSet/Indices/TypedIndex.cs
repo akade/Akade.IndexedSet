@@ -15,6 +15,8 @@ internal abstract class TypedIndex<TElement, TIndexKey> : Index<TElement>
 
     internal abstract IEnumerable<TElement> Where(TIndexKey indexKey);
 
+    internal abstract bool TryGetSingle(TIndexKey indexKey, out TElement? element);
+
     internal virtual IEnumerable<TElement> Range(TIndexKey start, TIndexKey end, bool inclusiveStart, bool inclusiveEnd)
     {
         throw new NotSupportedException($"Range queries are not supported on {GetType().Name}-indices. Use a range index to support this scenario.");
@@ -70,5 +72,8 @@ internal abstract class TypedIndex<TElement, TIndexKey> : Index<TElement>
         throw new NotSupportedException($"OrderByDescending queries are not supported on {GetType().Name}-indices. Use a range index to support this scenario.");
     }
 
-    internal abstract bool TryGetSingle(TIndexKey indexKey, out TElement? element);
+    internal virtual IEnumerable<TElement> FuzzyMatch(TIndexKey indexKey, int maxDistance)
+    {
+        throw new NotSupportedException($"Fuzzy queries are not supported on {GetType().Name}-indices. Use a text index to support this scenario.");
+    }
 }
