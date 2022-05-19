@@ -74,6 +74,16 @@ internal abstract class TypedIndex<TElement, TIndexKey> : Index<TElement>
 
     internal virtual IEnumerable<TElement> FuzzyMatch(TIndexKey indexKey, int maxDistance)
     {
-        throw new NotSupportedException($"Fuzzy queries are not supported on {GetType().Name}-indices. Use a text index to support this scenario.");
+        throw new NotSupportedException($"Fuzzy queries are not supported on {GetType().Name}-indices. Use a full text index to support this scenario.");
+    }
+
+    internal virtual IEnumerable<TElement> StartsWith(TIndexKey indexKey)
+    {
+        throw new NotSupportedException($"Fuzzy queries are not supported on {GetType().Name}-indices. Use a full text or StartsWith-index to support this scenario.");
+    }
+
+    internal virtual IEnumerable<TElement> Contains(TIndexKey indexKey)
+    {
+        throw new NotSupportedException($"Contain queries are not supported on {GetType().Name}-indices. Use a full text or StartsWith-index to support this scenario.");
     }
 }

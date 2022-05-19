@@ -1,18 +1,16 @@
 ﻿using Akade.IndexedSet.DataStructures;
 
 namespace Akade.IndexedSet.Indices;
-internal class TextIndex<TElement> : TypedIndex<TElement, ReadOnlyMemory<char>>
-    where TElement : class
+internal class FullTextIndex<TElement> : TypedIndex<TElement, ReadOnlyMemory<char>>
 {
     private readonly SuffixxTrie<TElement> _suffixxTrie;
     private readonly Func<TElement, ReadOnlyMemory<char>> _keyAccessor;
 
-    public TextIndex(Func<TElement, ReadOnlyMemory<char>> keyAccessor, string name) : base(name)
+    public FullTextIndex(Func<TElement, ReadOnlyMemory<char>> keyAccessor, string name) : base(name)
     {
         _keyAccessor = keyAccessor;
         _suffixxTrie = new();
     }
-
 
     public override void Add(TElement value)
     {
@@ -28,7 +26,7 @@ internal class TextIndex<TElement> : TypedIndex<TElement, ReadOnlyMemory<char>>
 
     internal override TElement Single(ReadOnlyMemory<char> indexKey)
     {
-        return _suffixxTrie.GetAll(indexKey).Single();
+        return _suffixxTrie.GetAll(indexKey.Span).Single();
     }
 
     internal override bool TryGetSingle(ReadOnlyMemory<char> indexKey, out TElement? element)
@@ -51,5 +49,17 @@ internal class TextIndex<TElement> : TypedIndex<TElement, ReadOnlyMemory<char>>
     internal override IEnumerable<TElement> Where(ReadOnlyMemory<char> indexKey)
     {
         return _suffixxTrie.Get(indexKey.Span);
+    }
+
+    internal override IEnumerable<TElement> StartsWith(ReadOnlyMemory<char> indexKey)
+    {
+        return _suffixxTrie.GetAll(indexKey.Span)
+                           .Where(candidate => _keyAccessor(candidate).Span.StartsWith(indexKey.Span))
+                           .Distinct();
+    }
+
+    internal override IEnumerable<TElement> FuzzyMatch(ReadOnlyMemory<char> indexKey, int maxDistance)
+    {
+        return _suffixxTrie.FuzzySearch(indexKey.Span, maxDistance, false).Distinct();
     }
 }

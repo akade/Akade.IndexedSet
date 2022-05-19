@@ -19,8 +19,6 @@ public class SuffixxTrieTests
         _ = AddToStringTrie(_trie, "Pangolin");
         _ = AddToStringTrie(_trie, "Parrot");
         _ = AddToStringTrie(_trie, "Chihuahua");
-
-
     }
 
     [TestMethod]
@@ -86,19 +84,34 @@ public class SuffixxTrieTests
     }
 
     [TestMethod]
-    public void fuzzy_search_hell_yeah()
+    public void exact_fuzzy_search_with_single_result()
     {
-        SuffixxTrie<string> trie = new();
-
-        _ = AddToStringTrie(trie, "Tiger");
-        _ = AddToStringTrie(trie, "Tarantula");
-        _ = AddToStringTrie(trie, "Penguin");
-        _ = AddToStringTrie(trie, "Panther");
-        _ = AddToStringTrie(trie, "Pangolin");
-        _ = AddToStringTrie(trie, "Parrot");
-
-        string[]? t = trie.FuzzySearch("Liger".AsMemory(), 1, true).ToArray();
+        IEnumerable<string> result = _trie.FuzzySearch("rantul", 1, true);
+        Assert.AreEqual("Tarantula", result.Single());
     }
+
+    [TestMethod]
+    public void exact_fuzzy_search_without_results()
+    {
+        IEnumerable<string> result = _trie.FuzzySearch("Panner", 1, true);
+        Assert.IsFalse(result.Any());
+    }
+
+    [TestMethod]
+
+    public void inexact_fuzzy_search_and_multiple_result()
+    {
+        IEnumerable<string> result = _trie.FuzzySearch("Pan", 2, false);
+        CollectionAssert.AreEquivalent(new[] { "Penguin", "Panther", "Pangolin", "Parrot", "Tarantula", "Chihuahua" }, result.ToArray());
+    }
+
+    [TestMethod]
+    public void inexact_fuzzy_search_without_result()
+    {
+        IEnumerable<string> result = _trie.FuzzySearch("Non", 1, false);
+        Assert.IsFalse(result.Any());
+    }
+
 
     // https://murilo.wordpress.com/2011/02/01/fast-and-easy-levenshtein-distance-using-a-trie-in-c/
     private static bool AddToStringTrie(SuffixxTrie<string> stringTrie, string value)

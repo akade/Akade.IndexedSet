@@ -44,32 +44,13 @@ internal class SuffixxTrie<TElement>
     }
 
 
-    public IEnumerable<TElement> GetAll(string key)
+    public IEnumerable<TElement> GetAll(ReadOnlySpan<char> key)
     {
-        return GetAll(key.AsMemory());
+        return _trie.GetAll(key).Distinct();
     }
 
-    public IEnumerable<TElement> GetAll(ReadOnlyMemory<char> key)
+    internal IEnumerable<TElement> FuzzySearch(ReadOnlySpan<char> key, int maxDistance, bool exactMatches)
     {
-        HashSet<TElement> set = new();
-        foreach (TElement element in _trie.GetAll(key))
-        {
-            if (set.Add(element))
-            {
-                yield return element;
-            }
-        }
-    }
-
-    internal IEnumerable<TElement> FuzzySearch(ReadOnlyMemory<char> key, int maxDistance, bool exactMatches)
-    {
-        HashSet<TElement> set = new();
-        foreach (TElement element in _trie.FuzzySearch(key.Span, maxDistance, exactMatches))
-        {
-            if (set.Add(element))
-            {
-                yield return element;
-            }
-        }
+        return _trie.FuzzySearch(key, maxDistance, exactMatches).Distinct();
     }
 }

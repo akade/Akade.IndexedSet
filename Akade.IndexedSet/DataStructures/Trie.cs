@@ -28,30 +28,24 @@ internal class Trie<TElement>
         return _root.Contains(key, element);
     }
 
-    public IEnumerable<TElement> GetAll(string prefix)
-    {
-        return GetAll(prefix.AsMemory());
-    }
 
-    public IEnumerable<TElement> GetAll(ReadOnlyMemory<char> prefix)
+    public IEnumerable<TElement> GetAll(ReadOnlySpan<char> prefix)
     {
-        TrieNode? matchingNode = _root.Find(prefix.Span);
+        TrieNode? matchingNode = _root.Find(prefix);
 
-        if (matchingNode is not null)
+        if (matchingNode is null)
         {
-            foreach (TElement element in matchingNode.GetLocalElements())
-            {
-                yield return element;
-            }
-
-            foreach (TrieNode node in matchingNode.GetAllChildren())
-            {
-                foreach (TElement element in node.GetLocalElements())
-                {
-                    yield return element;
-                }
-            }
+            return Enumerable.Empty<TElement>();
         }
+
+        IEnumerable<TElement> result = matchingNode.GetLocalElements();
+
+        foreach (TrieNode node in matchingNode.GetAllChildren())
+        {
+            result = result.Concat(node.GetLocalElements());
+        }
+
+        return result;
     }
 
 
