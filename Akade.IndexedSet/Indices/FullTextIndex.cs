@@ -1,4 +1,5 @@
 ﻿using Akade.IndexedSet.DataStructures;
+using Akade.IndexedSet.Utils;
 
 namespace Akade.IndexedSet.Indices;
 internal class FullTextIndex<TElement> : TypedIndex<TElement, ReadOnlyMemory<char>>
@@ -58,8 +59,20 @@ internal class FullTextIndex<TElement> : TypedIndex<TElement, ReadOnlyMemory<cha
                            .Distinct();
     }
 
-    internal override IEnumerable<TElement> FuzzyMatch(ReadOnlyMemory<char> indexKey, int maxDistance)
+    internal override IEnumerable<TElement> FuzzyStartsWith(ReadOnlyMemory<char> indexKey, int maxDistance)
+    {
+        return _suffixxTrie.FuzzySearch(indexKey.Span, maxDistance, false)
+                           .Where(candidate => LevenshteinDistance.FuzzyMatch(_keyAccessor(candidate).Span[..indexKey.Length], indexKey.Span, maxDistance))
+                           .Distinct();
+    }
+
+    internal override IEnumerable<TElement> FuzzyContains(ReadOnlyMemory<char> indexKey, int maxDistance)
     {
         return _suffixxTrie.FuzzySearch(indexKey.Span, maxDistance, false).Distinct();
+    }
+
+    internal override IEnumerable<TElement> Contains(ReadOnlyMemory<char> indexKey)
+    {
+        return _suffixxTrie.GetAll(indexKey.Span).Distinct();
     }
 }

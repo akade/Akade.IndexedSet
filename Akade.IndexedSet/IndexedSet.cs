@@ -383,6 +383,64 @@ public class IndexedSet<TElement>
     }
 
     /// <summary>
+    /// Returns all elements that start with the given char sequence
+    /// </summary>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="prefix">The prefix to use</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
+    public IEnumerable<TElement> StartsWith(Func<TElement, ReadOnlyMemory<char>> indexAccessor, ReadOnlyMemory<char> prefix,  [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+    {
+        TypedIndex<TElement, ReadOnlyMemory<char>> typedIndex = GetIndex<ReadOnlyMemory<char>>(indexName);
+        return typedIndex.StartsWith(prefix);
+    }
+
+    /// <summary>
+    /// Returns all elements that start with the given char sequence or a similar one.
+    /// </summary>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="prefix">The prefix to use</param>
+    /// <param name="maxDistance">The maximum distance (e.g. Levenshtein) between the input prefix and matches</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
+    public IEnumerable<TElement> FuzzyStartsWith(Func<TElement, ReadOnlyMemory<char>> indexAccessor, ReadOnlyMemory<char> prefix, int maxDistance, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+    {
+        TypedIndex<TElement, ReadOnlyMemory<char>> typedIndex = GetIndex<ReadOnlyMemory<char>>(indexName);
+        return typedIndex.FuzzyStartsWith(prefix, maxDistance);
+    }
+
+    /// <summary>
+    /// Returns all elements that contain the given char sequence
+    /// </summary>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="infix">The infix to use</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
+    public IEnumerable<TElement> Contains(Func<TElement, ReadOnlyMemory<char>> indexAccessor, ReadOnlyMemory<char> infix, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+    {
+        TypedIndex<TElement, ReadOnlyMemory<char>> typedIndex = GetIndex<ReadOnlyMemory<char>>(indexName);
+        return typedIndex.Contains(infix);
+    }
+
+    /// <summary>
+    /// Returns all elements that contain the given char sequence or a simalar one.
+    /// </summary>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="infix">The infix to use</param>
+    /// <param name="maxDistance">The maximum distance (e.g. Levenshtein) between the input infix and matches</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
+    public IEnumerable<TElement> FuzzyContains(Func<TElement, ReadOnlyMemory<char>> indexAccessor, ReadOnlyMemory<char> infix, int maxDistance, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+    {
+        TypedIndex<TElement, ReadOnlyMemory<char>> typedIndex = GetIndex<ReadOnlyMemory<char>>(indexName);
+        return typedIndex.FuzzyContains(infix, maxDistance);
+    }
+
+    /// <summary>
     /// Returns all values by fully enumerating the entire set.
     /// </summary>
     public IEnumerable<TElement> FullScan()

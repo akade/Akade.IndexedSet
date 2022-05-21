@@ -1,4 +1,4 @@
-﻿using Akade.IndexedSet.Tests.Utilities;
+﻿using Akade.IndexedSet.Tests.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.Samples.Appointments;

@@ -187,11 +187,10 @@ public class IndexedSetBuilder<TElement>
 
     /// <summary>
     /// Configures the <see cref="IndexedSet{TPrimaryKey, TElement}"/> to have a full text index based on a secondary key that 
-    /// supports fuzzy search and string startswith/contains queries. The secondary key can be any expression that does not change while 
-    /// the element is within the indexed set, even tuples or calculated expressions. The name of the index is based on the 
+    /// supports fuzzy search on string startswith/contains queries. The secondary key can be any expression that does not change while 
+    /// the element is within the indexed set. The name of the index is based on the 
     /// string representation of the expression and passed by the compiler to <paramref name="indexName"/>. 
-    /// The convention is to always use x as a lambda parameter:
-    /// x => (x.Prop1, x.Prop2, x.Prop3). Alternativly, you can also always use the same method from a static class.
+    /// The convention is to always use x as a lambda parameter: x => x.StringProp1. Alternativly, you can also always use the same method from a static class.
     /// </summary>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
     /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
@@ -205,6 +204,29 @@ public class IndexedSetBuilder<TElement>
         }
 
         _result.AddIndex(new FullTextIndex<TElement>(keyAccessor, indexName));
+
+        return this;
+    }
+
+    /// <summary>
+    /// Configures the <see cref="IndexedSet{TPrimaryKey, TElement}"/> to have a prefix index based on a secondary key that 
+    /// supports fuzzy search on string startswith queries. The secondary key can be any expression that does not change while 
+    /// the element is within the indexed set. The name of the index is based on the 
+    /// string representation of the expression and passed by the compiler to <paramref name="indexName"/>. 
+    /// The convention is to always use x as a lambda parameter: x => x.StringProp1. Alternativly, you can also always use the same method from a static class.
+    /// </summary>
+    /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
+    /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="keyAccessor"/> is automatically passed by the compiler.</param>
+    /// <returns>The instance on which this method is called is returned to support the fluent syntax.</returns>
+    public virtual IndexedSetBuilder<TElement> WithPrefixIndex(Func<TElement, ReadOnlyMemory<char>> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
+    {
+        if (indexName is null)
+        {
+            throw new ArgumentNullException(nameof(indexName));
+        }
+
+        _result.AddIndex(new PrefixIndex<TElement>(keyAccessor, indexName));
 
         return this;
     }
@@ -267,7 +289,14 @@ public class IndexedSetBuilder<TPrimaryKey, TElement> : IndexedSetBuilder<TEleme
     /// <inheritdoc />
     public override IndexedSetBuilder<TPrimaryKey, TElement> WithFullTextIndex(Func<TElement, ReadOnlyMemory<char>> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
     {
-        _ = base.WithUniqueIndex(keyAccessor, indexName);
+        _ = base.WithFullTextIndex(keyAccessor, indexName);
+        return this;
+    }
+
+    /// <inheritdoc />
+    public override IndexedSetBuilder<TPrimaryKey, TElement> WithPrefixIndex(Func<TElement, ReadOnlyMemory<char>> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
+    {
+        _ = base.WithPrefixIndex(keyAccessor, indexName);
         return this;
     }
 

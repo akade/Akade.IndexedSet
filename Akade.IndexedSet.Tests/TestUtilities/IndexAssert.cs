@@ -1,12 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Runtime.CompilerServices;
 
-namespace Akade.IndexedSet.Tests.Utilities;
+namespace Akade.IndexedSet.Tests.TestUtilities;
 
 internal static class IndexAssert
 {
-    public static void AssertSingleItem<TPrimaryKey, TElement, TIndexKey>(this IndexedSet<TPrimaryKey, TElement> indexedSet, Func<TElement, TIndexKey> indexAccessor, TElement testData, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
-        where TPrimaryKey : notnull
+    public static void AssertSingleItem<TElement, TIndexKey>(this IndexedSet<TElement> indexedSet, Func<TElement, TIndexKey> indexAccessor, TElement testData, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
         Assert.IsNotNull(indexName);
@@ -19,8 +18,7 @@ internal static class IndexAssert
         Assert.AreEqual(testData, accessViaWhere);
     }
 
-    public static void AssertMultipleItems<TPrimaryKey, TElement, TIndexKey>(this IndexedSet<TPrimaryKey, TElement> indexedSet, Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null, bool requireOrder = false, params TElement[] expectedElements)
-        where TPrimaryKey : notnull
+    public static void AssertMultipleItems<TElement, TIndexKey>(this IndexedSet<TElement> indexedSet, Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null, bool requireOrder = false, params TElement[] expectedElements)
         where TIndexKey : notnull
     {
         if (expectedElements.Length < 2)
@@ -53,8 +51,8 @@ internal static class IndexAssert
         }
     }
 
-    public static void AssertMultipleItemsViaRange<TPrimaryKey, TElement, TIndexKey>
-        (this IndexedSet<TPrimaryKey, TElement> indexedSet,
+    public static void AssertMultipleItemsViaRange<TElement, TIndexKey>
+        (this IndexedSet<TElement> indexedSet,
         Func<TElement, TIndexKey> indexAccessor,
         TIndexKey start,
         TIndexKey end,
@@ -62,7 +60,6 @@ internal static class IndexAssert
         bool inclusiveEnd,
         [CallerArgumentExpression("indexAccessor")] string? indexName = null,
         params TElement[] expectedElements)
-        where TPrimaryKey : notnull
         where TIndexKey : notnull
     {
         Assert.IsNotNull(indexName);
