@@ -59,8 +59,4 @@ jobs:
       run: dotnet build
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
-
-      
-    - name: Upload CodeQl Sarif
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/analyze@v2a
