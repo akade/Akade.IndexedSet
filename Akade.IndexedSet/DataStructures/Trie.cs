@@ -196,9 +196,9 @@ internal class Trie<TElement>
 
         internal bool Contains(ReadOnlySpan<char> key, TElement element)
         {
-            if (key.IsEmpty && _elements is not null)
+            if (key.IsEmpty)
             {
-                return _elements.Contains(element);
+                return _elements is not null && _elements.Contains(element);
             }
             else if (_children?.TryGetValue(key[0], out TrieNode? trieNode) ?? false)
             {
