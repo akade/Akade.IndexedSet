@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -14,7 +13,7 @@
 		<EnablePackageValidation>true</EnablePackageValidation>
 		<RepositoryUrl>https://github.com/akade/Akade.IndexedSet</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageTags>data structure;indices;range query;unique index;range index;non-unique index;multi-value;dictionary;collections;computed keys</PackageTags>
+		<PackageTags>data structure;indices;range query;unique index;range index;non-unique index;multi-value;dictionary;collections;computed keys;fuzzy;fuzzy search;approximate string matching;search</PackageTags>
 		<PackageReadmeFile>/README.md</PackageReadmeFile>
 	</PropertyGroup>
 	<ItemGroup>
