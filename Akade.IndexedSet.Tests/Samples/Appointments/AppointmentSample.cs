@@ -19,6 +19,7 @@ public class AppointmentSample
         .WithRangeIndex(x => x.Start)
         .WithRangeIndex(x => x.End)
         .WithRangeIndex(Duration) // calculated property
+        .WithFullTextIndex(x => x.Subject.AsMemory())
         .Build();
 
     public AppointmentSample()
@@ -107,5 +108,23 @@ public class AppointmentSample
         longerAppointments.ForEach(Console.WriteLine);
 
         CollectionAssert.AreEqual(new[] { "Iteration Planning - 420", "Weekly - 75", "Discuss Issue #1234 - 45", "Discuss Technical Debt #42 - 45" }, longerAppointments);
+    }
+
+    [TestMethod]
+    public void text_searching_within_subjects()
+    {
+        // querying within the full-text-search index allows to perform a contains over a trie instead of comparing it on all elements
+        Appointment meetingWith42InSubject = _appointments.Contains(x => x.Subject.AsMemory(), "#42".AsMemory()).Single();
+        Assert.IsTrue(meetingWith42InSubject.Subject.Contains("#42"));
+    }
+
+    [TestMethod]
+    public void fuzzy_searching_within_subjects()
+    {
+        // Fulltext and prefix indices support fuzzy matching to allow a certain number of errors (Levenshtein/edit distance)
+        Appointment technicalDebtMeeting = _appointments.FuzzyContains(x => x.Subject.AsMemory(), "Technical Det".AsMemory(), 1).Single();
+
+        Assert.IsFalse(technicalDebtMeeting.Subject.Contains("Technical Det"));
+        Assert.IsTrue(technicalDebtMeeting.Subject.Contains("Technical Debt"));
     }
 }
