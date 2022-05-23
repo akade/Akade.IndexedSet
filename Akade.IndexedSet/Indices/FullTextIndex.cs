@@ -4,35 +4,35 @@ using Akade.IndexedSet.Utils;
 namespace Akade.IndexedSet.Indices;
 internal class FullTextIndex<TElement> : TypedIndex<TElement, ReadOnlyMemory<char>>
 {
-    private readonly SuffixxTrie<TElement> _suffixxTrie;
+    private readonly SuffixTrie<TElement> _suffixTrie;
     private readonly Func<TElement, ReadOnlyMemory<char>> _keyAccessor;
 
     public FullTextIndex(Func<TElement, ReadOnlyMemory<char>> keyAccessor, string name) : base(name)
     {
         _keyAccessor = keyAccessor;
-        _suffixxTrie = new();
+        _suffixTrie = new();
     }
 
     public override void Add(TElement value)
     {
         ReadOnlyMemory<char> key = _keyAccessor(value);
-        _ = _suffixxTrie.Add(key.Span, value);
+        _ = _suffixTrie.Add(key.Span, value);
     }
 
     public override void Remove(TElement value)
     {
         ReadOnlyMemory<char> key = _keyAccessor(value);
-        _ = _suffixxTrie.Remove(key.Span, value);
+        _ = _suffixTrie.Remove(key.Span, value);
     }
 
     internal override TElement Single(ReadOnlyMemory<char> indexKey)
     {
-        return _suffixxTrie.GetAll(indexKey.Span).Single();
+        return _suffixTrie.GetAll(indexKey.Span).Single();
     }
 
     internal override bool TryGetSingle(ReadOnlyMemory<char> indexKey, out TElement? element)
     {
-        IEnumerable<TElement> allMatches = _suffixxTrie.Get(indexKey.Span);
+        IEnumerable<TElement> allMatches = _suffixTrie.Get(indexKey.Span);
         element = default;
 
         IEnumerator<TElement> enumerator = allMatches.GetEnumerator();
@@ -49,30 +49,30 @@ internal class FullTextIndex<TElement> : TypedIndex<TElement, ReadOnlyMemory<cha
 
     internal override IEnumerable<TElement> Where(ReadOnlyMemory<char> indexKey)
     {
-        return _suffixxTrie.Get(indexKey.Span);
+        return _suffixTrie.Get(indexKey.Span);
     }
 
     internal override IEnumerable<TElement> StartsWith(ReadOnlyMemory<char> indexKey)
     {
-        return _suffixxTrie.GetAll(indexKey.Span)
+        return _suffixTrie.GetAll(indexKey.Span)
                            .Where(candidate => _keyAccessor(candidate).Span.StartsWith(indexKey.Span))
                            .Distinct();
     }
 
     internal override IEnumerable<TElement> FuzzyStartsWith(ReadOnlyMemory<char> indexKey, int maxDistance)
     {
-        return _suffixxTrie.FuzzySearch(indexKey.Span, maxDistance, false)
+        return _suffixTrie.FuzzySearch(indexKey.Span, maxDistance, false)
                            .Where(candidate => LevenshteinDistance.FuzzyMatch(_keyAccessor(candidate).Span[..indexKey.Length], indexKey.Span, maxDistance))
                            .Distinct();
     }
 
     internal override IEnumerable<TElement> FuzzyContains(ReadOnlyMemory<char> indexKey, int maxDistance)
     {
-        return _suffixxTrie.FuzzySearch(indexKey.Span, maxDistance, false).Distinct();
+        return _suffixTrie.FuzzySearch(indexKey.Span, maxDistance, false).Distinct();
     }
 
     internal override IEnumerable<TElement> Contains(ReadOnlyMemory<char> indexKey)
     {
-        return _suffixxTrie.GetAll(indexKey.Span).Distinct();
+        return _suffixTrie.GetAll(indexKey.Span).Distinct();
     }
 }

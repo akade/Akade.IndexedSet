@@ -1,5 +1,5 @@
 ﻿namespace Akade.IndexedSet.DataStructures;
-internal class SuffixxTrie<TElement>
+internal class SuffixTrie<TElement>
 {
     private readonly Trie<TElement> _trie = new();
 

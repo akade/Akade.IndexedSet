@@ -4,9 +4,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Akade.IndexedSet.Tests.DataStructures;
 
 [TestClass]
-public class SuffixxTrieTests
+public class SuffixTrieTests
 {
-    private SuffixxTrie<string> _trie = default!;
+    private SuffixTrie<string> _trie = default!;
 
     [TestInitialize]
     public void TestInitializer()
@@ -49,7 +49,7 @@ public class SuffixxTrieTests
     [TestMethod]
     public void adding_the_same_element_return_false()
     {
-        SuffixxTrie<string> trie = new();
+        SuffixTrie<string> trie = new();
 
         Assert.IsTrue(AddToStringTrie(trie, "Cat"));
         Assert.IsFalse(AddToStringTrie(trie, "Cat"));
@@ -58,7 +58,7 @@ public class SuffixxTrieTests
     [TestMethod]
     public void contains_returns_correct_value_when_adding_elements()
     {
-        SuffixxTrie<string> trie = new();
+        SuffixTrie<string> trie = new();
 
         Assert.IsFalse(ContainsInStringTrie(trie, "Cat"));
         Assert.IsTrue(AddToStringTrie(trie, "Cat"));
@@ -68,7 +68,7 @@ public class SuffixxTrieTests
     [TestMethod]
     public void contains_returns_correct_value_when_removing_elements()
     {
-        SuffixxTrie<string> trie = new();
+        SuffixTrie<string> trie = new();
 
         _ = AddToStringTrie(trie, "Cat");
         Assert.IsTrue(ContainsInStringTrie(trie, "Cat"));
@@ -79,7 +79,7 @@ public class SuffixxTrieTests
     [TestMethod]
     public void removing_returns_false_if_the_element_is_not_present()
     {
-        SuffixxTrie<string> trie = new();
+        SuffixTrie<string> trie = new();
         Assert.IsFalse(RemoveFromStringTrie(trie, "Cat"));
     }
 
@@ -114,17 +114,17 @@ public class SuffixxTrieTests
 
 
     // https://murilo.wordpress.com/2011/02/01/fast-and-easy-levenshtein-distance-using-a-trie-in-c/
-    private static bool AddToStringTrie(SuffixxTrie<string> stringTrie, string value)
+    private static bool AddToStringTrie(SuffixTrie<string> stringTrie, string value)
     {
         return stringTrie.Add(value, value);
     }
 
-    private static bool RemoveFromStringTrie(SuffixxTrie<string> stringTrie, string value)
+    private static bool RemoveFromStringTrie(SuffixTrie<string> stringTrie, string value)
     {
         return stringTrie.Remove(value, value);
     }
 
-    private static bool ContainsInStringTrie(SuffixxTrie<string> stringTrie, string value)
+    private static bool ContainsInStringTrie(SuffixTrie<string> stringTrie, string value)
     {
         return stringTrie.Contains(value, value);
     }
