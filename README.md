@@ -6,6 +6,25 @@
 Provides an In-Memory data structure, the IndexedSet, that allows to easily add indices to allow efficient querying. Based on often seeing inefficient usage of 
 `.FirstOrDefault`, `.Where`, `.Single` etc... and implementing data-structures to improve those queries for every project I'm on.
 
+<!--TOC-->
+  - [Overview](#overview)
+    - [Performance / Operation-Support of the different indices:](#performance-operation-support-of-the-different-indices)
+      - [General queries](#general-queries)
+      - [String queries](#string-queries)
+  - [Features](#features)
+    - [Unique index (single entity, single key)](#unique-index-single-entity-single-key)
+    - [Non-unique index (multiple entities, single key)](#non-unique-index-multiple-entities-single-key)
+    - [Non-unique index (multiple entities, multiple keys)](#non-unique-index-multiple-entities-multiple-keys)
+    - [Range index](#range-index)
+    - [String indices & fuzzy matching](#string-indices-fuzzy-matching)
+    - [Computed or compound key](#computed-or-compound-key)
+    - [Reflection- & expression-free - convention-based index naming](#reflection-expression-free-convention-based-index-naming)
+    - [Updating key-values](#updating-key-values)
+  - [FAQs](#faqs)
+    - [How do I use multiple index types for the same property?](#how-do-i-use-multiple-index-types-for-the-same-property)
+  - [Roadmap](#roadmap)
+<!--/TOC-->
+
 ## Overview
 
 A sample showing different queries as you might want do for a report:
@@ -240,7 +259,7 @@ Potential features (not ordered):
 - [ ] Thread-safe version
 - [ ] Easier updating of keys
 - [ ] Events for changed values
-- [ ] More index types (Trie)
+- [x] More index types (Trie)
 - [ ] Tree-based range index for better insertion performance
 - [ ] Analyzers to help with best practices
 - [x] Range insertion and corresponding `.ToIndexedSet().WithIndex(x => ...).[...].Build()`
