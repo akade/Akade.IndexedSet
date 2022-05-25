@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<Version>0.3.0</Version>
+		<Version>0.4.0</Version>
 		<VersionSuffix>beta</VersionSuffix>
 		<Description>Provides an In-Memory data structure, the IndexedSet, that allows to easily add indices to allow efficient querying. Currently supports unique and non-unique indices as well as range indices for single attribute, compound or computed keys.</Description>
 		<Copyright>Copyright © Akade 2022</Copyright>
@@ -14,11 +13,11 @@
 		<EnablePackageValidation>true</EnablePackageValidation>
 		<RepositoryUrl>https://github.com/akade/Akade.IndexedSet</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageTags>data structure;indices;range query;unique index;range index;non-unique index;multi-value;dictionary;collections;computed keys</PackageTags>
+		<PackageTags>data structure;indices;range query;unique index;range index;non-unique index;multi-value;dictionary;collections;computed keys;fuzzy;fuzzy search;approximate string matching;search</PackageTags>
 		<PackageReadmeFile>/README.md</PackageReadmeFile>
 	</PropertyGroup>
 	<ItemGroup>
-		<None Include="..\README.md" Pack="true" PackagePath="\"/>
+		<None Include="..\README.md" Pack="true" PackagePath="\" />
 		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
 			<_Parameter1>Akade.IndexedSet.Tests</_Parameter1>
 		</AssemblyAttribute>

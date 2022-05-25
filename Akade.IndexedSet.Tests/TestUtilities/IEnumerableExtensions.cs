@@ -1,4 +1,4 @@
-﻿namespace Akade.IndexedSet.Tests.Utilities;
+﻿namespace Akade.IndexedSet.Tests.TestUtilities;
 
 internal static class IEnumerableExtensions
 {

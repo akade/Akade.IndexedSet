@@ -6,6 +6,25 @@
 Provides an In-Memory data structure, the IndexedSet, that allows to easily add indices to allow efficient querying. Based on often seeing inefficient usage of 
 `.FirstOrDefault`, `.Where`, `.Single` etc... and implementing data-structures to improve those queries for every project I'm on.
 
+<!--TOC-->
+  - [Overview](#overview)
+    - [Performance / Operation-Support of the different indices:](#performance-operation-support-of-the-different-indices)
+      - [General queries](#general-queries)
+      - [String queries](#string-queries)
+  - [Features](#features)
+    - [Unique index (single entity, single key)](#unique-index-single-entity-single-key)
+    - [Non-unique index (multiple entities, single key)](#non-unique-index-multiple-entities-single-key)
+    - [Non-unique index (multiple entities, multiple keys)](#non-unique-index-multiple-entities-multiple-keys)
+    - [Range index](#range-index)
+    - [String indices & fuzzy matching](#string-indices-fuzzy-matching)
+    - [Computed or compound key](#computed-or-compound-key)
+    - [Reflection- & expression-free - convention-based index naming](#reflection-expression-free-convention-based-index-naming)
+    - [Updating key-values](#updating-key-values)
+  - [FAQs](#faqs)
+    - [How do I use multiple index types for the same property?](#how-do-i-use-multiple-index-types-for-the-same-property)
+  - [Roadmap](#roadmap)
+<!--/TOC-->
+
 ## Overview
 
 A sample showing different queries as you might want do for a report:
@@ -35,24 +54,41 @@ _ = set.MaxBy(x => x.Amount * x.UnitPrice);
 _ = set.Where(x => (x.ProductId, x.UnitPrice), (4, 10));
 ```
 
-Performance / Operation-Support of the different indices:
+### Performance / Operation-Support of the different indices:
 
 - n: total number of elements
 - m: number of elements in the return set
+- ✔: Supported
+- ⚠: Supported but throws if not exactly 1 item was found
+- ❌: Not-supported
 
-| Query   | Unique-Index | NonUnique-Index | Range-Index     |
-| ------  | ------------ | --------------- | --------------- |
-| Single  | ⚠ O(1)      | ⚠ O(1)         | ⚠ O(log n)    |
-| Where   | ✔ O(1)       | ✔ O(m)         | ✔ O(log n + m) |
-| Range   | ❌           | ❌             | ✔ O(log n + m)  |
-| < / <=  | ❌           | ❌             | ✔ O(log n + m)  |
-| > / >=  | ❌           | ❌             | ✔ O(log n + m)  |
-| OrderBy | ❌           | ❌             | ✔ O(m)          |
-| Max/Min | ❌           | ❌             | ✔ O(1)          |
+#### General queries
 
-✔: Supported
-⚠: Supported but throws if not exactly 1 item was found
-❌: Not-supported
+| Query     | Unique-Index | NonUnique-Index | Range-Index     |
+| --------- | ------------ | --------------- | --------------- |
+| Single    | ⚠ O(1)      | ⚠ O(1)         | ⚠ O(log n)    |
+| Where     | ✔ O(1)       | ✔ O(m)         | ✔ O(log n + m) |
+| Range     | ❌           | ❌             | ✔ O(log n + m)  |
+| < / <=    | ❌           | ❌             | ✔ O(log n + m)  |
+| > / >=    | ❌           | ❌             | ✔ O(log n + m)  |
+| OrderBy   | ❌           | ❌             | ✔ O(m)          |
+| Max/Min   | ❌           | ❌             | ✔ O(1)          |
+
+#### String queries
+
+- w: length of query word
+- D: maximum distance in fuzzy query
+
+| Query           | Prefix-Index | FullText-Index |
+| ----------------| ------------ | ---------------|
+| StartWith       | ⚠ O(w)      | ⚠ O(w)       |
+| Contains        | ❌           | ✔ O(w)        |
+| Fuzzy StartWith | ⚠ O(w+D)    | ⚠ O(w+D)     |
+| Fuzzy Contains  | ❌           | ✔ O(w+D)      |
+
+> ℹ FullText indices use a lot more memory than prefix indices and are more expensive to construct. Only
+use FullText indices if you really require it.
+
 
 ## Features
 This project aims to provide a data structure (*it's not a DB!*) that allows to easily setup fast access on different properties:
@@ -73,7 +109,9 @@ Data data = set[1];
 data = set.Single(x => x.SecondaryKey, 5);
 ```
 
-> ℹ Entities do not require a primary key. `IndexedSet<TPrimaryKey, TData>` inherits from `IndexedSet<TData>` but provides convenient access to the automatically added unique index: `set[primaryKey]` instead of `set.Single(x => x.PrimaryKey, primaryKey)`.
+> ℹ Entities do not require a primary key. `IndexedSet<TPrimaryKey, TData>` inherits from `IndexedSet<TData>`
+but provides convenient access to the automatically added unique index: `set[primaryKey]` instead 
+of `set.Single(x => x.PrimaryKey, primaryKey)`.
 
 
 ### Non-unique index (multiple entities, single key)
@@ -138,6 +176,27 @@ data = set.LessThan(x => x.SecondaryKey, 4);
 data = set.OrderBy(x => x.SecondaryKey, skip: 10).Take(10); // second page of 10 elements
 ```
 
+### String indices & fuzzy matching
+Prefix- & Suffix-Trie based indices for efficient StartWith & String-Contains queries including support
+for fuzzy matching.
+
+```csharp
+IndexedSet<Type> data = typeof(object).Assembly.GetTypes()
+                                               .ToIndexedSet()
+                                               .WithPrefixIndex(x => x.Name.AsMemory())
+                                               .WithFullTextIndex(x => x.FullName.AsMemory())
+                                               .Build();
+
+// fast prefix or contains queries via indices
+_ = data.StartsWith(x => x.Name.AsMemory(), "Int".AsMemory());
+_ = data.Contains(x => x.FullName.AsMemory(), "Int".AsMemory());
+
+// fuzzy searching is supported by prefix and full text indices
+// the following will also match "String"
+_ = data.FuzzyStartsWith(x => x.Name.AsMemory(), "Strang".AsMemory(), 1);
+_ = data.FuzzyContains(x => x.FullName.AsMemory(), "Strang".AsMemory(), 1);
+```
+
 ### Computed or compound key
 
 The data structure also allows to use computed or compound keys:
@@ -200,7 +259,7 @@ Potential features (not ordered):
 - [ ] Thread-safe version
 - [ ] Easier updating of keys
 - [ ] Events for changed values
-- [ ] More index types (Trie)
+- [x] More index types (Trie)
 - [ ] Tree-based range index for better insertion performance
 - [ ] Analyzers to help with best practices
 - [x] Range insertion and corresponding `.ToIndexedSet().WithIndex(x => ...).[...].Build()`

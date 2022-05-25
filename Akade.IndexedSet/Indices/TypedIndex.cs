@@ -15,6 +15,8 @@ internal abstract class TypedIndex<TElement, TIndexKey> : Index<TElement>
 
     internal abstract IEnumerable<TElement> Where(TIndexKey indexKey);
 
+    internal abstract bool TryGetSingle(TIndexKey indexKey, out TElement? element);
+
     internal virtual IEnumerable<TElement> Range(TIndexKey start, TIndexKey end, bool inclusiveStart, bool inclusiveEnd)
     {
         throw new NotSupportedException($"Range queries are not supported on {GetType().Name}-indices. Use a range index to support this scenario.");
@@ -70,5 +72,23 @@ internal abstract class TypedIndex<TElement, TIndexKey> : Index<TElement>
         throw new NotSupportedException($"OrderByDescending queries are not supported on {GetType().Name}-indices. Use a range index to support this scenario.");
     }
 
-    internal abstract bool TryGetSingle(TIndexKey indexKey, out TElement? element);
+    internal virtual IEnumerable<TElement> FuzzyStartsWith(ReadOnlyMemory<char> indexKey, int maxDistance)
+    {
+        throw new NotSupportedException($"Fuzzy starts with queries are not supported on {GetType().Name}-indices. Use a full text or prefix index to support this scenario.");
+    }
+
+    internal virtual IEnumerable<TElement> FuzzyContains(ReadOnlyMemory<char> indexKey, int maxDistance)
+    {
+        throw new NotSupportedException($"Fuzzy contains queries are not supported on {GetType().Name}-indices. Use a full text or prefix index to support this scenario.");
+    }
+
+    internal virtual IEnumerable<TElement> StartsWith(ReadOnlyMemory<char> indexKey)
+    {
+        throw new NotSupportedException($"Fuzzy queries are not supported on {GetType().Name}-indices. Use a full text or or prefix to support this scenario.");
+    }
+
+    internal virtual IEnumerable<TElement> Contains(ReadOnlyMemory<char> indexKey)
+    {
+        throw new NotSupportedException($"Contain queries are not supported on {GetType().Name}-indices. Use a full text to support this scenario.");
+    }
 }

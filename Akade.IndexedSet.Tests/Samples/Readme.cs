@@ -103,6 +103,24 @@ public class Readme
         result = set.Where(ComputedKey.SomeStaticMethod, 42);
     }
 
+    [TestMethod]
+    public void Features_StringQueries()
+    {
+        IndexedSet<Type> data = typeof(object).Assembly.GetTypes()
+                                                       .ToIndexedSet()
+                                                       .WithPrefixIndex(x => x.Name.AsMemory())
+                                                       .WithFullTextIndex(x => x.FullName.AsMemory())
+                                                       .Build();
+
+        // fast prefix or contains queries via indices
+        _ = data.StartsWith(x => x.Name.AsMemory(), "Int".AsMemory());
+        _ = data.Contains(x => x.FullName.AsMemory(), "Int".AsMemory());
+
+        // fuzzy searching is supported by prefix and full text indices
+        // the following will also match "String"
+        _ = data.FuzzyStartsWith(x => x.Name.AsMemory(), "Strang".AsMemory(), 1);
+        _ = data.FuzzyContains(x => x.FullName.AsMemory(), "Strang".AsMemory(), 1);
+    }
 
     [TestMethod]
     public void FAQ_MultipleIndicesForSameProperty()
@@ -145,6 +163,9 @@ public class Readme
         _ = set.MaxBy(x => x.Amount * x.UnitPrice);
         _ = set.Where(x => (x.ProductId, x.UnitPrice), (4, 10));
     }
+
+
+
 
     private static class DataIndices
     {

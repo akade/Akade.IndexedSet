@@ -5,7 +5,6 @@ namespace Akade.IndexedSet.Tests.Samples.Leaderboard;
 [TestClass]
 public class LeaderboardSample
 {
-
     private readonly IndexedSet<int, LeaderboardEntry> _leaderboard = IndexedSetBuilder<LeaderboardEntry>.Create(x => x.Id)
         .WithRangeIndex(x => x.Score)
         .WithRangeIndex(x => x.Timestamp)
