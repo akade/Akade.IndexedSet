@@ -21,12 +21,11 @@ A convenient data structure supporting efficient in-memory indexing and querying
     - [String indices & fuzzy matching](#string-indices-fuzzy-matching)
     - [Computed or compound key](#computed-or-compound-key)
     - [Reflection- & expression-free - convention-based index naming](#reflection-expression-free-convention-based-index-naming)
-    - [Updating key-values](#updating-key-values)
   - [FAQs](#faqs)
     - [How do I use multiple index types for the same property?](#how-do-i-use-multiple-index-types-for-the-same-property)
+    - [How do I update key values if I have mutable elements in the set?](#how-do-i-update-key-values-if-i-have-mutable-elements-in-the-set)
   - [Roadmap](#roadmap)
 <!--/TOC-->
-
 ## Overview
 
 A sample showing different queries as you might want do for a report:
