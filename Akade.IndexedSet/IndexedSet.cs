@@ -20,8 +20,6 @@ public class IndexedSet<TElement>
     {
     }
 
-
-
     /// <summary>
     /// Returns the number of elements currently within the set.
     /// </summary>
@@ -390,7 +388,7 @@ public class IndexedSet<TElement>
     /// <param name="prefix">The prefix to use</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
-    public IEnumerable<TElement> StartsWith(Func<TElement, ReadOnlyMemory<char>> indexAccessor, ReadOnlyMemory<char> prefix,  [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+    public IEnumerable<TElement> StartsWith(Func<TElement, ReadOnlyMemory<char>> indexAccessor, ReadOnlyMemory<char> prefix, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
     {
         TypedIndex<TElement, ReadOnlyMemory<char>> typedIndex = GetIndex<ReadOnlyMemory<char>>(indexName);
         return typedIndex.StartsWith(prefix);
@@ -448,6 +446,7 @@ public class IndexedSet<TElement>
         return _data;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private TypedIndex<TElement, TIndexKey> GetIndex<TIndexKey>(string? indexName)
         where TIndexKey : notnull
     {
@@ -487,7 +486,6 @@ public class IndexedSet<TElement>
         }
     }
 }
-
 
 /// <summary>
 /// Additionaly provides convienience access to a "primary key" unique index.
