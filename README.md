@@ -3,8 +3,9 @@
 [![CI Build](https://github.com/akade/Akade.IndexedSet/actions/workflows/ci-build.yml/badge.svg?branch=master)](https://github.com/akade/Akade.IndexedSet/actions/workflows/ci-build.yml)
 [![NuGet version (Akade.IndexedSet)](https://img.shields.io/nuget/v/Akade.IndexedSet.svg)](https://www.nuget.org/packages/Akade.IndexedSet/)
 
-Provides an In-Memory data structure, the IndexedSet, that allows to easily add indices to allow efficient querying. Based on often seeing inefficient usage of 
-`.FirstOrDefault`, `.Where`, `.Single` etc... and implementing data-structures to improve those queries for every project I'm on.
+
+A convenient data structure supporting efficient in-memory indexing and querying, including range queries and fuzzy string matching.
+In a nutshell, it allows you to write LINQ-like queries *without* enumerating through the entire list.
 
 <!--TOC-->
   - [Overview](#overview)
@@ -47,12 +48,19 @@ IndexedSet<int, Purchase> set = data.ToIndexedSet(x => x.Id)
                                     .Build();
 
 // efficient queries on configured indices
+// in contrast to standard LINQ, they do not enumerate the entire list!
 _ = set.Where(x => x.ProductId, 4);
-_ = set.Range(x => x.Amount, 1, 3, inclusiveStart: true, inclusiveEnd: true);
+_ = set.Range(x => x.Amount, 1, 3, inclusiveStart: true, inclusiveEnd: true); 
 _ = set.GreaterThanOrEqual(x => x.UnitPrice, 10);
 _ = set.MaxBy(x => x.Amount * x.UnitPrice);
 _ = set.Where(x => (x.ProductId, x.UnitPrice), (4, 10));
 ```
+
+### Design Goals
+- At least o
+- der of magnitude faster solution than naive LINQ-based full-enumeration
+- Syntax close to LINQ-Queries
+- 
 
 ### Performance / Operation-Support of the different indices:
 
