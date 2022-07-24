@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1D4D9594-0CD1-4103-AA2E-8589FBBD6EAC}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		docs\Benchmarks.md = docs\Benchmarks.md
 		.github\workflows\ci-build.yml = .github\workflows\ci-build.yml
 		.github\workflows\codeql-analysis.yml = .github\workflows\codeql-analysis.yml
 		.github\workflows\publish-to-nuget-org.yml = .github\workflows\publish-to-nuget-org.yml
@@ -15,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Akade.IndexedSet.Tests", "Akade.IndexedSet.Tests\Akade.IndexedSet.Tests.csproj", "{E504884A-2704-4030-8B12-74FD40F7534C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Akade.IndexedSet.Benchmarks", "Akade.IndexedSet.Benchmarks\Akade.IndexedSet.Benchmarks.csproj", "{D7D6B12C-9963-4B30-B87A-A1039521CDDB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,6 +33,10 @@ Global
 		{E504884A-2704-4030-8B12-74FD40F7534C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E504884A-2704-4030-8B12-74FD40F7534C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E504884A-2704-4030-8B12-74FD40F7534C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7D6B12C-9963-4B30-B87A-A1039521CDDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7D6B12C-9963-4B30-B87A-A1039521CDDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7D6B12C-9963-4B30-B87A-A1039521CDDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7D6B12C-9963-4B30-B87A-A1039521CDDB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -7,9 +7,12 @@
 
 
 A convenient data structure supporting efficient in-memory indexing and querying, including range queries and fuzzy string matching.
+In a nutshell, it allows you to write LINQ-like queries *without* enumerating through the entire list. If you are currently completly enumerating
+through your data, expect huge [speedups](docs/Benchmarks.md) and much better scalability!
 
 <!--TOC-->
   - [Overview](#overview)
+    - [Design Goals](#design-goals)
     - [Performance / Operation-Support of the different indices:](#performance-operation-support-of-the-different-indices)
       - [General queries](#general-queries)
       - [String queries](#string-queries)
@@ -24,6 +27,7 @@ A convenient data structure supporting efficient in-memory indexing and querying
   - [FAQs](#faqs)
     - [How do I use multiple index types for the same property?](#how-do-i-use-multiple-index-types-for-the-same-property)
     - [How do I update key values if I have mutable elements in the set?](#how-do-i-update-key-values-if-i-have-mutable-elements-in-the-set)
+    - [How do I do case-insensitve (fuzzy) string matching (Prefix / FullTextIndex)?](#how-do-i-do-case-insensitve-fuzzy-string-matching-prefix-fulltextindex)
   - [Roadmap](#roadmap)
 <!--/TOC-->
 ## Overview
@@ -48,22 +52,32 @@ IndexedSet<int, Purchase> set = data.ToIndexedSet(x => x.Id)
                                     .Build();
 
 // efficient queries on configured indices
+// in contrast to standard LINQ, they do not enumerate the entire list!
 _ = set.Where(x => x.ProductId, 4);
-_ = set.Range(x => x.Amount, 1, 3, inclusiveStart: true, inclusiveEnd: true);
+_ = set.Range(x => x.Amount, 1, 3, inclusiveStart: true, inclusiveEnd: true); 
 _ = set.GreaterThanOrEqual(x => x.UnitPrice, 10);
 _ = set.MaxBy(x => x.Amount * x.UnitPrice);
 _ = set.Where(x => (x.ProductId, x.UnitPrice), (4, 10));
 ```
 
+### Design Goals
+- Much faster solution than (naive) LINQ-based full-enumeration
+- Syntax close to LINQ-Queries
+- Easy to use with a fluent builder API
+- Reflection & Expression-free to be AOT & Trimming friendly (for example for Blazor/WebASM)
+- It's not a db - in-memory only
+
 ### Performance / Operation-Support of the different indices:
+
+Below, you find runtime complexities. Benchmarks can be found [here](docs/Benchmarks.md)
+
+#### General queries
 
 - n: total number of elements
 - m: number of elements in the return set
 - ✔: Supported
 - ⚠: Supported but throws if not exactly 1 item was found
 - ❌: Not-supported
-
-#### General queries
 
 | Query     | Unique-Index | NonUnique-Index | Range-Index     |
 | --------- | ------------ | --------------- | --------------- |
@@ -79,20 +93,21 @@ _ = set.Where(x => (x.ProductId, x.UnitPrice), (4, 10));
 
 - w: length of query word
 - D: maximum distance in fuzzy query
+- r: number of items in result set
 
 | Query           | Prefix-Index | FullText-Index |
 | ----------------| ------------ | ---------------|
-| StartWith       | ⚠ O(w)      | ⚠ O(w)       |
-| Contains        | ❌           | ✔ O(w)        |
-| Fuzzy StartWith | ⚠ O(w+D)    | ⚠ O(w+D)     |
-| Fuzzy Contains  | ❌           | ✔ O(w+D)      |
+| StartWith       | ✔ O(w+r)      | ✔ O(w+r)       |
+| Contains        | ❌           | ✔ O(w+r)        |
+| Fuzzy StartWith | ✔ O(w+D+r)    | ✔ O(w+D+r)     |
+| Fuzzy Contains  | ❌           | ✔ O(w+D+r)      |
 
 > ℹ FullText indices use a lot more memory than prefix indices and are more expensive to construct. Only
 use FullText indices if you really require it.
 
 
 ## Features
-This project aims to provide a data structure (*it's not a DB!*) that allows to easily setup fast access on different properties:
+
 ### Unique index (single entity, single key)
 Dictionary-based, O(1), access on keys:
 
@@ -260,6 +275,17 @@ set.Remove(element);
 // update element
 set.Add(element);
 ```
+
+### How do I do case-insensitve (fuzzy) string matching (Prefix / FullTextIndex)?
+Remember that you can index whatever you want, including copmuter properties. This also applies for fuzzy matching:
+
+```csharp
+IndexedSet<Data> set = IndexedSetBuilder<Data>.Create(x => x.PrimaryKey)
+                                              .WithFullTextIndex(x => x.Text.ToLowerInvariant().AsMemory())
+                                              .Build();
+IEnumerable<Data> matches = set.FuzzyContains(x => x.Text.ToLowerInvariant().AsMemory(), "Search".AsMemory(), maxDistance: 2);
+```
+
 ## Roadmap
 Potential features (not ordered):
 - [ ] Thread-safe version
