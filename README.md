@@ -1,7 +1,9 @@
 ﻿# Akade.IndexedSet
 
+![.Net Version](https://img.shields.io/badge/dynamic/xml?color=%23512bd4&label=target&query=%2F%2FTargetFramework%5B1%5D&url=https://raw.githubusercontent.com/akade/Akade.IndexedSet/main/Akade.IndexedSet/Akade.IndexedSet.csproj&logo=.net)
 [![CI Build](https://github.com/akade/Akade.IndexedSet/actions/workflows/ci-build.yml/badge.svg?branch=master)](https://github.com/akade/Akade.IndexedSet/actions/workflows/ci-build.yml)
 [![NuGet version (Akade.IndexedSet)](https://img.shields.io/nuget/v/Akade.IndexedSet.svg)](https://www.nuget.org/packages/Akade.IndexedSet/)
+[![MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/akade/Akade.IndexedSet#readme)
 
 
 A convenient data structure supporting efficient in-memory indexing and querying, including range queries and fuzzy string matching.
@@ -20,12 +22,11 @@ In a nutshell, it allows you to write LINQ-like queries *without* enumerating th
     - [String indices & fuzzy matching](#string-indices-fuzzy-matching)
     - [Computed or compound key](#computed-or-compound-key)
     - [Reflection- & expression-free - convention-based index naming](#reflection-expression-free-convention-based-index-naming)
-    - [Updating key-values](#updating-key-values)
   - [FAQs](#faqs)
     - [How do I use multiple index types for the same property?](#how-do-i-use-multiple-index-types-for-the-same-property)
+    - [How do I update key values if I have mutable elements in the set?](#how-do-i-update-key-values-if-i-have-mutable-elements-in-the-set)
   - [Roadmap](#roadmap)
 <!--/TOC-->
-
 ## Overview
 
 A sample showing different queries as you might want do for a report:
@@ -237,9 +238,6 @@ Reasons
 - Performance: No reflection at work and no (runtime) code-gen necessary
 - AOT-friendly including full trimming support
 
-### Updating key-values
-**The current implementation requires any keys of any type to never change the value while the instance is within the set**. Hence, in order to update any key you will need to remove the instance, update the keys and add the instance again.
-
 ## FAQs
 
 ### How do I use multiple index types for the same property?
@@ -250,9 +248,9 @@ Use "named" indices by using static methods:
 record Data(int PrimaryKey, int SecondaryKey);
 
 IndexedSet<int, Data> set = IndexedSetBuilder<Data>.Create(x => x.PrimaryKey)
-                                                        .WithUniqueIndex(DataIndices.UniqueIndex)
-                                                        .WithRangeIndex(x => x.SecondaryKey)
-                                                        .Build();
+                                                   .WithUniqueIndex(DataIndices.UniqueIndex)
+                                                   .WithRangeIndex(x => x.SecondaryKey)
+                                                   .Build();
 _ = set.Add(new(1, 4));
 // querying unique index:
 Data data = set.Single(DataIndices.UniqueIndex, 4); // Uses the unique index
@@ -262,6 +260,14 @@ IEnumerable<Data> inRange = set.Range(x => x.SecondaryKey, 1, 10); // Uses the r
 
 > ℹ We recommend using the lambda syntax for "simple" properties and static methods for more complicated ones. It's easy to read, resembles "normal" LINQ-Queries and all the magic strings are compiler generated.
 
+### How do I update key values if I have mutable elements in the set?
+**The current implementation requires any keys of any type to never change the value while the instance is within the set**. Hence, in order to update any key you will need to remove the instance, update the keys and add the instance again:
+
+```csharp
+set.Remove(element);
+// update element
+set.Add(element);
+```
 ## Roadmap
 Potential features (not ordered):
 - [ ] Thread-safe version
