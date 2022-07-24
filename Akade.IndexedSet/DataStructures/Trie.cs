@@ -28,7 +28,6 @@ internal class Trie<TElement>
         return _root.Contains(key, element);
     }
 
-
     public IEnumerable<TElement> GetAll(ReadOnlySpan<char> prefix)
     {
         TrieNode? matchingNode = _root.Find(prefix);
@@ -48,7 +47,6 @@ internal class Trie<TElement>
         return result;
     }
 
-
     public IEnumerable<TElement> FuzzySearch(ReadOnlySpan<char> word, int maxDistance, bool exactMatches)
     {
         int wordLength = word.Length;
@@ -61,7 +59,6 @@ internal class Trie<TElement>
         }
 
         PriorityQueue<TrieNode, int> results = new();
-
 
         for (int i = 0; i < wordLength; i++)
         {
@@ -173,7 +170,6 @@ internal class Trie<TElement>
         {
             return _children ?? Enumerable.Empty<KeyValuePair<char, TrieNode>>();
         }
-
 
         internal IEnumerable<TElement> GetLocalElements()
         {

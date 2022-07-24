@@ -15,16 +15,20 @@ public class MultiValueIndexBenchmarks
     public MultiValueIndexBenchmarks()
     {
         Random r = new(42);
-        _orders = new(500);
+        _orders = Enumerable.Range(0, 1000)
+                            .Select(_ => new Order(r.Next(1, 10), (decimal)r.NextDouble() * 100m))
+                            .ToList();
 
-        _orders.AddRange(Enumerable.Range(0, 500).Select(_ => new Order(r.Next(1, 10), (decimal)r.NextDouble() * 100m)));
-        _productIds = Enumerable.Range(1, 10).ToList();
+        _productIds = Enumerable.Range(1, 10)
+                                .ToList();
 
         _lookup = _orders.ToLookup(x => x.ProductId);
-        _indexedSet = _orders.ToIndexedSet().WithIndex(x => x.ProductId).Build();
+        _indexedSet = _orders.ToIndexedSet()
+                             .WithIndex(x => x.ProductId)
+                             .Build();
     }
 
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     public decimal MultivalueLookupWithinALoop_NaiveLinqImplementation()
     {
         decimal total = 0;
@@ -52,7 +56,7 @@ public class MultiValueIndexBenchmarks
         return total;
     }
 
-    [Benchmark(Baseline = true)]
+    [Benchmark]
     public decimal MultivalueLookupWithinALoop_UsingToIndexedSet()
     {
         decimal total = 0;

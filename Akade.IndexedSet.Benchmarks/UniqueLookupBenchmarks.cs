@@ -16,18 +16,20 @@ public class UniqueIndexBenchmarks
     public UniqueIndexBenchmarks()
     {
         Random r = new(42);
-        _products = new(500);
-        _orders = new(100);
+        _products = Enumerable.Range(0, 1000)
+                              .Select(i => new Product(i, r.Next(0, 10)))
+                              .ToList();
 
-        _products.AddRange(Enumerable.Range(0, 500).Select(i => new Product(i, r.Next(0, 10))));
-        _orders.AddRange(Enumerable.Range(0, 100).Select(_ => (r.Next(0, 500), r.Next(0, 10))));
+        _orders = Enumerable.Range(0, 100)
+                            .Select(_ => (r.Next(0, 500), r.Next(0, 10)))
+                            .ToList();
 
         _dictionary = _products.ToDictionary(x => x.Id);
-
-        _indexedSet = _products.ToIndexedSet(x => x.Id).Build();
+        _indexedSet = _products.ToIndexedSet(x => x.Id)
+                               .Build();
     }
 
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     public bool UniqueLookupWithinALoop_NaiveLinqImplementation()
     {
         bool result = true;
@@ -49,7 +51,7 @@ public class UniqueIndexBenchmarks
         return result;
     }
 
-    [Benchmark(Baseline = true)]
+    [Benchmark]
     public bool UniqueLookupWithinALoop_UsingToIndexedSetPrimaryKey()
     {
         bool result = true;
