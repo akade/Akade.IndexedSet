@@ -27,6 +27,7 @@ through your data, expect huge [speedups](docs/Benchmarks.md) and much better sc
   - [FAQs](#faqs)
     - [How do I use multiple index types for the same property?](#how-do-i-use-multiple-index-types-for-the-same-property)
     - [How do I update key values if I have mutable elements in the set?](#how-do-i-update-key-values-if-i-have-mutable-elements-in-the-set)
+    - [How do I do case-insensitve (fuzzy) string matching (Prefix / FullTextIndex)?](#how-do-i-do-case-insensitve-fuzzy-string-matching-prefix-fulltextindex)
   - [Roadmap](#roadmap)
 <!--/TOC-->
 ## Overview
