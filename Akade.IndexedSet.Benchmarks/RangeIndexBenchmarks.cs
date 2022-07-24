@@ -30,7 +30,7 @@ public class RangeIndexBenchmarks
 
     [Benchmark(Baseline = true)]
     [BenchmarkCategory("Range")]
-    public int RangeLoop()
+    public int Range_Linq()
     {
         DateOnly start = _start.AddYears(10);
         DateOnly end = _start.AddYears(18);
@@ -39,7 +39,7 @@ public class RangeIndexBenchmarks
 
     [Benchmark]
     [BenchmarkCategory("Range")]
-    public int RangeIndexedSet()
+    public int Range_IndexedSet()
     {
         DateOnly start = _start.AddYears(10);
         DateOnly end = _start.AddYears(18);
@@ -48,7 +48,7 @@ public class RangeIndexBenchmarks
 
     [Benchmark(Baseline = true)]
     [BenchmarkCategory("Paging")]
-    public int PagingLoop()
+    public int Paging_Linq()
     {
         // ToArray() is important here as directly using Count() is optimized and does not perform the OrderBy
         return _appointments.OrderBy(x => x.Date).Skip(100).Take(10).ToArray().Length;
@@ -56,28 +56,28 @@ public class RangeIndexBenchmarks
 
     [Benchmark]
     [BenchmarkCategory("Paging")]
-    public int PagingIndexedSet()
+    public int Paging_IndexedSet()
     {
         return _indexedSet.OrderBy(x => x.Date, 100).Take(10).ToArray().Length;
     }
 
     [Benchmark(Baseline = true)]
     [BenchmarkCategory("Min")]
-    public DateOnly MinLoop()
+    public DateOnly Min_Linq()
     {
         return _appointments.Min(x => x.Date);
     }
 
     [Benchmark]
     [BenchmarkCategory("Min")]
-    public DateOnly MinIndexedSet()
+    public DateOnly Min_IndexedSet()
     {
         return _indexedSet.Min(x => x.Date);
     }
 
     [Benchmark(Baseline = true)]
     [BenchmarkCategory("LessThan")]
-    public int LessThanLoop()
+    public int LessThan_Linq()
     {
         DateOnly end = _start.AddYears(10);
         return _appointments.Where(x => x.Date < end).Count();
@@ -85,7 +85,7 @@ public class RangeIndexBenchmarks
 
     [Benchmark]
     [BenchmarkCategory("LessThan")]
-    public int LessThanIndexedSet()
+    public int LessThan_IndexedSet()
     {
         DateOnly end = _start.AddYears(10);
         return _indexedSet.LessThan(x => x.Date, end).Count();

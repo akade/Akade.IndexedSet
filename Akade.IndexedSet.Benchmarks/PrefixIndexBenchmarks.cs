@@ -24,28 +24,28 @@ public class PrefixIndexBenchmarks
 
     [Benchmark(Baseline = true)]
     [BenchmarkCategory("StartsWith")]
-    public int StartsWithLoop()
+    public int StartsWith_Linq()
     {
         return _persons.Count(x => x.FullName.StartsWith("Peter", StringComparison.Ordinal));
     }
 
     [Benchmark]
     [BenchmarkCategory("StartsWith")]
-    public int StartsWithIndexedSet()
+    public int StartsWith_IndexedSet()
     {
         return _indexedSet.StartsWith(x => x.FullName.AsMemory(), "Peter".AsMemory()).Count();
     }
 
     [Benchmark(Baseline = true)]
     [BenchmarkCategory("Fuzzy StartsWith")]
-    public int FuzzyStartsWithLoop()
+    public int FuzzyStartsWith_Linq()
     {
         return _persons.Count(x => Fastenshtein.Levenshtein.Distance(x.FullName[..5], "Peter") <= 2);
     }
 
     [Benchmark]
     [BenchmarkCategory("Fuzzy StartsWith")]
-    public int FuzzyStartsWithIndexedSet()
+    public int FuzzyStartsWith_IndexedSet()
     {
         return _indexedSet.FuzzyStartsWith(x => x.FullName.AsMemory(), "Peter".AsMemory(), 2).Count();
     }

@@ -29,7 +29,7 @@ public class MultiValueIndexBenchmarks
     }
 
     [Benchmark(Baseline = true)]
-    public decimal MultivalueLookupWithinALoop_NaiveLinqImplementation()
+    public decimal MultiValue_Linq()
     {
         decimal total = 0;
         foreach (int productId in _productIds)
@@ -43,7 +43,7 @@ public class MultiValueIndexBenchmarks
     }
 
     [Benchmark]
-    public decimal MultivalueLookupWithinALoop_UsingToBuiltInLookup()
+    public decimal Multivalue_Lookup()
     {
         decimal total = 0;
         foreach (int productId in _productIds)
@@ -57,7 +57,7 @@ public class MultiValueIndexBenchmarks
     }
 
     [Benchmark]
-    public decimal MultivalueLookupWithinALoop_UsingToIndexedSet()
+    public decimal Multivalue_IndexedSet()
     {
         decimal total = 0;
         foreach (int productId in _productIds)

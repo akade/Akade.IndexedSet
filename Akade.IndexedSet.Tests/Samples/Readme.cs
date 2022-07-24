@@ -2,11 +2,10 @@
 
 namespace Akade.IndexedSet.Tests.Samples;
 
-
 [TestClass]
 public class Readme
 {
-    private record Data(int PrimaryKey, int SecondaryKey);
+    private record Data(int PrimaryKey, int SecondaryKey, string Text = "");
 
     [TestMethod]
     public void Features_UniqueIndex()
@@ -37,7 +36,6 @@ public class Readme
     }
 
     private record GraphNode(int Id, IEnumerable<int> ConnectsTo);
-
 
     [TestMethod]
     public void Features_NonUniqueIndex_MultipleKeys()
@@ -136,6 +134,15 @@ public class Readme
         IEnumerable<Data> inRange = set.Range(x => x.SecondaryKey, 1, 10); // Uses the range index
     }
 
+    [TestMethod]
+    public void FAQ_CaseInsensitiveFuzzyMatching()
+    {
+        IndexedSet<Data> set = IndexedSetBuilder<Data>.Create(x => x.PrimaryKey)
+                                                      .WithFullTextIndex(x => x.Text.ToLowerInvariant().AsMemory())
+                                                      .Build();
+        IEnumerable<Data> matches = set.FuzzyContains(x => x.Text.ToLowerInvariant().AsMemory(), "Search".AsMemory(), maxDistance: 2);
+    }
+
     private record Purchase(int Id, int ProductId, int Amount, decimal UnitPrice);
 
     [TestMethod]
@@ -163,9 +170,6 @@ public class Readme
         _ = set.MaxBy(x => x.Amount * x.UnitPrice);
         _ = set.Where(x => (x.ProductId, x.UnitPrice), (4, 10));
     }
-
-
-
 
     private static class DataIndices
     {

@@ -30,7 +30,7 @@ public class UniqueIndexBenchmarks
     }
 
     [Benchmark(Baseline = true)]
-    public bool UniqueLookupWithinALoop_NaiveLinqImplementation()
+    public bool Unqiue_Linq()
     {
         bool result = true;
         foreach ((int productId, int amount) in _orders)
@@ -41,7 +41,7 @@ public class UniqueIndexBenchmarks
     }
 
     [Benchmark]
-    public bool UniqueLookupWithinALoop_UsingDictionary()
+    public bool Unique_Dictionary()
     {
         bool result = true;
         foreach ((int productId, int amount) in _orders)
@@ -52,7 +52,7 @@ public class UniqueIndexBenchmarks
     }
 
     [Benchmark]
-    public bool UniqueLookupWithinALoop_UsingToIndexedSetPrimaryKey()
+    public bool Unique_IndexedSet_PrimaryKey()
     {
         bool result = true;
         foreach ((int productId, int amount) in _orders)
@@ -63,7 +63,7 @@ public class UniqueIndexBenchmarks
     }
 
     [Benchmark()]
-    public bool UniqueLookupWithinALoop_UsingToIndexedSetViaSingle()
+    public bool Unique_IndexedSet_Single()
     {
         bool result = true;
         foreach ((int productId, int amount) in _orders)

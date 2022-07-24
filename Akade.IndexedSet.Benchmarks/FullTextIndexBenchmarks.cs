@@ -1,4 +1,8 @@
-﻿namespace Akade.IndexedSet.Benchmarks;
+﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using Bogus;
+
+namespace Akade.IndexedSet.Benchmarks;
 [MemoryDiagnoser]
 [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
 [CategoriesColumn]
@@ -23,21 +27,21 @@ public class FullTextIndexBenchmarks
 
     [Benchmark(Baseline = true)]
     [BenchmarkCategory("Contains")]
-    public int ContainsLoop()
+    public int Contains_Linq()
     {
         return _document.Count(x => x.Content.Contains("excellent"));
     }
 
     [Benchmark]
     [BenchmarkCategory("Contains")]
-    public int ContainsIndexedSet()
+    public int Contains_IndexedSet()
     {
         return _indexedSet.Contains(x => x.Content.AsMemory(), "excellent".AsMemory()).Count();
     }
 
     [Benchmark(Baseline = true)]
     [BenchmarkCategory("Fuzzy Contains")]
-    public int FuzzyContainsLoop()
+    public int FuzzyContains_Linq()
     {
         return _document.Count(x =>
         {
@@ -60,7 +64,7 @@ public class FullTextIndexBenchmarks
 
     [Benchmark]
     [BenchmarkCategory("Fuzzy Contains")]
-    public int FuzzyContainsIndexedSet()
+    public int FuzzyContains_IndexedSet()
     {
         return _indexedSet.FuzzyContains(x => x.Content.AsMemory(), "excellent".AsMemory(), 2).Count();
     }
