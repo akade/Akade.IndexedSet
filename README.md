@@ -23,6 +23,7 @@ through your data, expect huge [speedups](docs/Benchmarks.md) and much better sc
     - [Range index](#range-index)
     - [String indices & fuzzy matching](#string-indices-fuzzy-matching)
     - [Computed or compound key](#computed-or-compound-key)
+    - [Concurrency / Thread-Safety](#concurrency-thread-safety)
     - [Reflection- & expression-free - convention-based index naming](#reflection-expression-free-convention-based-index-naming)
   - [FAQs](#faqs)
     - [How do I use multiple index types for the same property?](#how-do-i-use-multiple-index-types-for-the-same-property)
@@ -231,6 +232,19 @@ result = set.Where(ComputedKey.SomeStaticMethod, 42);
 ```
 > ℹ For more samples, take a look at the unit tests.
 
+### Concurrency / Thread-Safety
+
+The "normal" indexedset is not thread-safe, however, a ReaderWriterLock-based implementation is available.
+Just call `BuildConcurrent()` instead of `Build()`:
+
+```csharp
+ConcurrentIndexedSet<RangeData> set = data.ToIndexedSet()
+                                          .WithIndex(x => (x.Start, x.End))
+                                          .BuildConcurrent();
+```
+
+> ⚠ The concurrent implmentation needs to materialize all query results.<br />
+> `OrderBy` and `OrderByDescending)` take an additional `count` parameter to avoid unnecessary materialization.
 ### Reflection- & expression-free - convention-based index naming
 
 We are using the [CallerArgumentExpression](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.callerargumentexpressionattribute)-Feature 
@@ -288,7 +302,7 @@ IEnumerable<Data> matches = set.FuzzyContains(x => x.Text.ToLowerInvariant().AsM
 
 ## Roadmap
 Potential features (not ordered):
-- [ ] Thread-safe version
+- [x] Thread-safe version
 - [ ] Easier updating of keys
 - [ ] Events for changed values
 - [x] More index types (Trie)
@@ -297,6 +311,6 @@ Potential features (not ordered):
 - [x] Range insertion and corresponding `.ToIndexedSet().WithIndex(x => ...).[...].Build()`
 - [x] Refactoring to allow a primarykey-less set: this was an artifical restriction that is not necessary
 - [ ] Aggregates (i.e. sum or average: interface based on state & add/removal state update functions)
-- [ ] Benchmarks
+- [x] Benchmarks
 
 If you have any suggestion or found a bug / unexpected behavior, open an issue! I will also review PRs and integrate them if they fit the project.
