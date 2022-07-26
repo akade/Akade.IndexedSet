@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace Akade.IndexedSet.Concurrency;
 
@@ -9,7 +10,7 @@ namespace Akade.IndexedSet.Concurrency;
 /// </summary>
 public class ConcurrentIndexedSet<TElement>
 {
-    private readonly AsyncReaderWriterLock _lock = new();
+    private readonly ReaderWriterLockEx _lock = new();
     private readonly IndexedSet<TElement> _indexedSet;
 
     internal ConcurrentIndexedSet(IndexedSet<TElement> indexedSet)
@@ -23,30 +24,28 @@ public class ConcurrentIndexedSet<TElement>
     public int Count => _indexedSet.Count;
 
     /// <summary>
-    /// Adds a new item to the set. Use <see cref="AddRangeAsync(IEnumerable{TElement}, CancellationToken)"/> if you
+    /// Adds a new item to the set. Use <see cref="AddRange(IEnumerable{TElement})"/> if you
     /// want to add multiple items at once.
     /// </summary>
     /// <param name="element">The new element to add</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<bool> AddAsync(TElement element, CancellationToken cancellationToken = default)
+    public bool Add(TElement element)
     {
-        using (await AcquireWriterLockAsync(cancellationToken))
+        using (AcquireWriterLock())
         {
             return _indexedSet.Add(element);
         }
     }
 
     /// <summary>
-    /// Adds multiple elements at once. In contrast to <see cref="AddAsync(TElement, CancellationToken)"/>, this method
+    /// Adds multiple elements at once. In contrast to <see cref="Add(TElement)"/>, this method
     /// allows indices to perform the insertion in a preferable way, for example, by ordering
     /// the elements prior to insertion.
     /// </summary>
     /// <param name="elements">The elements to insert</param>
     /// <returns>Returns the number of inserted elements</returns>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<int> AddRangeAsync(IEnumerable<TElement> elements, CancellationToken cancellationToken = default)
+    public int AddRange(IEnumerable<TElement> elements)
     {
-        using (await AcquireWriterLockAsync(cancellationToken))
+        using (AcquireWriterLock())
         {
             return _indexedSet.AddRange(elements);
         }
@@ -57,10 +56,9 @@ public class ConcurrentIndexedSet<TElement>
     /// </summary>
     /// <param name="element">The element to remove</param>
     /// <returns>True if an element was removed otherwise, false.</returns>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<bool> RemoveAsync(TElement element, CancellationToken cancellationToken = default)
+    public bool Remove(TElement element)
     {
-        using (await AcquireWriterLockAsync(cancellationToken))
+        using (AcquireWriterLock())
         {
             return _indexedSet.Remove(element);
         }
@@ -73,19 +71,18 @@ public class ConcurrentIndexedSet<TElement>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexKey">The key within the index.</param>
+    /// <param name="element">The element if found, otherwise null.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<TElement?> TryGetSingleAsync<TIndexKey>(
+    public bool TryGetSingle<TIndexKey>(
         Func<TElement, TIndexKey> indexAccessor,
         TIndexKey indexKey,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+        [NotNullWhen(true)] out TElement? element,
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
-            _ = _indexedSet.TryGetSingle(indexAccessor, indexKey, out TElement? result, indexName);
-            return result;
+            return _indexedSet.TryGetSingle(indexAccessor, indexKey, out element, indexName);
         }
     }
 
@@ -97,15 +94,13 @@ public class ConcurrentIndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexKey">The key within the index.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<TElement> SingleAsync<TIndexKey>(
+    public TElement Single<TIndexKey>(
         Func<TElement, TIndexKey> indexAccessor,
         TIndexKey indexKey,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             return _indexedSet.Single(indexAccessor, indexKey, indexName);
         }
@@ -119,15 +114,13 @@ public class ConcurrentIndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="contains">The key within the index. The convention is to write the parameter name for increased readability i.e. .Single(x => x.Prop, contains: value).</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<TElement> SingleAsync<TIndexKey>(
+    public TElement Single<TIndexKey>(
         Func<TElement, IEnumerable<TIndexKey>> indexAccessor,
         TIndexKey contains,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             return _indexedSet.Single(indexAccessor, contains, indexName);
         }
@@ -141,15 +134,13 @@ public class ConcurrentIndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexKey">The key within the index.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<IEnumerable<TElement>> WhereAsync<TIndexKey>(
+    public IEnumerable<TElement> Where<TIndexKey>(
         Func<TElement, TIndexKey> indexAccessor,
         TIndexKey indexKey,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             return _indexedSet.Where(indexAccessor, indexKey, indexName).ToList();
         }
@@ -163,15 +154,13 @@ public class ConcurrentIndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="contains">The key within the index. The convention is to write the parameter name for increased readability i.e. .Where(x => x.Prop, contains: value).</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<IEnumerable<TElement>> WhereAsync<TIndexKey>(
+    public IEnumerable<TElement> Where<TIndexKey>(
         Func<TElement, IEnumerable<TIndexKey>> indexAccessor,
         TIndexKey contains,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             return _indexedSet.Where(indexAccessor, contains, indexName).ToList();
         }
@@ -189,18 +178,16 @@ public class ConcurrentIndexedSet<TElement>
     /// <param name="inclusiveStart">True, if the query should include the start, otherwise false.</param>
     /// <param name="inclusiveEnd">True, if the query should include the end, otherwise false.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<IEnumerable<TElement>> RangeAsync<TIndexKey>(
+    public IEnumerable<TElement> Range<TIndexKey>(
         Func<TElement, TIndexKey> indexAccessor,
         TIndexKey start,
         TIndexKey end,
         bool inclusiveStart = true,
         bool inclusiveEnd = false,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             return _indexedSet.Range(indexAccessor, start, end, inclusiveStart, inclusiveEnd, indexName).ToList();
         }
@@ -214,12 +201,10 @@ public class ConcurrentIndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="value">The key value to compare other keys with.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<IEnumerable<TElement>> LessThanAsync<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+    public IEnumerable<TElement> LessThan<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             return _indexedSet.LessThan(indexAccessor, value, indexName).ToList();
         }
@@ -233,12 +218,10 @@ public class ConcurrentIndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="value">The key value to compare other keys with.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<IEnumerable<TElement>> LessThanOrEqualAsync<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+    public IEnumerable<TElement> LessThanOrEqual<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             return _indexedSet.LessThanOrEqual(indexAccessor, value, indexName).ToList();
         }
@@ -252,12 +235,10 @@ public class ConcurrentIndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="value">The key value to compare other keys with.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<IEnumerable<TElement>> GreaterThanAsync<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+    public IEnumerable<TElement> GreaterThan<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             return _indexedSet.GreaterThan(indexAccessor, value, indexName).ToList();
         }
@@ -271,12 +252,10 @@ public class ConcurrentIndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="value">The key value to compare other keys with.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<IEnumerable<TElement>> GreaterThanOrEqualAsync<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+    public IEnumerable<TElement> GreaterThanOrEqual<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             return _indexedSet.GreaterThanOrEqual(indexAccessor, value, indexName).ToList();
         }
@@ -289,12 +268,10 @@ public class ConcurrentIndexedSet<TElement>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<TIndexKey> MaxAsync<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+    public TIndexKey Max<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             return _indexedSet.Max(indexAccessor, indexName);
         }
@@ -307,12 +284,10 @@ public class ConcurrentIndexedSet<TElement>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<TIndexKey> MinAsync<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+    public TIndexKey Min<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             return _indexedSet.Min(indexAccessor, indexName);
         }
@@ -325,12 +300,10 @@ public class ConcurrentIndexedSet<TElement>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<IEnumerable<TElement>> MaxByAsync<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+    public IEnumerable<TElement> MaxBy<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             return _indexedSet.MaxBy(indexAccessor, indexName).ToList();
         }
@@ -343,12 +316,10 @@ public class ConcurrentIndexedSet<TElement>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<IEnumerable<TElement>> MinByAsync<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+    public IEnumerable<TElement> MinBy<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             return _indexedSet.MinBy(indexAccessor, indexName).ToList();
         }
@@ -363,16 +334,14 @@ public class ConcurrentIndexedSet<TElement>
     /// <param name="skip">Allows to efficiently skip a number of elements. Default is 0</param>
     /// <param name="count">The concurrent implementation performs enumeration on the results. If this value is bigger than zero, at max the specified amount of items is returned.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<IEnumerable<TElement>> OrderByAsync<TIndexKey>(
+    public IEnumerable<TElement> OrderBy<TIndexKey>(
         Func<TElement, TIndexKey> indexAccessor,
         int skip = 0,
         int count = -1,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             IEnumerable<TElement> result = _indexedSet.OrderBy(indexAccessor, skip, indexName);
 
@@ -394,16 +363,14 @@ public class ConcurrentIndexedSet<TElement>
     /// <param name="skip">Allows to efficiently skip a number of elements. Default is 0</param>
     /// <param name="count">The concurrent implementation performs enumeration on the results. If this value is bigger than zero, at max the specified amount of items is returned.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<IEnumerable<TElement>> OrderByDescendingAsync<TIndexKey>(
+    public IEnumerable<TElement> OrderByDescending<TIndexKey>(
         Func<TElement, TIndexKey> indexAccessor,
         int skip = 0,
         int count = -1,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             IEnumerable<TElement> result = _indexedSet.OrderByDescending(indexAccessor, skip, indexName);
 
@@ -423,14 +390,12 @@ public class ConcurrentIndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="prefix">The prefix to use</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<IEnumerable<TElement>> StartsWithAsync(
+    public IEnumerable<TElement> StartsWith(
         Func<TElement, ReadOnlyMemory<char>> indexAccessor,
         ReadOnlyMemory<char> prefix,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             return _indexedSet.StartsWith(indexAccessor, prefix, indexName).ToList();
         }
@@ -444,15 +409,13 @@ public class ConcurrentIndexedSet<TElement>
     /// <param name="prefix">The prefix to use</param>
     /// <param name="maxDistance">The maximum distance (e.g. Levenshtein) between the input prefix and matches</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<IEnumerable<TElement>> FuzzyStartsWithAsync(
+    public IEnumerable<TElement> FuzzyStartsWith(
         Func<TElement, ReadOnlyMemory<char>> indexAccessor,
         ReadOnlyMemory<char> prefix,
         int maxDistance,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             return _indexedSet.FuzzyStartsWith(indexAccessor, prefix, maxDistance, indexName).ToList();
         }
@@ -465,14 +428,12 @@ public class ConcurrentIndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="infix">The infix to use</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<IEnumerable<TElement>> ContainsAsync(
+    public IEnumerable<TElement> Contains(
         Func<TElement, ReadOnlyMemory<char>> indexAccessor,
         ReadOnlyMemory<char> infix,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             return _indexedSet.Contains(indexAccessor, infix, indexName).ToList();
         }
@@ -486,15 +447,13 @@ public class ConcurrentIndexedSet<TElement>
     /// <param name="infix">The infix to use</param>
     /// <param name="maxDistance">The maximum distance (e.g. Levenshtein) between the input infix and matches</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<IEnumerable<TElement>> FuzzyContainsAsync(
+    public IEnumerable<TElement> FuzzyContains(
         Func<TElement, ReadOnlyMemory<char>> indexAccessor,
         ReadOnlyMemory<char> infix,
         int maxDistance,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null,
-        CancellationToken cancellationToken = default)
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             return _indexedSet.FuzzyContains(indexAccessor, infix, maxDistance, indexName).ToList();
         }
@@ -504,18 +463,18 @@ public class ConcurrentIndexedSet<TElement>
     /// Internal method.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected ValueTask<IDisposable> AcquireWriterLockAsync(CancellationToken cancellationToken)
+    protected IDisposable AcquireWriterLock()
     {
-        return _lock.AcquireWriterLockAsync(cancellationToken);
+        return _lock.EnterWriteLock();
     }
 
     /// <summary>
     /// Internal method.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected ValueTask<IDisposable> AcquireReaderLockAsync(CancellationToken cancellationToken)
+    protected IDisposable AcquireReaderLock()
     {
-        return _lock.AcquireReaderLockAsync(cancellationToken);
+        return _lock.EnterReadLock();
     }
 }
 /// <summary>
@@ -534,9 +493,9 @@ public class ConcurrentIndexedSet<TPrimaryKey, TElement> : ConcurrentIndexedSet<
     /// <summary>
     /// Attempts to remove an item with the given primary key and returns true, if one was found and removed. Otherwise, false.
     /// </summary>
-    public async ValueTask<bool> RemoveAsync(TPrimaryKey key, CancellationToken cancellationToken = default)
+    public bool Remove(TPrimaryKey key)
     {
-        using (await AcquireWriterLockAsync(cancellationToken))
+        using (AcquireWriterLock())
         {
             return _primaryKeyIndexedSet.Remove(key);
         }
@@ -546,10 +505,9 @@ public class ConcurrentIndexedSet<TPrimaryKey, TElement> : ConcurrentIndexedSet<
     /// Returns the element associated to the given primary key.
     /// </summary>
     /// <param name="key">The primary key to obtain the item for</param>
-    /// <param name="cancellationToken">Cancellation token to cancel any potential concurrent wait.</param>
-    public async ValueTask<TElement> SingleAsync(TPrimaryKey key, CancellationToken cancellationToken = default)
+    public TElement Single(TPrimaryKey key)
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             return _primaryKeyIndexedSet.Single(key);
         }
@@ -558,9 +516,9 @@ public class ConcurrentIndexedSet<TPrimaryKey, TElement> : ConcurrentIndexedSet<
     /// <summary>
     /// Returns true if an element with the given primary key is present in the current set, otherwise, false.
     /// </summary>
-    public async ValueTask<bool> ContainsAsync(TPrimaryKey key, CancellationToken cancellationToken = default)
+    public bool Contains(TPrimaryKey key)
     {
-        using (await AcquireReaderLockAsync(cancellationToken))
+        using (AcquireReaderLock())
         {
             return _primaryKeyIndexedSet.Contains(key);
         }
