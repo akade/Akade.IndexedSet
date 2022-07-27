@@ -1,4 +1,5 @@
-﻿using Akade.IndexedSet.Indices;
+﻿using Akade.IndexedSet.Concurrency;
+using Akade.IndexedSet.Indices;
 using System.Runtime.CompilerServices;
 
 namespace Akade.IndexedSet;
@@ -83,7 +84,6 @@ public class IndexedSetBuilder<TElement>
         _result = indexedSet ?? new();
         _initialContent = initialContent;
     }
-
 
     /// <summary>
     /// Configures the <see cref="IndexedSet{TPrimaryKey, TElement}"/> to have an unique index based on a secondary key.
@@ -243,6 +243,14 @@ public class IndexedSetBuilder<TElement>
 
         return _result;
     }
+
+    /// <summary>
+    /// Builds and returns the configured <see cref="IndexedSet{TPrimaryKey, TElement}"/>
+    /// </summary>
+    public virtual ConcurrentIndexedSet<TElement> BuildConcurrent()
+    {
+        return new(Build());
+    }
 }
 
 /// <summary>
@@ -252,7 +260,6 @@ public class IndexedSetBuilder<TElement>
 public class IndexedSetBuilder<TPrimaryKey, TElement> : IndexedSetBuilder<TElement>
     where TPrimaryKey : notnull
 {
-
 
     internal IndexedSetBuilder(Func<TElement, TPrimaryKey> primaryKeyAccessor, IEnumerable<TElement>? initialContent, string primaryKeyIndexName) : base(new IndexedSet<TPrimaryKey, TElement>(primaryKeyAccessor, primaryKeyIndexName), initialContent)
     {
@@ -305,4 +312,13 @@ public class IndexedSetBuilder<TPrimaryKey, TElement> : IndexedSetBuilder<TEleme
     {
         return (IndexedSet<TPrimaryKey, TElement>)base.Build();
     }
+
+    /// <summary>
+    /// Builds and returns the configured <see cref="IndexedSet{TPrimaryKey, TElement}"/>
+    /// </summary>
+    public override ConcurrentIndexedSet<TPrimaryKey, TElement> BuildConcurrent()
+    {
+        return new(Build());
+    }
+
 }

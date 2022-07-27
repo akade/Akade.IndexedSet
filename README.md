@@ -13,7 +13,7 @@ through your data, expect huge [speedups](docs/Benchmarks.md) and much better sc
 <!--TOC-->
   - [Overview](#overview)
     - [Design Goals](#design-goals)
-    - [Performance / Operation-Support of the different indices:](#performance-operation-support-of-the-different-indices)
+    - [Performance and Operation-Support of the different indices:](#performance-and-operation-support-of-the-different-indices)
       - [General queries](#general-queries)
       - [String queries](#string-queries)
   - [Features](#features)
@@ -21,13 +21,14 @@ through your data, expect huge [speedups](docs/Benchmarks.md) and much better sc
     - [Non-unique index (multiple entities, single key)](#non-unique-index-multiple-entities-single-key)
     - [Non-unique index (multiple entities, multiple keys)](#non-unique-index-multiple-entities-multiple-keys)
     - [Range index](#range-index)
-    - [String indices & fuzzy matching](#string-indices-fuzzy-matching)
+    - [String indices and fuzzy matching](#string-indices-and-fuzzy-matching)
     - [Computed or compound key](#computed-or-compound-key)
-    - [Reflection- & expression-free - convention-based index naming](#reflection-expression-free-convention-based-index-naming)
+    - [Concurrency and Thread-Safety](#concurrency-and-thread-safety)
+    - [Reflection- and expression-free - convention-based index naming](#reflection-and-expression-free-convention-based-index-naming)
   - [FAQs](#faqs)
     - [How do I use multiple index types for the same property?](#how-do-i-use-multiple-index-types-for-the-same-property)
     - [How do I update key values if I have mutable elements in the set?](#how-do-i-update-key-values-if-i-have-mutable-elements-in-the-set)
-    - [How do I do case-insensitve (fuzzy) string matching (Prefix / FullTextIndex)?](#how-do-i-do-case-insensitve-fuzzy-string-matching-prefix-fulltextindex)
+    - [How do I do case-insensitve (fuzzy) string matching (Prefix, FullTextIndex)?](#how-do-i-do-case-insensitve-fuzzy-string-matching-prefix-fulltextindex)
   - [Roadmap](#roadmap)
 <!--/TOC-->
 ## Overview
@@ -67,7 +68,7 @@ _ = set.Where(x => (x.ProductId, x.UnitPrice), (4, 10));
 - Reflection & Expression-free to be AOT & Trimming friendly (for example for Blazor/WebASM)
 - It's not a db - in-memory only
 
-### Performance / Operation-Support of the different indices:
+### Performance and Operation-Support of the different indices:
 
 Below, you find runtime complexities. Benchmarks can be found [here](docs/Benchmarks.md)
 
@@ -192,7 +193,7 @@ data = set.LessThan(x => x.SecondaryKey, 4);
 data = set.OrderBy(x => x.SecondaryKey, skip: 10).Take(10); // second page of 10 elements
 ```
 
-### String indices & fuzzy matching
+### String indices and fuzzy matching
 Prefix- & Suffix-Trie based indices for efficient StartWith & String-Contains queries including support
 for fuzzy matching.
 
@@ -231,7 +232,21 @@ result = set.Where(ComputedKey.SomeStaticMethod, 42);
 ```
 > ℹ For more samples, take a look at the unit tests.
 
-### Reflection- & expression-free - convention-based index naming
+### Concurrency and Thread-Safety
+
+The "normal" indexedset is not thread-safe, however, a ReaderWriterLock-based implementation is available.
+Just call `BuildConcurrent()` instead of `Build()`:
+
+```csharp
+ConcurrentIndexedSet<RangeData> set = data.ToIndexedSet()
+                                          .WithIndex(x => (x.Start, x.End))
+                                          .BuildConcurrent();
+```
+
+> ⚠ The concurrent implmentation needs to materialize all query results.<br />
+> `OrderBy` and `OrderByDescending)` take an additional `count` parameter to avoid unnecessary materialization.
+> You can judge the overhead [here](docs/Benchmarks.md#ConcurrentSet)
+### No reflection and no expressions - convention-based index naming
 
 We are using the [CallerArgumentExpression](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.callerargumentexpressionattribute)-Feature 
 of .Net 6/C# 10 to provide convention-based naming of the indices:
@@ -276,7 +291,7 @@ set.Remove(element);
 set.Add(element);
 ```
 
-### How do I do case-insensitve (fuzzy) string matching (Prefix / FullTextIndex)?
+### How do I do case-insensitve (fuzzy) string matching (Prefix, FullTextIndex)?
 Remember that you can index whatever you want, including copmuter properties. This also applies for fuzzy matching:
 
 ```csharp
@@ -288,7 +303,7 @@ IEnumerable<Data> matches = set.FuzzyContains(x => x.Text.ToLowerInvariant().AsM
 
 ## Roadmap
 Potential features (not ordered):
-- [ ] Thread-safe version
+- [x] Thread-safe version
 - [ ] Easier updating of keys
 - [ ] Events for changed values
 - [x] More index types (Trie)
@@ -297,6 +312,6 @@ Potential features (not ordered):
 - [x] Range insertion and corresponding `.ToIndexedSet().WithIndex(x => ...).[...].Build()`
 - [x] Refactoring to allow a primarykey-less set: this was an artifical restriction that is not necessary
 - [ ] Aggregates (i.e. sum or average: interface based on state & add/removal state update functions)
-- [ ] Benchmarks
+- [x] Benchmarks
 
 If you have any suggestion or found a bug / unexpected behavior, open an issue! I will also review PRs and integrate them if they fit the project.

@@ -5,7 +5,6 @@ using Bogus;
 namespace Akade.IndexedSet.Benchmarks;
 [MemoryDiagnoser]
 [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
-[CategoriesColumn]
 public class RangeIndexBenchmarks
 {
     private record class Appointment(DateOnly Date);
