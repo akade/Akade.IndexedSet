@@ -292,7 +292,7 @@ set.Add(element);
 ```
 
 ### How do I do case-insensitve (fuzzy) string matching (Prefix, FullTextIndex)?
-Remember that you can index whatever you want, including copmuter properties. This also applies for fuzzy matching:
+Remember that you can index whatever you want, including computed properties. This also applies for fuzzy matching:
 
 ```csharp
 IndexedSet<Data> set = IndexedSetBuilder<Data>.Create(x => x.PrimaryKey)
