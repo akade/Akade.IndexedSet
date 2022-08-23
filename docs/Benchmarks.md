@@ -22,7 +22,7 @@ much better than the naive LINQ Queries.
 |     Unique_IndexedSet_Single |   1,545.8 ns |   7.05 ns |   6.60 ns | 0.010 |   1,225 B |      - |         - |
 
 > ℹ️ Note that manually maintaining a dictionary is *currently* faster but only if the executing class has direct access
-> to the directory. Ideas to bring it on par are being explored for scenarios with very tight loops around dictionary lookup.
+> to the dictionary. Ideas to bring it on par are being explored for scenarios with very tight loops around dictionary lookup.
 
 ## MultiValue-Index
 |                Method |     Mean |    Error |   StdDev | Ratio | Code Size |  Gen 0 | Allocated |
