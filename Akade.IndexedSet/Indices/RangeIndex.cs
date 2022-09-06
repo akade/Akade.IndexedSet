@@ -143,4 +143,9 @@ internal class RangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
     {
         return _lookup.GetValuesDescending(skip..);
     }
+
+    public override void Clear()
+    {
+        _lookup.Clear();
+    }
 }

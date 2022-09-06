@@ -37,6 +37,11 @@ internal class UniqueIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey
         base.AddRange(elementsToAdd);
     }
 
+    public override void Clear()
+    {
+        _data.Clear();
+    }
+
     public override void Remove(TElement value)
     {
         TIndexKey key = _keyAccessor(value);

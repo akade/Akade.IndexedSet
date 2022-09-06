@@ -53,4 +53,9 @@ internal class SuffixTrie<TElement>
     {
         return _trie.FuzzySearch(key, maxDistance, exactMatches).Distinct();
     }
+
+    internal void Clear()
+    {
+        _trie.Clear();
+    }
 }

@@ -60,4 +60,9 @@ internal class PrefixIndex<TElement> : TypedIndex<TElement, ReadOnlyMemory<char>
     {
         return _trie.FuzzySearch(indexKey.Span, maxDistance, false);
     }
+
+    public override void Clear()
+    {
+        _trie.Clear();
+    }
 }

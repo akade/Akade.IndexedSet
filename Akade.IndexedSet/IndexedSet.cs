@@ -472,6 +472,29 @@ public class IndexedSet<TElement>
         return _data.Contains(element);
     }
 
+    public void Clear()
+    {
+        _data.Clear();
+        foreach(Index<TElement> index in _indices.Values)
+        {
+            index.Clear();
+        }
+    }
+
+    public void AddOrUpdate(TElement element, Action<TElement> updateFunc)
+    {
+        _ = Remove(element);
+        updateFunc(element);
+        _ = Add(element);
+    }
+
+    public void AddOrUpdate<TState>(TElement element, TState state, Action<TElement, TState> updateFunc)
+    {
+        _ = Remove(element);
+        updateFunc(element, state);
+        _ = Add(element);
+    }
+
     internal void AddIndex(Index<TElement> index)
     {
         ThrowIfNonEmpty();

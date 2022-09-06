@@ -33,6 +33,11 @@ internal class MultiValueIndex<TElement, TIndexKey> : TypedIndex<TElement, TInde
         base.AddRange(elementsToAdd);
     }
 
+    public override void Clear()
+    {
+        _data.Clear();
+    }
+
     public override void Remove(TElement value)
     {
         foreach (TIndexKey key in _keyAccessor(value))
@@ -40,7 +45,6 @@ internal class MultiValueIndex<TElement, TIndexKey> : TypedIndex<TElement, TInde
             _ = _data.Remove(key, value);
         }
     }
-
 
     internal override TElement Single(TIndexKey indexKey)
     {

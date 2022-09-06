@@ -110,6 +110,11 @@ internal class Trie<TElement>
         }
     }
 
+    internal void Clear()
+    {
+        _root.Clear();
+    }
+
     private class TrieNode
     {
         private SortedDictionary<char, TrieNode>? _children;
@@ -213,6 +218,12 @@ internal class Trie<TElement>
         internal bool HasElements()
         {
             return _elements is not null && _elements.Count > 0;
+        }
+
+        internal void Clear()
+        {
+            _elements?.Clear();
+            _children?.Clear();
         }
     }
 }
