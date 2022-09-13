@@ -24,10 +24,10 @@ through your data, expect huge [speedups](docs/Benchmarks.md) and much better sc
     - [String indices and fuzzy matching](#string-indices-and-fuzzy-matching)
     - [Computed or compound key](#computed-or-compound-key)
     - [Concurrency and Thread-Safety](#concurrency-and-thread-safety)
-    - [Reflection- and expression-free - convention-based index naming](#reflection-and-expression-free-convention-based-index-naming)
+    - [No reflection and no expressions - convention-based index naming](#no-reflection-and-no-expressions-convention-based-index-naming)
   - [FAQs](#faqs)
     - [How do I use multiple index types for the same property?](#how-do-i-use-multiple-index-types-for-the-same-property)
-    - [How do I update key values if I have mutable elements in the set?](#how-do-i-update-key-values-if-i-have-mutable-elements-in-the-set)
+    - [How do I update key values if the elements are already in the set?](#how-do-i-update-key-values-if-the-elements-are-already-in-the-set)
     - [How do I do case-insensitve (fuzzy) string matching (Prefix, FullTextIndex)?](#how-do-i-do-case-insensitve-fuzzy-string-matching-prefix-fulltextindex)
   - [Roadmap](#roadmap)
 <!--/TOC-->
@@ -282,13 +282,23 @@ IEnumerable<Data> inRange = set.Range(x => x.SecondaryKey, 1, 10); // Uses the r
 
 > ℹ We recommend using the lambda syntax for "simple" properties and static methods for more complicated ones. It's easy to read, resembles "normal" LINQ-Queries and all the magic strings are compiler generated.
 
-### How do I update key values if I have mutable elements in the set?
-**The current implementation requires any keys of any type to never change the value while the instance is within the set**. Hence, in order to update any key you will need to remove the instance, update the keys and add the instance again:
+### How do I update key values if the elements are already in the set?
+**The current implementation requires any keys of any type to never change the value while the instance is within the set**.
+Hence, you either have to remove 
 
 ```csharp
-set.Remove(element);
-// update element
-set.Add(element);
+// updating a mutable property
+_ = set.Update(dataElement, e => e.MutableProperty = 7);
+// updating an immutable property
+_ = set.Update(dataElement, e => e with { SecondaryKey = 12 });
+// be careful: the dataElement still refers to the "old" record after the update method
+_ = set.Update(dataElement, e => e with { SecondaryKey = 12 });
+
+// updating in an concurrent set
+concurrentSet.Update(set =>
+{
+    // serialized access to the inner IndexedSet, where you can use above update methods
+});
 ```
 
 ### How do I do case-insensitve (fuzzy) string matching (Prefix, FullTextIndex)?
@@ -304,7 +314,7 @@ IEnumerable<Data> matches = set.FuzzyContains(x => x.Text.ToLowerInvariant().AsM
 ## Roadmap
 Potential features (not ordered):
 - [x] Thread-safe version
-- [ ] Easier updating of keys
+- [x] Easier updating of keys
 - [ ] Events for changed values
 - [x] More index types (Trie)
 - [ ] Tree-based range index for better insertion performance

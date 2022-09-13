@@ -1,11 +1,15 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Akade.IndexedSet.Concurrency;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.Samples;
 
 [TestClass]
 public class Readme
 {
-    private record Data(int PrimaryKey, int SecondaryKey, string Text = "");
+    private record Data(int PrimaryKey, int SecondaryKey, string Text = "")
+    {
+        public int MutableProperty { get; set; }
+    }
 
     [TestMethod]
     public void Features_UniqueIndex()
@@ -141,6 +145,27 @@ public class Readme
                                                       .WithFullTextIndex(x => x.Text.ToLowerInvariant().AsMemory())
                                                       .Build();
         IEnumerable<Data> matches = set.FuzzyContains(x => x.Text.ToLowerInvariant().AsMemory(), "Search".AsMemory(), maxDistance: 2);
+    }
+
+    [TestMethod]
+    public void FAQ_UpdatingKeys()
+    {
+        IndexedSet<Data> set = IndexedSetBuilder<Data>.Create(x => x.PrimaryKey).Build();
+        ConcurrentIndexedSet<Data> concurrentSet = IndexedSetBuilder<Data>.Create(x => x.PrimaryKey).BuildConcurrent();
+        Data dataElement = new(1, 4);
+
+        // updating a mutable property
+        _ = set.Update(dataElement, e => e.MutableProperty = 7);
+        // updating an immutable property
+        _ = set.Update(dataElement, e => e with { SecondaryKey = 12 });
+        // be careful, the second time will do an add as dataElement still refers to the "old" record
+        _ = set.Update(dataElement, e => e with { SecondaryKey = 12 });
+
+        // updating in an concurrent set
+        concurrentSet.Update(set =>
+        {
+            // serialized access to the inner IndexedSet, where you can use above update methods
+        });
     }
 
     private record Purchase(int Id, int ProductId, int Amount, decimal UnitPrice);
