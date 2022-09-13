@@ -1,4 +1,6 @@
 using Akade.IndexedSet.Concurrency;
+using Akade.IndexedSet.Tests.Data;
+using Akade.IndexedSet.Tests.TestUtilities;
 using Bogus;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -52,6 +54,24 @@ public class ConcurrentSetTests
 
         bool[] result = await Task.WhenAll(tasks);
         Assert.IsTrue(result.Distinct().Single());
+    }
+
+    [TestMethod]
+    public async Task Update_method_allows_to_execute_code_in_isolation()
+    {
+        ConcurrentIndexedSet<int, TestData> sut = IndexedSetBuilder<TestData>.Create(t => t.PrimaryKey)
+                                                                             .WithIndex(t => t.IntProperty)
+                                                                             .BuildConcurrent();
+        var element = new TestData(1, 0, GuidGen.Get(1), "Test");
+        _ = sut.Add(element);
+
+        await Task.WhenAll(Enumerable.Range(0, 100).Select(__ => Task.Run(() => sut.Update(set =>
+        {
+            TestData dataToUpdate = set[1];
+            _ = set.Update(dataToUpdate, x => x with { IntProperty = x.IntProperty + 10 });
+        }))));
+
+        Assert.AreEqual(1000, sut.Single(1).IntProperty);
     }
 
     private static ConcurrentIndexedSet<Person> CreateSet()
