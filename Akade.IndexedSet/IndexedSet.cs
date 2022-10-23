@@ -472,6 +472,74 @@ public class IndexedSet<TElement>
         return _data.Contains(element);
     }
 
+    /// <summary>
+    /// Removes all elements
+    /// </summary>
+    public void Clear()
+    {
+        _data.Clear();
+        foreach (Index<TElement> index in _indices.Values)
+        {
+            index.Clear();
+        }
+    }
+
+    /// <summary>
+    /// Helper function that allows to safely update mutable, indexed keys within <paramref name="updateFunc"/>.
+    /// </summary>
+    /// <param name="element">The element to update. Is passed to <paramref name="updateFunc"/>.</param>
+    /// <param name="updateFunc">The update function</param>
+    /// <returns>True, if the element was present before. False if the element was added.</returns>
+    public bool Update(TElement element, Action<TElement> updateFunc)
+    {
+        bool result = Remove(element);
+        updateFunc(element);
+        _ = Add(element);
+        return result;
+    }
+
+    /// <summary>
+    /// Helper function that allows to safely update mutable, indexed keys within <paramref name="updateFunc"/>.
+    /// </summary>
+    /// <param name="element">The element to update. Is passed to <paramref name="updateFunc"/>.</param>
+    /// <param name="state">User defined state that is passed to <paramref name="updateFunc"/>.</param>
+    /// <param name="updateFunc">The update function</param>
+    /// <returns>True, if the element was present before. False if the element was added.</returns>
+    public bool Update<TState>(TElement element, TState state, Action<TElement, TState> updateFunc)
+    {
+        bool result = Remove(element);
+        updateFunc(element, state);
+        _ = Add(element);
+        return result;
+    }
+
+    /// <summary>
+    /// Helper function that allows to safely update mutable, indexed keys within <paramref name="updateFunc"/>.
+    /// </summary>
+    /// <param name="element">The element to update. Is passed to <paramref name="updateFunc"/>.</param>
+    /// <param name="updateFunc">The update function, can return the same or a new instance that will be in the set after the function completes.</param>
+    /// <returns>True, if the element was present before. False if the element was added.</returns>
+    public bool Update(TElement element, Func<TElement, TElement> updateFunc)
+    {
+        bool result = Remove(element);
+        _ = Add(updateFunc(element));
+        return result;
+    }
+
+    /// <summary>
+    /// Helper function that allows to safely update mutable, indexed keys within <paramref name="updateFunc"/>.
+    /// </summary>
+    /// <param name="element">The element to update. Is passed to <paramref name="updateFunc"/>.</param>
+    /// <param name="state">User defined state that is passed to <paramref name="updateFunc"/>.</param>
+    /// <param name="updateFunc">The update function, can return the same or a new instance that will be in the set after the function completes.</param>
+    /// <returns>True, if the element was present before. False if the element was added.</returns>
+    public bool Update<TState>(TElement element, TState state, Func<TElement, TState, TElement> updateFunc)
+    {
+        bool result = Remove(element);
+        _ = Add(updateFunc(element, state));
+        return result;
+    }
+
     internal void AddIndex(Index<TElement> index)
     {
         ThrowIfNonEmpty();
@@ -488,7 +556,7 @@ public class IndexedSet<TElement>
 }
 
 /// <summary>
-/// Additionaly provides convienience access to a "primary key" unique index.
+/// Additionally provides convenience access to a "primary key" unique index.
 /// Functionally the same as manually adding a unique index on the primary key property.
 /// </summary>
 public class IndexedSet<TPrimaryKey, TElement> : IndexedSet<TElement>

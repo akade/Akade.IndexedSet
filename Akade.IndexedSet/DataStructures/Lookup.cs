@@ -64,4 +64,9 @@ internal class Lookup<TKey, TValue>
     {
         return _values.EnsureCapacity(capacity);
     }
+
+    internal void Clear()
+    {
+        _values.Clear();
+    }
 }

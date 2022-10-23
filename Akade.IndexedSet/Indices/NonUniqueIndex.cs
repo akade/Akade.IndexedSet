@@ -30,6 +30,11 @@ internal class NonUniqueIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndex
         base.AddRange(elementsToAdd);
     }
 
+    public override void Clear()
+    {
+        _data.Clear();
+    }
+
     public override void Remove(TElement value)
     {
         TIndexKey key = _keyAccessor(value);

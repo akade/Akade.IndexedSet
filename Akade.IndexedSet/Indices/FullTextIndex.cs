@@ -75,4 +75,9 @@ internal class FullTextIndex<TElement> : TypedIndex<TElement, ReadOnlyMemory<cha
     {
         return _suffixTrie.GetAll(indexKey.Span).Distinct();
     }
+
+    public override void Clear()
+    {
+        _suffixTrie.Clear();
+    }
 }

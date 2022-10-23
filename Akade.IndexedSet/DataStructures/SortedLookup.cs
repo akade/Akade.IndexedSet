@@ -135,4 +135,10 @@ internal class SortedLookup<TKey, TValue>
             yield return _sortedValues[_sortedValues.Count - offset - i];
         }
     }
+
+    internal void Clear()
+    {
+        _sortedKeys.Clear();
+        _sortedValues.Clear();
+    }
 }

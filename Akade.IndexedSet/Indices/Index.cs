@@ -21,4 +21,6 @@ internal abstract class Index<TElement>
             Add(element);
         }
     }
+
+    public abstract void Clear();
 }

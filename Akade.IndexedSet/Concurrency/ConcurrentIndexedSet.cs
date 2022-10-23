@@ -460,6 +460,42 @@ public class ConcurrentIndexedSet<TElement>
     }
 
     /// <summary>
+    /// Removes all elements
+    /// </summary>
+    public void Clear()
+    {
+        using (AcquireWriterLock())
+        {
+            _indexedSet.Clear();
+        }
+    }
+
+    /// <summary>
+    /// Allows to update the underlying indexed set while being protected by the write lock
+    /// </summary>
+    /// <param name="updateFunc">Update function</param>
+    public void Update(Action<IndexedSet<TElement>> updateFunc)
+    {
+        using (AcquireWriterLock())
+        {
+            updateFunc(_indexedSet);
+        }
+    }
+
+    /// <summary>
+    /// Allows to update the underlying indexed set while being protected by the write lock
+    /// </summary>
+    /// <param name="updateFunc">Update function</param>
+    /// <param name="state">User defined state that is passed to <paramref name="updateFunc"/>.</param>
+    public void Update<TState>(Action<IndexedSet<TElement>, TState> updateFunc, TState state)
+    {
+        using (AcquireWriterLock())
+        {
+            updateFunc(_indexedSet, state);
+        }
+    }
+
+    /// <summary>
     /// Internal method.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -523,4 +559,35 @@ public class ConcurrentIndexedSet<TPrimaryKey, TElement> : ConcurrentIndexedSet<
             return _primaryKeyIndexedSet.Contains(key);
         }
     }
+
+    /// <summary>
+    /// Allows to update the underlying indexed set while being protected by the write lock
+    /// </summary>
+    /// <param name="updateFunc">Update function</param>
+    public void Update(Action<IndexedSet<TPrimaryKey, TElement>> updateFunc)
+    {
+        using (AcquireWriterLock())
+        {
+            updateFunc(_primaryKeyIndexedSet);
+        }
+    }
+
+    /// <summary>
+    /// Allows to update the underlying indexed set while being protected by the write lock
+    /// </summary>
+    /// <param name="updateFunc">Update function</param>
+    /// <param name="state">User defined state that is passed to <paramref name="updateFunc"/>.</param>
+    public void Update<TState>(Action<IndexedSet<TPrimaryKey, TElement>, TState> updateFunc, TState state)
+    {
+        using (AcquireWriterLock())
+        {
+            updateFunc(_primaryKeyIndexedSet, state);
+        }
+    }
+
+    /// <summary>
+    /// Returns the element associated to the given primary key.
+    /// Short-hand for <see cref="Single(TPrimaryKey)"/>.
+    /// </summary>
+    public TElement this[TPrimaryKey key] => Single(key);
 }

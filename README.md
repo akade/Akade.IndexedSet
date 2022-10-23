@@ -11,25 +11,6 @@ In a nutshell, it allows you to write LINQ-like queries *without* enumerating th
 through your data, expect huge [speedups](docs/Benchmarks.md) and much better scalability!
 
 <!--TOC-->
-  - [Overview](#overview)
-    - [Design Goals](#design-goals)
-    - [Performance and Operation-Support of the different indices:](#performance-and-operation-support-of-the-different-indices)
-      - [General queries](#general-queries)
-      - [String queries](#string-queries)
-  - [Features](#features)
-    - [Unique index (single entity, single key)](#unique-index-single-entity-single-key)
-    - [Non-unique index (multiple entities, single key)](#non-unique-index-multiple-entities-single-key)
-    - [Non-unique index (multiple entities, multiple keys)](#non-unique-index-multiple-entities-multiple-keys)
-    - [Range index](#range-index)
-    - [String indices and fuzzy matching](#string-indices-and-fuzzy-matching)
-    - [Computed or compound key](#computed-or-compound-key)
-    - [Concurrency and Thread-Safety](#concurrency-and-thread-safety)
-    - [Reflection- and expression-free - convention-based index naming](#reflection-and-expression-free-convention-based-index-naming)
-  - [FAQs](#faqs)
-    - [How do I use multiple index types for the same property?](#how-do-i-use-multiple-index-types-for-the-same-property)
-    - [How do I update key values if I have mutable elements in the set?](#how-do-i-update-key-values-if-i-have-mutable-elements-in-the-set)
-    - [How do I do case-insensitve (fuzzy) string matching (Prefix, FullTextIndex)?](#how-do-i-do-case-insensitve-fuzzy-string-matching-prefix-fulltextindex)
-  - [Roadmap](#roadmap)
 <!--/TOC-->
 ## Overview
 
@@ -282,13 +263,25 @@ IEnumerable<Data> inRange = set.Range(x => x.SecondaryKey, 1, 10); // Uses the r
 
 > ℹ We recommend using the lambda syntax for "simple" properties and static methods for more complicated ones. It's easy to read, resembles "normal" LINQ-Queries and all the magic strings are compiler generated.
 
-### How do I update key values if I have mutable elements in the set?
-**The current implementation requires any keys of any type to never change the value while the instance is within the set**. Hence, in order to update any key you will need to remove the instance, update the keys and add the instance again:
+### How do I update key values if the elements are already in the set?
+**The implementation requires any keys of any type to never change the value while the instance is within the set**.
+You can manually remove, update and add an object. However, there are some helper methods for that - which is especially
+useful for the concurrent variant as it provides thread-safe serialized access.
 
 ```csharp
-set.Remove(element);
-// update element
-set.Add(element);
+// updating a mutable property
+_ = set.Update(dataElement, e => e.MutableProperty = 7);
+// updating an immutable property
+_ = set.Update(dataElement, e => e with { SecondaryKey = 12 });
+// be careful: the dataElement still refers to the "old" record after the update method
+_ = set.Update(dataElement, e => e with { SecondaryKey = 12 });
+
+// updating in an concurrent set
+concurrentSet.Update(set =>
+{
+    // serialized access to the inner IndexedSet, where you can safely use above update methods
+    // in an multi-threaded environment
+});
 ```
 
 ### How do I do case-insensitve (fuzzy) string matching (Prefix, FullTextIndex)?
@@ -304,14 +297,15 @@ IEnumerable<Data> matches = set.FuzzyContains(x => x.Text.ToLowerInvariant().AsM
 ## Roadmap
 Potential features (not ordered):
 - [x] Thread-safe version
-- [ ] Easier updating of keys
-- [ ] Events for changed values
+- [x] Easier updating of keys
 - [x] More index types (Trie)
-- [ ] Tree-based range index for better insertion performance
-- [ ] Analyzers to help with best practices
 - [x] Range insertion and corresponding `.ToIndexedSet().WithIndex(x => ...).[...].Build()`
 - [x] Refactoring to allow a primarykey-less set: this was an artifical restriction that is not necessary
-- [ ] Aggregates (i.e. sum or average: interface based on state & add/removal state update functions)
 - [x] Benchmarks
+- [ ] Tree-based range index for better insertion performance
+- [ ] Analyzers to help with best practices
+- [ ] Aggregates (i.e. sum or average: interface based on state & add/removal state update functions)
+- [ ] Custom (equality) comparators for indices
+- [ ] Simplification of string indices, i.e. Span based overloads to avoid `.AsMemory()`...
 
 If you have any suggestion or found a bug / unexpected behavior, open an issue! I will also review PRs and integrate them if they fit the project.
