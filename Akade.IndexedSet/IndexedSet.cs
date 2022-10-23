@@ -556,7 +556,7 @@ public class IndexedSet<TElement>
 }
 
 /// <summary>
-/// Additionaly provides convienience access to a "primary key" unique index.
+/// Additionally provides convenience access to a "primary key" unique index.
 /// Functionally the same as manually adding a unique index on the primary key property.
 /// </summary>
 public class IndexedSet<TPrimaryKey, TElement> : IndexedSet<TElement>

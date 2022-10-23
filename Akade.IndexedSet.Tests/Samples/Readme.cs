@@ -164,7 +164,8 @@ public class Readme
         // updating in an concurrent set
         concurrentSet.Update(set =>
         {
-            // serialized access to the inner IndexedSet, where you can use above update methods
+            // serialized access to the inner IndexedSet, where you can safely use above update methods
+            // in an multi-threaded environment
         });
     }
 
