@@ -22,13 +22,13 @@ public class ConcurrentSetBenchmarks
 
         _indexedSet = _persons.ToIndexedSet()
                               .WithUniqueIndex(x => x.Phone)
-                              .WithFullTextIndex(x => x.FullName.AsMemory())
+                              .WithFullTextIndex(x => x.FullName)
                               .WithRangeIndex(GetAge)
                               .Build();
 
         _concurrentIndexedSet = _persons.ToIndexedSet()
                                         .WithUniqueIndex(x => x.Phone)
-                                        .WithFullTextIndex(x => x.FullName.AsMemory())
+                                        .WithFullTextIndex(x => x.FullName)
                                         .WithRangeIndex(GetAge)
                                         .BuildConcurrent();
     }
@@ -77,13 +77,13 @@ public class ConcurrentSetBenchmarks
     [BenchmarkCategory("FullText")]
     public int FullTextLookup()
     {
-        return _indexedSet.FuzzyContains(x => x.FullName.AsMemory(), "Peter".AsMemory(), 1).Count();
+        return _indexedSet.FuzzyContains(x => x.FullName, "Peter", 1).Count();
     }
 
     [Benchmark]
     [BenchmarkCategory("FullText")]
     public int ConcurrentFullTextLookup()
     {
-        return _concurrentIndexedSet.FuzzyContains(x => x.FullName.AsMemory(), "Peter".AsMemory(), 1).Count();
+        return _concurrentIndexedSet.FuzzyContains(x => x.FullName, "Peter", 1).Count();
     }
 }

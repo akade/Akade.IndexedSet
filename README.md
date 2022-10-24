@@ -11,6 +11,25 @@ In a nutshell, it allows you to write LINQ-like queries *without* enumerating th
 through your data, expect huge [speedups](docs/Benchmarks.md) and much better scalability!
 
 <!--TOC-->
+  - [Overview](#overview)
+    - [Design Goals](#design-goals)
+    - [Performance and Operation-Support of the different indices:](#performance-and-operation-support-of-the-different-indices)
+      - [General queries](#general-queries)
+      - [String queries](#string-queries)
+  - [Features](#features)
+    - [Unique index (single entity, single key)](#unique-index-single-entity-single-key)
+    - [Non-unique index (multiple entities, single key)](#non-unique-index-multiple-entities-single-key)
+    - [Non-unique index (multiple entities, multiple keys)](#non-unique-index-multiple-entities-multiple-keys)
+    - [Range index](#range-index)
+    - [String indices and fuzzy matching](#string-indices-and-fuzzy-matching)
+    - [Computed or compound key](#computed-or-compound-key)
+    - [Concurrency and Thread-Safety](#concurrency-and-thread-safety)
+    - [No reflection and no expressions - convention-based index naming](#no-reflection-and-no-expressions-convention-based-index-naming)
+  - [FAQs](#faqs)
+    - [How do I use multiple index types for the same property?](#how-do-i-use-multiple-index-types-for-the-same-property)
+    - [How do I update key values if the elements are already in the set?](#how-do-i-update-key-values-if-the-elements-are-already-in-the-set)
+    - [How do I do case-insensitve (fuzzy) string matching (Prefix, FullTextIndex)?](#how-do-i-do-case-insensitve-fuzzy-string-matching-prefix-fulltextindex)
+  - [Roadmap](#roadmap)
 <!--/TOC-->
 ## Overview
 
@@ -181,18 +200,18 @@ for fuzzy matching.
 ```csharp
 IndexedSet<Type> data = typeof(object).Assembly.GetTypes()
                                                .ToIndexedSet()
-                                               .WithPrefixIndex(x => x.Name.AsMemory())
-                                               .WithFullTextIndex(x => x.FullName.AsMemory())
+                                               .WithPrefixIndex(x => x.Name)
+                                               .WithFullTextIndex(x => x.FullName)
                                                .Build();
 
 // fast prefix or contains queries via indices
-_ = data.StartsWith(x => x.Name.AsMemory(), "Int".AsMemory());
-_ = data.Contains(x => x.FullName.AsMemory(), "Int".AsMemory());
+_ = data.StartsWith(x => x.Name, "Int");
+_ = data.Contains(x => x.FullName, "Int");
 
 // fuzzy searching is supported by prefix and full text indices
 // the following will also match "String"
-_ = data.FuzzyStartsWith(x => x.Name.AsMemory(), "Strang".AsMemory(), 1);
-_ = data.FuzzyContains(x => x.FullName.AsMemory(), "Strang".AsMemory(), 1);
+_ = data.FuzzyStartsWith(x => x.Name, "Strang", 1);
+_ = data.FuzzyContains(x => x.FullName, "Strang", 1);
 ```
 
 ### Computed or compound key
@@ -225,7 +244,7 @@ ConcurrentIndexedSet<RangeData> set = data.ToIndexedSet()
 ```
 
 > ⚠ The concurrent implmentation needs to materialize all query results.<br />
-> `OrderBy` and `OrderByDescending)` take an additional `count` parameter to avoid unnecessary materialization.
+> `OrderBy` and `OrderByDescending` take an additional `count` parameter to avoid unnecessary materialization.
 > You can judge the overhead [here](docs/Benchmarks.md#ConcurrentSet)
 ### No reflection and no expressions - convention-based index naming
 
@@ -289,9 +308,9 @@ Remember that you can index whatever you want, including computed properties. Th
 
 ```csharp
 IndexedSet<Data> set = IndexedSetBuilder<Data>.Create(x => x.PrimaryKey)
-                                              .WithFullTextIndex(x => x.Text.ToLowerInvariant().AsMemory())
+                                              .WithFullTextIndex(x => x.Text.ToLowerInvariant())
                                               .Build();
-IEnumerable<Data> matches = set.FuzzyContains(x => x.Text.ToLowerInvariant().AsMemory(), "Search".AsMemory(), maxDistance: 2);
+IEnumerable<Data> matches = set.FuzzyContains(x => x.Text.ToLowerInvariant(), "Search", maxDistance: 2);
 ```
 
 ## Roadmap
@@ -306,6 +325,6 @@ Potential features (not ordered):
 - [ ] Analyzers to help with best practices
 - [ ] Aggregates (i.e. sum or average: interface based on state & add/removal state update functions)
 - [ ] Custom (equality) comparators for indices
-- [ ] Simplification of string indices, i.e. Span based overloads to avoid `.AsMemory()`...
+- [ ] Simplification of string indices, i.e. Span based overloads to avoid ``...
 
 If you have any suggestion or found a bug / unexpected behavior, open an issue! I will also review PRs and integrate them if they fit the project.

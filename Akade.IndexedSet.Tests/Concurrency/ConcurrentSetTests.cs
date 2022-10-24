@@ -78,7 +78,7 @@ public class ConcurrentSetTests
     {
         return IndexedSetBuilder<Person>.Create()
                                         .WithUniqueIndex(x => x.Phone)
-                                        .WithPrefixIndex(x => x.FullName.AsMemory())
+                                        .WithPrefixIndex(x => x.FullName)
                                         .WithIndex(x => x.Company)
                                         .BuildConcurrent();
     }

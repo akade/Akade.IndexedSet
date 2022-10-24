@@ -19,7 +19,7 @@ public class AppointmentSample
         .WithRangeIndex(x => x.Start)
         .WithRangeIndex(x => x.End)
         .WithRangeIndex(Duration) // calculated property
-        .WithFullTextIndex(x => x.Subject.AsMemory())
+        .WithFullTextIndex(x => x.Subject)
         .Build();
 
     public AppointmentSample()
@@ -40,11 +40,9 @@ public class AppointmentSample
 
         _ = _appointments.Add(new(id++, "Discuss Technical Debt #42", "Lancelot", days[3].WithDayTime(11, 00), days[3].WithDayTime(11, 45)));
 
-
         _ = _appointments.Add(new(id++, "Discuss Issue #1234", "Esmeralda", days[4].WithDayTime(09, 15), days[4].WithDayTime(10, 00)));
 
     }
-
 
     [TestMethod]
     public void get_all_meetings_for_owner()
@@ -54,7 +52,6 @@ public class AppointmentSample
         Assert.AreEqual(2, _appointments.Where(x => x.Owner, "Esmeralda").Count());
         Assert.AreEqual(1, _appointments.Where(x => x.Owner, "Cinderella").Count());
     }
-
 
     [TestMethod]
     public void get_all_meetings_today_or_tomorrow()
@@ -114,7 +111,7 @@ public class AppointmentSample
     public void text_searching_within_subjects()
     {
         // querying within the full-text-search index allows to perform a contains over a trie instead of comparing it on all elements
-        Appointment meetingWith42InSubject = _appointments.Contains(x => x.Subject.AsMemory(), "#42".AsMemory()).Single();
+        Appointment meetingWith42InSubject = _appointments.Contains(x => x.Subject, "#42").Single();
         Assert.IsTrue(meetingWith42InSubject.Subject.Contains("#42"));
     }
 
@@ -122,7 +119,7 @@ public class AppointmentSample
     public void fuzzy_searching_within_subjects()
     {
         // Fulltext and prefix indices support fuzzy matching to allow a certain number of errors (Levenshtein/edit distance)
-        Appointment technicalDebtMeeting = _appointments.FuzzyContains(x => x.Subject.AsMemory(), "Technical Det".AsMemory(), 1).Single();
+        Appointment technicalDebtMeeting = _appointments.FuzzyContains(x => x.Subject, "Technical Det", 1).Single();
 
         Assert.IsFalse(technicalDebtMeeting.Subject.Contains("Technical Det"));
         Assert.IsTrue(technicalDebtMeeting.Subject.Contains("Technical Debt"));

@@ -19,7 +19,7 @@ public class FullTextIndexBenchmarks
                                          .Generate(1000);
 
         _indexedSet = _document.ToIndexedSet()
-                               .WithFullTextIndex(x => x.Content.AsMemory())
+                               .WithFullTextIndex(x => x.Content)
                                .Build();
 
     }
@@ -35,7 +35,7 @@ public class FullTextIndexBenchmarks
     [BenchmarkCategory("Contains")]
     public int Contains_IndexedSet()
     {
-        return _indexedSet.Contains(x => x.Content.AsMemory(), "excellent".AsMemory()).Count();
+        return _indexedSet.Contains(x => x.Content, "excellent").Count();
     }
 
     [Benchmark(Baseline = true)]
@@ -65,6 +65,6 @@ public class FullTextIndexBenchmarks
     [BenchmarkCategory("Fuzzy Contains")]
     public int FuzzyContains_IndexedSet()
     {
-        return _indexedSet.FuzzyContains(x => x.Content.AsMemory(), "excellent".AsMemory(), 2).Count();
+        return _indexedSet.FuzzyContains(x => x.Content, "excellent", 2).Count();
     }
 }
