@@ -321,10 +321,10 @@ Potential features (not ordered):
 - [x] Range insertion and corresponding `.ToIndexedSet().WithIndex(x => ...).[...].Build()`
 - [x] Refactoring to allow a primarykey-less set: this was an artifical restriction that is not necessary
 - [x] Benchmarks
+- [x] Simplification of string indices, i.e. Span/String based overloads to avoid `AsMemory()`...
 - [ ] Tree-based range index for better insertion performance
 - [ ] Analyzers to help with best practices
 - [ ] Aggregates (i.e. sum or average: interface based on state & add/removal state update functions)
 - [ ] Custom (equality) comparators for indices
-- [ ] Simplification of string indices, i.e. Span based overloads to avoid ``...
 
 If you have any suggestion or found a bug / unexpected behavior, open an issue! I will also review PRs and integrate them if they fit the project.
