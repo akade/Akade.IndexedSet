@@ -391,8 +391,8 @@ public class ConcurrentIndexedSet<TElement>
     /// <param name="prefix">The prefix to use</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     public IEnumerable<TElement> StartsWith(
-        Func<TElement, ReadOnlyMemory<char>> indexAccessor,
-        ReadOnlyMemory<char> prefix,
+        Func<TElement, string> indexAccessor,
+        ReadOnlySpan<char> prefix,
         [CallerArgumentExpression("indexAccessor")] string? indexName = null)
     {
         using (AcquireReaderLock())
@@ -410,8 +410,8 @@ public class ConcurrentIndexedSet<TElement>
     /// <param name="maxDistance">The maximum distance (e.g. Levenshtein) between the input prefix and matches</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     public IEnumerable<TElement> FuzzyStartsWith(
-        Func<TElement, ReadOnlyMemory<char>> indexAccessor,
-        ReadOnlyMemory<char> prefix,
+        Func<TElement, string> indexAccessor,
+        ReadOnlySpan<char> prefix,
         int maxDistance,
         [CallerArgumentExpression("indexAccessor")] string? indexName = null)
     {
@@ -429,8 +429,8 @@ public class ConcurrentIndexedSet<TElement>
     /// <param name="infix">The infix to use</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     public IEnumerable<TElement> Contains(
-        Func<TElement, ReadOnlyMemory<char>> indexAccessor,
-        ReadOnlyMemory<char> infix,
+        Func<TElement, string> indexAccessor,
+        ReadOnlySpan<char> infix,
         [CallerArgumentExpression("indexAccessor")] string? indexName = null)
     {
         using (AcquireReaderLock())
@@ -448,8 +448,8 @@ public class ConcurrentIndexedSet<TElement>
     /// <param name="maxDistance">The maximum distance (e.g. Levenshtein) between the input infix and matches</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     public IEnumerable<TElement> FuzzyContains(
-        Func<TElement, ReadOnlyMemory<char>> indexAccessor,
-        ReadOnlyMemory<char> infix,
+        Func<TElement, string> indexAccessor,
+        ReadOnlySpan<char> infix,
         int maxDistance,
         [CallerArgumentExpression("indexAccessor")] string? indexName = null)
     {

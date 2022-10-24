@@ -196,7 +196,7 @@ public class IndexedSetBuilder<TElement>
     /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="keyAccessor"/> is automatically passed by the compiler.</param>
     /// <returns>The instance on which this method is called is returned to support the fluent syntax.</returns>
-    public virtual IndexedSetBuilder<TElement> WithFullTextIndex(Func<TElement, ReadOnlyMemory<char>> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
+    public virtual IndexedSetBuilder<TElement> WithFullTextIndex(Func<TElement, string> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
     {
         if (indexName is null)
         {
@@ -219,7 +219,7 @@ public class IndexedSetBuilder<TElement>
     /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="keyAccessor"/> is automatically passed by the compiler.</param>
     /// <returns>The instance on which this method is called is returned to support the fluent syntax.</returns>
-    public virtual IndexedSetBuilder<TElement> WithPrefixIndex(Func<TElement, ReadOnlyMemory<char>> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
+    public virtual IndexedSetBuilder<TElement> WithPrefixIndex(Func<TElement, string> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
     {
         if (indexName is null)
         {
@@ -294,14 +294,14 @@ public class IndexedSetBuilder<TPrimaryKey, TElement> : IndexedSetBuilder<TEleme
     }
 
     /// <inheritdoc />
-    public override IndexedSetBuilder<TPrimaryKey, TElement> WithFullTextIndex(Func<TElement, ReadOnlyMemory<char>> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
+    public override IndexedSetBuilder<TPrimaryKey, TElement> WithFullTextIndex(Func<TElement, string> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
     {
         _ = base.WithFullTextIndex(keyAccessor, indexName);
         return this;
     }
 
     /// <inheritdoc />
-    public override IndexedSetBuilder<TPrimaryKey, TElement> WithPrefixIndex(Func<TElement, ReadOnlyMemory<char>> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
+    public override IndexedSetBuilder<TPrimaryKey, TElement> WithPrefixIndex(Func<TElement, string> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
     {
         _ = base.WithPrefixIndex(keyAccessor, indexName);
         return this;
