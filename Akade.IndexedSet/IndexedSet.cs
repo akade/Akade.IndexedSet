@@ -388,9 +388,9 @@ public class IndexedSet<TElement>
     /// <param name="prefix">The prefix to use</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
-    public IEnumerable<TElement> StartsWith(Func<TElement, ReadOnlyMemory<char>> indexAccessor, ReadOnlyMemory<char> prefix, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+    public IEnumerable<TElement> StartsWith(Func<TElement, string> indexAccessor, ReadOnlySpan<char> prefix, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
     {
-        TypedIndex<TElement, ReadOnlyMemory<char>> typedIndex = GetIndex<ReadOnlyMemory<char>>(indexName);
+        TypedIndex<TElement, string> typedIndex = GetIndex<string>(indexName);
         return typedIndex.StartsWith(prefix);
     }
 
@@ -403,9 +403,9 @@ public class IndexedSet<TElement>
     /// <param name="maxDistance">The maximum distance (e.g. Levenshtein) between the input prefix and matches</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
-    public IEnumerable<TElement> FuzzyStartsWith(Func<TElement, ReadOnlyMemory<char>> indexAccessor, ReadOnlyMemory<char> prefix, int maxDistance, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+    public IEnumerable<TElement> FuzzyStartsWith(Func<TElement, string> indexAccessor, ReadOnlySpan<char> prefix, int maxDistance, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
     {
-        TypedIndex<TElement, ReadOnlyMemory<char>> typedIndex = GetIndex<ReadOnlyMemory<char>>(indexName);
+        TypedIndex<TElement, string> typedIndex = GetIndex<string>(indexName);
         return typedIndex.FuzzyStartsWith(prefix, maxDistance);
     }
 
@@ -417,9 +417,9 @@ public class IndexedSet<TElement>
     /// <param name="infix">The infix to use</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
-    public IEnumerable<TElement> Contains(Func<TElement, ReadOnlyMemory<char>> indexAccessor, ReadOnlyMemory<char> infix, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+    public IEnumerable<TElement> Contains(Func<TElement, string> indexAccessor, ReadOnlySpan<char> infix, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
     {
-        TypedIndex<TElement, ReadOnlyMemory<char>> typedIndex = GetIndex<ReadOnlyMemory<char>>(indexName);
+        TypedIndex<TElement, string> typedIndex = GetIndex<string>(indexName);
         return typedIndex.Contains(infix);
     }
 
@@ -432,9 +432,9 @@ public class IndexedSet<TElement>
     /// <param name="maxDistance">The maximum distance (e.g. Levenshtein) between the input infix and matches</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
-    public IEnumerable<TElement> FuzzyContains(Func<TElement, ReadOnlyMemory<char>> indexAccessor, ReadOnlyMemory<char> infix, int maxDistance, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+    public IEnumerable<TElement> FuzzyContains(Func<TElement, string> indexAccessor, ReadOnlySpan<char> infix, int maxDistance, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
     {
-        TypedIndex<TElement, ReadOnlyMemory<char>> typedIndex = GetIndex<ReadOnlyMemory<char>>(indexName);
+        TypedIndex<TElement, string> typedIndex = GetIndex<string>(indexName);
         return typedIndex.FuzzyContains(infix, maxDistance);
     }
 

@@ -21,7 +21,6 @@ public class FullTextIndices
     private readonly Animal _pangolin = new("Pangolin", "Mammal");
     private readonly Animal _parrot = new("Parrot", "Bird");
 
-
     [TestInitialize]
     public void Init()
     {
@@ -39,58 +38,56 @@ public class FullTextIndices
             _parrot,
         };
         _indexedSet = data.ToIndexedSet()
-                          .WithFullTextIndex(x => x.Category.AsMemory())
-                          .WithFullTextIndex(x => x.Name.AsMemory())
+                          .WithFullTextIndex(x => x.Category)
+                          .WithFullTextIndex(x => x.Name)
                           .Build();
     }
 
     [TestMethod]
     public void single_item_retrieval_works()
     {
-        _indexedSet.AssertSingleItem(x => x.Category.AsMemory(), _boomslang);
-        _indexedSet.AssertSingleItem(x => x.Category.AsMemory(), _tarantula);
+        _indexedSet.AssertSingleItem(x => x.Category, _boomslang);
+        _indexedSet.AssertSingleItem(x => x.Category, _tarantula);
     }
 
     [TestMethod]
     [ExpectedException(typeof(InvalidOperationException))]
     public void single_item_retrieval_throws_exception_if_there_is_more_than_one_result()
     {
-        _indexedSet.AssertSingleItem(x => x.Category.AsMemory(), _bonobo);
+        _indexedSet.AssertSingleItem(x => x.Category, _bonobo);
     }
 
     [TestMethod]
     public void multi_item_retrieval_works()
     {
-        _indexedSet.AssertMultipleItems(x => x.Category.AsMemory(), expectedElements: new[] { _bonobo, _borador, _tiger, _tapir, _panther, _pangolin });
-        _indexedSet.AssertMultipleItems(x => x.Category.AsMemory(), expectedElements: new[] { _booby, _penguin, _parrot });
+        _indexedSet.AssertMultipleItems(x => x.Category, expectedElements: new[] { _bonobo, _borador, _tiger, _tapir, _panther, _pangolin });
+        _indexedSet.AssertMultipleItems(x => x.Category, expectedElements: new[] { _booby, _penguin, _parrot });
     }
 
     [TestMethod]
     public void search_via_starts_with()
     {
-        CollectionAssert.AreEquivalent(new[] { _booby, _boomslang }, _indexedSet.StartsWith(x => x.Name.AsMemory(), "Boo".AsMemory()).ToArray());
-        CollectionAssert.AreEquivalent(new[] { _panther, _pangolin }, _indexedSet.StartsWith(x => x.Name.AsMemory(), "Pan".AsMemory()).ToArray());
+        CollectionAssert.AreEquivalent(new[] { _booby, _boomslang }, _indexedSet.StartsWith(x => x.Name, "Boo").ToArray());
+        CollectionAssert.AreEquivalent(new[] { _panther, _pangolin }, _indexedSet.StartsWith(x => x.Name, "Pan").ToArray());
     }
-
 
     [TestMethod]
     public void search_via_fuzzy_starts_with()
     {
-        CollectionAssert.AreEquivalent(new[] { _bonobo, _booby, _boomslang, _borador }, _indexedSet.FuzzyStartsWith(x => x.Name.AsMemory(), "Boo".AsMemory(), 1).ToArray());
-        CollectionAssert.AreEquivalent(new[] { _penguin, _parrot, _panther, _pangolin }, _indexedSet.FuzzyStartsWith(x => x.Name.AsMemory(), "Pan".AsMemory(), 1).ToArray());
+        CollectionAssert.AreEquivalent(new[] { _bonobo, _booby, _boomslang, _borador }, _indexedSet.FuzzyStartsWith(x => x.Name, "Boo", 1).ToArray());
+        CollectionAssert.AreEquivalent(new[] { _penguin, _parrot, _panther, _pangolin }, _indexedSet.FuzzyStartsWith(x => x.Name, "Pan", 1).ToArray());
     }
 
     [TestMethod]
     public void search_via_contains()
     {
-        CollectionAssert.AreEquivalent(new[] { _boomslang, _tarantula, _panther, _pangolin }, _indexedSet.Contains(x => x.Name.AsMemory(), "an".AsMemory()).ToArray());
+        CollectionAssert.AreEquivalent(new[] { _boomslang, _tarantula, _panther, _pangolin }, _indexedSet.Contains(x => x.Name, "an").ToArray());
     }
-
 
     [TestMethod]
     public void search_via_fuzzy_contains()
     {
-        Animal[] actual = _indexedSet.FuzzyContains(x => x.Name.AsMemory(), "Pan".AsMemory(), 1).ToArray();
+        Animal[] actual = _indexedSet.FuzzyContains(x => x.Name, "Pan", 1).ToArray();
         CollectionAssert.AreEquivalent(new[] { _boomslang, _tarantula, _penguin, _parrot, _panther, _pangolin }, actual);
     }
 }

@@ -18,7 +18,7 @@ public class PrefixIndexBenchmarks
                              .ToList();
 
         _indexedSet = _persons.ToIndexedSet()
-                              .WithPrefixIndex(x => x.FullName.AsMemory())
+                              .WithPrefixIndex(x => x.FullName)
                               .Build();
     }
 
@@ -33,7 +33,7 @@ public class PrefixIndexBenchmarks
     [BenchmarkCategory("StartsWith")]
     public int StartsWith_IndexedSet()
     {
-        return _indexedSet.StartsWith(x => x.FullName.AsMemory(), "Peter".AsMemory()).Count();
+        return _indexedSet.StartsWith(x => x.FullName, "Peter").Count();
     }
 
     [Benchmark(Baseline = true)]
@@ -47,6 +47,6 @@ public class PrefixIndexBenchmarks
     [BenchmarkCategory("Fuzzy StartsWith")]
     public int FuzzyStartsWith_IndexedSet()
     {
-        return _indexedSet.FuzzyStartsWith(x => x.FullName.AsMemory(), "Peter".AsMemory(), 2).Count();
+        return _indexedSet.FuzzyStartsWith(x => x.FullName, "Peter", 2).Count();
     }
 }

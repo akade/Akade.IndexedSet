@@ -1,12 +1,12 @@
 ﻿using Akade.IndexedSet.DataStructures;
 
 namespace Akade.IndexedSet.Indices;
-internal class PrefixIndex<TElement> : TypedIndex<TElement, ReadOnlyMemory<char>>
+internal class PrefixIndex<TElement> : TypedIndex<TElement, string>
 {
     private readonly Trie<TElement> _trie;
-    private readonly Func<TElement, ReadOnlyMemory<char>> _keyAccessor;
+    private readonly Func<TElement, string> _keyAccessor;
 
-    public PrefixIndex(Func<TElement, ReadOnlyMemory<char>> keyAccessor, string name) : base(name)
+    public PrefixIndex(Func<TElement, string> keyAccessor, string name) : base(name)
     {
         _keyAccessor = keyAccessor;
         _trie = new();
@@ -14,24 +14,24 @@ internal class PrefixIndex<TElement> : TypedIndex<TElement, ReadOnlyMemory<char>
 
     public override void Add(TElement value)
     {
-        ReadOnlyMemory<char> key = _keyAccessor(value);
-        _ = _trie.Add(key.Span, value);
+        string key = _keyAccessor(value);
+        _ = _trie.Add(key, value);
     }
 
     public override void Remove(TElement value)
     {
-        ReadOnlyMemory<char> key = _keyAccessor(value);
-        _ = _trie.Remove(key.Span, value);
+        string key = _keyAccessor(value);
+        _ = _trie.Remove(key, value);
     }
 
-    internal override TElement Single(ReadOnlyMemory<char> indexKey)
+    internal override TElement Single(string indexKey)
     {
-        return _trie.GetAll(indexKey.Span).Single();
+        return _trie.GetAll(indexKey).Single();
     }
 
-    internal override bool TryGetSingle(ReadOnlyMemory<char> indexKey, out TElement? element)
+    internal override bool TryGetSingle(string indexKey, out TElement? element)
     {
-        IEnumerable<TElement> allMatches = _trie.Get(indexKey.Span);
+        IEnumerable<TElement> allMatches = _trie.Get(indexKey);
         element = default;
 
         IEnumerator<TElement> enumerator = allMatches.GetEnumerator();
@@ -46,19 +46,19 @@ internal class PrefixIndex<TElement> : TypedIndex<TElement, ReadOnlyMemory<char>
         return !enumerator.MoveNext();
     }
 
-    internal override IEnumerable<TElement> Where(ReadOnlyMemory<char> indexKey)
+    internal override IEnumerable<TElement> Where(string indexKey)
     {
-        return _trie.Get(indexKey.Span);
+        return _trie.Get(indexKey);
     }
 
-    internal override IEnumerable<TElement> StartsWith(ReadOnlyMemory<char> indexKey)
+    internal override IEnumerable<TElement> StartsWith(ReadOnlySpan<char> indexKey)
     {
-        return _trie.GetAll(indexKey.Span);
+        return _trie.GetAll(indexKey);
     }
 
-    internal override IEnumerable<TElement> FuzzyStartsWith(ReadOnlyMemory<char> indexKey, int maxDistance)
+    internal override IEnumerable<TElement> FuzzyStartsWith(ReadOnlySpan<char> indexKey, int maxDistance)
     {
-        return _trie.FuzzySearch(indexKey.Span, maxDistance, false);
+        return _trie.FuzzySearch(indexKey, maxDistance, false);
     }
 
     public override void Clear()

@@ -22,7 +22,7 @@ public class GeneralTests
                           .WithIndex(x => x.IntProperty)
                           .WithIndex(x => x.WritableProperty)
                           .WithRangeIndex(x => x.GuidProperty)
-                          .WithFullTextIndex(x => x.StringProperty.AsMemory())
+                          .WithFullTextIndex(x => x.StringProperty)
                           .Build();
     }
 

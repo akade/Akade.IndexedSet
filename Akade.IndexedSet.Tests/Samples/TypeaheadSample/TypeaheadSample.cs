@@ -11,7 +11,7 @@ public class TypeaheadSample
     {
         _types = typeof(string).Assembly.GetTypes()
                                         .ToIndexedSet()
-                                        .WithPrefixIndex(x => x.Name.ToLowerInvariant().AsMemory())
+                                        .WithPrefixIndex(x => x.Name.ToLowerInvariant())
                                         .Build();
     }
 
@@ -19,7 +19,7 @@ public class TypeaheadSample
     public void Case_insensitve_lookahead_in_all_types_within_system_runtime()
     {
         // Travers the prefix trie to efficiently find all matches
-        Type[] types = _types.StartsWith(x => x.Name.ToLowerInvariant().AsMemory(), "int".AsMemory()).ToArray();
+        Type[] types = _types.StartsWith(x => x.Name.ToLowerInvariant(), "int").ToArray();
 
         Assert.IsTrue(types.Any());
         Assert.IsTrue(types.All(t => t.Name.StartsWith("int", StringComparison.InvariantCultureIgnoreCase)));
