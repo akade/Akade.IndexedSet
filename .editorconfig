@@ -39,6 +39,7 @@ csharp_style_inlined_variable_declaration = true:suggestion
 csharp_style_unused_value_assignment_preference = discard_variable:suggestion
 csharp_prefer_static_local_function = true:suggestion
 csharp_style_prefer_not_pattern = true:suggestion
+csharp_style_prefer_top_level_statements = true:silent
 [*.{cs,vb}]
 dotnet_style_prefer_auto_properties= true:suggestion
 dotnet_style_prefer_conditional_expression_over_assignment= true:suggestion

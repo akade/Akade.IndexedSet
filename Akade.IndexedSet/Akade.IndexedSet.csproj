@@ -5,6 +5,7 @@
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<Version>0.6.0</Version>
 		<VersionSuffix>beta</VersionSuffix>
 		<Description>Provides an In-Memory data structure, the IndexedSet, that allows to easily add indices to allow efficient querying. Currently supports unique and non-unique indices, range indices as well as fuzzy string matching for single attributes, compound or computed keys.</Description>
@@ -21,5 +22,11 @@
 		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
 			<_Parameter1>Akade.IndexedSet.Tests</_Parameter1>
 		</AssemblyAttribute>
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.3">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
 	</ItemGroup>
 </Project>

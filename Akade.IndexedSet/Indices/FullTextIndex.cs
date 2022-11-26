@@ -73,7 +73,7 @@ internal class FullTextIndex<TElement> : TypedIndex<TElement, string>
 
         foreach (TElement candidate in _suffixTrie.FuzzySearch(indexKey, maxDistance, false))
         {
-            if (LevenshteinDistance.FuzzyMatch(_keyAccessor(candidate)[..indexKey.Length], indexKey, maxDistance))
+            if (LevenshteinDistance.FuzzyMatch(_keyAccessor(candidate).AsSpan()[..indexKey.Length], indexKey, maxDistance))
             {
                 _ = matches.Add(candidate);
             }
