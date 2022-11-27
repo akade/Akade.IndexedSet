@@ -20,11 +20,9 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build -c Release --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
-    - name: publish
-      run: dotnet publish -c Release
+      run: dotnet test -c Release --no-build --verbosity normal
     - name: upload
       run: dotnet nuget push ./Akade.IndexedSet/bin/Release/Akade.IndexedSet.*.nupkg --source https://api.nuget.org/v3/index.json --api-key "$NUGET_KEY"
       env:
