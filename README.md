@@ -1,6 +1,6 @@
 ﻿# Akade.IndexedSet
 
-![.Net Version](https://img.shields.io/badge/dynamic/xml?color=%23512bd4&label=target&query=%2F%2FTargetFramework%5B1%5D&url=https://raw.githubusercontent.com/akade/Akade.IndexedSet/main/Akade.IndexedSet/Akade.IndexedSet.csproj&logo=.net)
+![.Net Version](https://img.shields.io/badge/dynamic/xml?color=%23512bd4&label=version&query=%2F%2FTargetFrameworks%5B1%5D&url=https://raw.githubusercontent.com/akade/Akade.IndexedSet/main/Akade.IndexedSet/Akade.IndexedSet.csproj&logo=.net)
 [![CI Build](https://github.com/akade/Akade.IndexedSet/actions/workflows/ci-build.yml/badge.svg?branch=master)](https://github.com/akade/Akade.IndexedSet/actions/workflows/ci-build.yml)
 [![NuGet version (Akade.IndexedSet)](https://img.shields.io/nuget/v/Akade.IndexedSet.svg)](https://www.nuget.org/packages/Akade.IndexedSet/)
 [![MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/akade/Akade.IndexedSet#readme)
