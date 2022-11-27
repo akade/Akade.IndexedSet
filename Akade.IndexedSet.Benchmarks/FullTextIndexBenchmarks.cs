@@ -5,6 +5,8 @@ using Bogus;
 namespace Akade.IndexedSet.Benchmarks;
 [MemoryDiagnoser]
 [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
+[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net60)]
+[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net70)]
 public class FullTextIndexBenchmarks
 {
     private record class Document(string Content);

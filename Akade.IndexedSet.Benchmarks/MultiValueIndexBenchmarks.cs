@@ -4,6 +4,8 @@ namespace Akade.IndexedSet.Benchmarks;
 
 [MemoryDiagnoser]
 [DisassemblyDiagnoser]
+[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net60)]
+[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net70)]
 public class MultiValueIndexBenchmarks
 {
     private record Order(int ProductId, decimal Price);
