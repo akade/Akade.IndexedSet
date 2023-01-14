@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
 using VerifyCS = Akade.IndexedSet.Analyzers.Test.CSharpCodeFixVerifier<
-    Akade.IndexedSet.Analyzers.UseXAsParameterNameAnalyzer,
+    Akade.IndexedSet.Analyzers.IndexNamingRulesAnalyzer,
     Akade.IndexedSet.Analyzers.AkadeIndexedSetAnalyzersCodeFixProvider>;
 
 namespace Akade.IndexedSet.Analyzers.Test;
@@ -21,53 +21,18 @@ public class AkadeIndexedSetAnalyzersUnitTest
     }
 
     //Diagnostic and CodeFix both triggered and checked for
-    [TestMethod]
-    public async Task Not_using_x_on_builder_triggers_warnings()
+    [DataTestMethod]
+    [DataRow(SampleCode.ConcurrentIndexedSet, DisplayName = nameof(SampleCode.ConcurrentIndexedSet))]
+    [DataRow(SampleCode.IndexedSet, DisplayName = nameof(SampleCode.IndexedSet))]
+    [DataRow(SampleCode.IndexedSetBuilder, DisplayName = nameof(SampleCode.IndexedSetBuilder))]
+    [DataRow(SampleCode.PrimaryKeyConcurrentIndexedSet, DisplayName = nameof(SampleCode.PrimaryKeyConcurrentIndexedSet))]
+    [DataRow(SampleCode.PrimaryKeyIndexedSet, DisplayName = nameof(SampleCode.PrimaryKeyIndexedSet))]
+    [DataRow(SampleCode.PrimaryKeyIndexedSetBuilder, DisplayName = nameof(SampleCode.PrimaryKeyIndexedSetBuilder))]
+    public async Task All_relevant_types_are_supported_and_reported(string input)
     {
-
-        DiagnosticResult simpleLamda = VerifyCS.Diagnostic(UseXAsParameterNameAnalyzer.DiagnosticId).WithLocation(0).WithArguments("a");
-        DiagnosticResult parantherizedLambda = VerifyCS.Diagnostic(UseXAsParameterNameAnalyzer.DiagnosticId).WithLocation(1).WithArguments("b");
-        await VerifyCS.VerifyAnalyzerAsync(SampleCode.IndexedSetBuilder, simpleLamda, parantherizedLambda);
-    }
-
-    [TestMethod]
-    public async Task Not_using_x_on_set_triggers_warnings()
-    {
-        DiagnosticResult simpleLamda = VerifyCS.Diagnostic(UseXAsParameterNameAnalyzer.DiagnosticId).WithLocation(0).WithArguments("a");
-        DiagnosticResult parantherizedLambda = VerifyCS.Diagnostic(UseXAsParameterNameAnalyzer.DiagnosticId).WithLocation(1).WithArguments("b");
-        await VerifyCS.VerifyAnalyzerAsync(SampleCode.IndexedSet, simpleLamda, parantherizedLambda);
-    }
-
-    [TestMethod]
-    public async Task Not_using_x_on_concurrent_set_triggers_warnings()
-    {
-        DiagnosticResult simpleLamda = VerifyCS.Diagnostic(UseXAsParameterNameAnalyzer.DiagnosticId).WithLocation(0).WithArguments("a");
-        DiagnosticResult parantherizedLambda = VerifyCS.Diagnostic(UseXAsParameterNameAnalyzer.DiagnosticId).WithLocation(1).WithArguments("b");
-        await VerifyCS.VerifyAnalyzerAsync(SampleCode.ConcurrentIndexedSet, simpleLamda, parantherizedLambda);
-    }
-
-    //Diagnostic and CodeFix both triggered and checked for
-    [TestMethod]
-    public async Task Not_using_x_on_primarykey_builder_triggers_warnings()
-    {
-        DiagnosticResult simpleLamda = VerifyCS.Diagnostic(UseXAsParameterNameAnalyzer.DiagnosticId).WithLocation(0).WithArguments("a");
-        DiagnosticResult parantherizedLambda = VerifyCS.Diagnostic(UseXAsParameterNameAnalyzer.DiagnosticId).WithLocation(1).WithArguments("b");
-        await VerifyCS.VerifyAnalyzerAsync(SampleCode.PrimaryKeyIndexedSetBuilder, simpleLamda, parantherizedLambda);
-    }
-
-    [TestMethod]
-    public async Task Not_using_x_on_primarykey_set_triggers_warnings()
-    {
-        DiagnosticResult simpleLamda = VerifyCS.Diagnostic(UseXAsParameterNameAnalyzer.DiagnosticId).WithLocation(0).WithArguments("a");
-        DiagnosticResult parantherizedLambda = VerifyCS.Diagnostic(UseXAsParameterNameAnalyzer.DiagnosticId).WithLocation(1).WithArguments("b");
-        await VerifyCS.VerifyAnalyzerAsync(SampleCode.PrimaryKeyIndexedSet, simpleLamda, parantherizedLambda);
-    }
-
-    [TestMethod]
-    public async Task Not_using_x_on_concurrent_primarykey_set_triggers_warnings()
-    {
-        DiagnosticResult simpleLamda = VerifyCS.Diagnostic(UseXAsParameterNameAnalyzer.DiagnosticId).WithLocation(0).WithArguments("a");
-        DiagnosticResult parantherizedLambda = VerifyCS.Diagnostic(UseXAsParameterNameAnalyzer.DiagnosticId).WithLocation(1).WithArguments("b");
-        await VerifyCS.VerifyAnalyzerAsync(SampleCode.PrimaryKeyConcurrentIndexedSet, simpleLamda, parantherizedLambda);
+        DiagnosticResult blockBody = VerifyCS.Diagnostic(IndexNamingRulesAnalyzer.DoNotUseBlockBodiedLambdaRuleId).WithLocation(0);
+        DiagnosticResult name = VerifyCS.Diagnostic(IndexNamingRulesAnalyzer.UseXAsIdentifierInLambdaRuleId).WithLocation(1).WithArguments("a");
+        DiagnosticResult parantherizedLambda = VerifyCS.Diagnostic(IndexNamingRulesAnalyzer.DoNotUseParenthesesInLambdaRuleId).WithLocation(2);
+        await VerifyCS.VerifyAnalyzerAsync(input, blockBody, name, parantherizedLambda);
     }
 }

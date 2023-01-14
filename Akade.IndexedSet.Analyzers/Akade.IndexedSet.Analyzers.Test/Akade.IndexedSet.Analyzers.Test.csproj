@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Akade.IndexedSet\Akade.IndexedSet.csproj" />
-    <ProjectReference Include="..\Akade.IndexedSet.Analyzers.CodeFixes\Akade.IndexedSet.Analyzers.CodeFixes.csproj" />
     <ProjectReference Include="..\Akade.IndexedSet.Analyzers\Akade.IndexedSet.Analyzers.csproj" />
   </ItemGroup>
 

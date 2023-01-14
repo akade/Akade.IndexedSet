@@ -27,7 +27,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Akade.IndexedSet.Analyzers.CodeFixes\Akade.IndexedSet.Analyzers.CodeFixes.csproj" />
     <ProjectReference Include="..\Akade.IndexedSet.Analyzers\Akade.IndexedSet.Analyzers.csproj" />
   </ItemGroup>
 
@@ -38,7 +37,6 @@
   <Target Name="_AddAnalyzersToOutput">
     <ItemGroup>
       <TfmSpecificPackageFile Include="$(OutputPath)\Akade.IndexedSet.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
-      <TfmSpecificPackageFile Include="$(OutputPath)\Akade.IndexedSet.Analyzers.CodeFixes.dll" PackagePath="analyzers/dotnet/cs" />
     </ItemGroup>
   </Target>
 
