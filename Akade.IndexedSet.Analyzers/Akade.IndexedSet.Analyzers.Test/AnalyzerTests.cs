@@ -20,7 +20,6 @@ public class AkadeIndexedSetAnalyzersUnitTest
         await VerifyCS.VerifyAnalyzerAsync(test);
     }
 
-    //Diagnostic and CodeFix both triggered and checked for
     [DataTestMethod]
     [DataRow(SampleCode.ConcurrentIndexedSet, DisplayName = nameof(SampleCode.ConcurrentIndexedSet))]
     [DataRow(SampleCode.IndexedSet, DisplayName = nameof(SampleCode.IndexedSet))]
