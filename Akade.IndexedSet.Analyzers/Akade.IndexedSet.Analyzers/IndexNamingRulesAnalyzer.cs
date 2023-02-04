@@ -60,6 +60,68 @@ public class IndexNamingRulesAnalyzer : DiagnosticAnalyzer
 
     private void AnalyzeNode(SyntaxNodeAnalysisContext context)
     {
-        
+        var node = (InvocationExpressionSyntax)context.Node;
+
+        var _relevantTypes = new INamedTypeSymbol?[]
+        {
+            context.Compilation.GetTypeByMetadataName("Akade.IndexedSet.IndexedSet`1"),
+            context.Compilation.GetTypeByMetadataName("Akade.IndexedSet.IndexedSet`2"),
+            context.Compilation.GetTypeByMetadataName("Akade.IndexedSet.Concurrency.ConcurrentIndexedSet`1"),
+            context.Compilation.GetTypeByMetadataName("Akade.IndexedSet.Concurrency.ConcurrentIndexedSet`2"),
+            context.Compilation.GetTypeByMetadataName("Akade.IndexedSet.IndexedSetBuilder`1"),
+            context.Compilation.GetTypeByMetadataName("Akade.IndexedSet.IndexedSetBuilder`2"),
+        }.OfType<INamedTypeSymbol>()
+         .ToImmutableHashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+
+        if (node.Expression is MemberAccessExpressionSyntax memberAccess)
+        {
+            ITypeSymbol? targetExpressionType = context.SemanticModel.GetTypeInfo(memberAccess.Expression).Type;
+            if (targetExpressionType is INamedTypeSymbol namedType
+                && namedType.IsGenericType
+                && _relevantTypes.Contains(namedType.OriginalDefinition))
+            {
+                if (node.ArgumentList.Arguments.FirstOrDefault()?.Expression is LambdaExpressionSyntax lambda)
+                {
+                    CheckParameterName(context, lambda);
+                    CheckForParenthesized(context, lambda);
+                    CheckForBlockBodiedLambda(context, lambda);
+                }
+            }
+        }
+    }
+
+    private void CheckForBlockBodiedLambda(SyntaxNodeAnalysisContext context, LambdaExpressionSyntax lambda)
+    {
+        if (lambda.Block != null)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(_doNotUseBlockBodiedLambdaDescriptor, lambda.GetLocation()));
+        }
+    }
+
+    private void CheckForParenthesized(SyntaxNodeAnalysisContext context, LambdaExpressionSyntax lambda)
+    {
+        if (lambda is ParenthesizedLambdaExpressionSyntax parenthesizedLambda)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(_doNotUseParenthesesDescriptor, parenthesizedLambda.ParameterList.GetLocation()));
+        }
+    }
+
+    private static void CheckParameterName(SyntaxNodeAnalysisContext context, LambdaExpressionSyntax lambda)
+    {
+        ParameterSyntax? parameterSyntax = null;
+        if (lambda is SimpleLambdaExpressionSyntax simpleLambda)
+        {
+            parameterSyntax = simpleLambda.Parameter;
+
+        }
+        else if (lambda is ParenthesizedLambdaExpressionSyntax parenthesizedLambda)
+        {
+            parameterSyntax = parenthesizedLambda.ParameterList.Parameters.FirstOrDefault();
+        }
+
+        if (parameterSyntax?.Identifier.ValueText is string name && name != "x")
+        {
+            context.ReportDiagnostic(Diagnostic.Create(_useXInLambdaDescriptor, parameterSyntax.GetLocation(), name));
+        }
     }
 }

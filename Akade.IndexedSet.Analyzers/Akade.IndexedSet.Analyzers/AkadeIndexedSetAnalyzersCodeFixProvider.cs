@@ -50,13 +50,14 @@ public class AkadeIndexedSetAnalyzersCodeFixProvider : CodeFixProvider
                     action = FixUseXNaming(context, root, diagnosticSpan);
                     break;
                 case IndexNamingRulesAnalyzer.DoNotUseParenthesesInLambdaRuleId:
-                    //action = RemoveParenthesesInLambda(context, root, diagnosticSpan);
+                    action = RemoveParenthesesInLambda(context, root, diagnosticSpan);
                     break;
                 case IndexNamingRulesAnalyzer.DoNotUseBlockBodiedLambdaRuleId:
-                    //action = RemoveBlockBodiedLambda(context, root, diagnosticSpan);
+                    action = RemoveBlockBodiedLambda(context, root, diagnosticSpan);
                     break;
                 default:
                     break;
+                    //throw new NotSupportedException();
             }
             if (action != null)
             {
@@ -64,70 +65,6 @@ public class AkadeIndexedSetAnalyzersCodeFixProvider : CodeFixProvider
             }
         }
 
-    }
-
-    private CodeAction FixUseXNaming(CodeFixContext context, SyntaxNode root, TextSpan diagnosticSpan)
-    {
-        LambdaExpressionSyntax? lambda = root.FindToken(diagnosticSpan.Start).Parent?
-                                                                             .AncestorsAndSelf()
-                                                                             .OfType<LambdaExpressionSyntax>()
-                                                                             .First();
-
-        if (lambda is null)
-        {
-            throw new InvalidOperationException("Codefix cannot find associated node from diagnostic");
-        }
-
-        return CodeAction.Create(
-                title: "Rename to x",
-                createChangedSolution: cancellationToken => RenameToXAsync(context.Document, lambda, cancellationToken),
-                equivalenceKey: nameof(IndexNamingRulesAnalyzer.UseXAsIdentifierInLambdaRuleId));
-    }
-
-    private async Task<Solution> RenameToXAsync(Document document, LambdaExpressionSyntax lambda, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-
-    private CodeAction? RemoveParenthesesInLambda(CodeFixContext context, SyntaxNode root, TextSpan diagnosticSpan)
-    {
-        ParenthesizedLambdaExpressionSyntax? lambda = root.FindToken(diagnosticSpan.Start).Parent?
-                                                          .AncestorsAndSelf()
-                                                          .OfType<ParenthesizedLambdaExpressionSyntax>()
-                                                          .First();
-        if (lambda is null)
-        {
-            throw new InvalidOperationException("Codefix cannot find associated node from diagnostic");
-        }
-
-        return lambda.ParameterList.Parameters.Count != 1
-            ? null
-            : CodeAction.Create(
-            title: "Remove parenthesis",
-            createChangedSolution: cancellationToken => RemoveParenthesisAsync(context.Document, lambda, cancellationToken),
-            equivalenceKey: nameof(IndexNamingRulesAnalyzer.DoNotUseParenthesesInLambdaRuleId));
-    }
-
-    private async Task<Solution> RemoveParenthesisAsync(Document document, ParenthesizedLambdaExpressionSyntax lambda, CancellationToken cancellationToken)
-    {
-        var solutionEditor = new SolutionEditor(document.Project.Solution);
-        DocumentEditor documentEditor = await solutionEditor.GetDocumentEditorAsync(document.Project.Solution.GetDocumentId(lambda.SyntaxTree), cancellationToken);
-
-        var syntaxGenerator = SyntaxGenerator.GetGenerator(documentEditor.OriginalDocument);
-
-        string parameterName = lambda.ParameterList.Parameters.Single().Identifier.Text;
-
-        SyntaxNode simpleLambda = lambda switch
-        {
-            { ExpressionBody: not null } => syntaxGenerator.VoidReturningLambdaExpression(parameterName, lambda.ExpressionBody),
-            { Block: not null } => syntaxGenerator.VoidReturningLambdaExpression(parameterName, lambda.Block.Statements),
-            _ => throw new InvalidOperationException("Invalid input lambda")
-        };
-
-        documentEditor.ReplaceNode(lambda, simpleLambda);
-
-        return solutionEditor.GetChangedSolution();
     }
 
     private CodeAction? RemoveBlockBodiedLambda(CodeFixContext context, SyntaxNode root, TextSpan diagnosticSpan)
@@ -178,5 +115,95 @@ public class AkadeIndexedSetAnalyzersCodeFixProvider : CodeFixProvider
         documentEditor.ReplaceNode(lambda, refactored);
         return solutionEditor.GetChangedSolution();
     }
-    
+
+    private CodeAction? RemoveParenthesesInLambda(CodeFixContext context, SyntaxNode root, TextSpan diagnosticSpan)
+    {
+        ParenthesizedLambdaExpressionSyntax? lambda = root.FindToken(diagnosticSpan.Start).Parent?
+                                                          .AncestorsAndSelf()
+                                                          .OfType<ParenthesizedLambdaExpressionSyntax>()
+                                                          .First();
+        if (lambda is null)
+        {
+            throw new InvalidOperationException("Codefix cannot find associated node from diagnostic");
+        }
+
+        return lambda.ParameterList.Parameters.Count != 1
+            ? null
+            : CodeAction.Create(
+            title: "Remove parenthesis",
+            createChangedSolution: cancellationToken => RemoveParenthesisAsync(context.Document, lambda, cancellationToken),
+            equivalenceKey: nameof(IndexNamingRulesAnalyzer.DoNotUseParenthesesInLambdaRuleId));
+    }
+
+    private async Task<Solution> RemoveParenthesisAsync(Document document, ParenthesizedLambdaExpressionSyntax lambda, CancellationToken cancellationToken)
+    {
+        var solutionEditor = new SolutionEditor(document.Project.Solution);
+        DocumentEditor documentEditor = await solutionEditor.GetDocumentEditorAsync(document.Project.Solution.GetDocumentId(lambda.SyntaxTree), cancellationToken);
+
+        var syntaxGenerator = SyntaxGenerator.GetGenerator(documentEditor.OriginalDocument);
+
+        string parameterName = lambda.ParameterList.Parameters.Single().Identifier.Text;
+
+        SyntaxNode simpleLambda = lambda switch
+        {
+            { ExpressionBody: not null } => syntaxGenerator.VoidReturningLambdaExpression(parameterName, lambda.ExpressionBody),
+            { Block: not null } => syntaxGenerator.VoidReturningLambdaExpression(parameterName, lambda.Block.Statements),
+            _ => throw new InvalidOperationException("Invalid input lambda")
+        };
+
+        documentEditor.ReplaceNode(lambda, simpleLambda);
+
+        return solutionEditor.GetChangedSolution();
+    }
+
+    private CodeAction FixUseXNaming(CodeFixContext context, SyntaxNode root, TextSpan diagnosticSpan)
+    {
+        LambdaExpressionSyntax? lambda = root.FindToken(diagnosticSpan.Start).Parent?
+                                                                             .AncestorsAndSelf()
+                                                                             .OfType<LambdaExpressionSyntax>()
+                                                                             .First();
+
+        if (lambda is null)
+        {
+            throw new InvalidOperationException("Codefix cannot find associated node from diagnostic");
+        }
+
+        return CodeAction.Create(
+                title: "Rename to x",
+                createChangedSolution: cancellationToken => RenameToXAsync(context.Document, lambda, cancellationToken),
+                equivalenceKey: nameof(IndexNamingRulesAnalyzer.UseXAsIdentifierInLambdaRuleId));
+    }
+
+    private async Task<Solution> RenameToXAsync(Document document, LambdaExpressionSyntax lambda, CancellationToken cancellationToken)
+    {
+        if (lambda is SimpleLambdaExpressionSyntax simpleLambda)
+        {
+            return await RenameToXInSimpleLambdaAsync(document, simpleLambda, cancellationToken);
+        }
+        else if (lambda is ParenthesizedLambdaExpressionSyntax parenthesizedLambda)
+        {
+            return await FixParenthesizedLambdaAsync(document, parenthesizedLambda, cancellationToken);
+        }
+        throw new ArgumentOutOfRangeException(nameof(lambda));
+    }
+
+    private async Task<Solution> FixParenthesizedLambdaAsync(Document document, ParenthesizedLambdaExpressionSyntax parenthesizedLambda, CancellationToken cancellationToken)
+    {
+        Solution originalSolution = document.Project.Solution;
+        SemanticModel semanticModel = await document.GetSemanticModelAsync() ?? throw new InvalidOperationException("Cannot obtain semantic model");
+
+        ParameterSyntax parameter = parenthesizedLambda.ParameterList.Parameters.First();
+
+        ISymbol symbol = semanticModel.GetDeclaredSymbol(parameter, cancellationToken) ?? throw new InvalidOperationException("Cannot obtain symbol");
+        return await Renamer.RenameSymbolAsync(originalSolution, symbol, default, "x", cancellationToken);
+    }
+
+    private async Task<Solution> RenameToXInSimpleLambdaAsync(Document document, SimpleLambdaExpressionSyntax simpleLambda, CancellationToken cancellationToken)
+    {
+        Solution originalSolution = document.Project.Solution;
+        SemanticModel semanticModel = await document.GetSemanticModelAsync() ?? throw new InvalidOperationException("Cannot obtain semantic model");
+
+        ISymbol symbol = semanticModel.GetDeclaredSymbol(simpleLambda.Parameter, cancellationToken) ?? throw new InvalidOperationException("Cannot obtain symbol");
+        return await Renamer.RenameSymbolAsync(originalSolution, symbol, default, "x", cancellationToken);
+    }
 }
