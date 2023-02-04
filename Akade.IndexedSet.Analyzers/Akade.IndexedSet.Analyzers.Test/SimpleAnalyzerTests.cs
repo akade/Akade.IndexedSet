@@ -8,7 +8,7 @@ using VerifyCS = Akade.IndexedSet.Analyzers.Test.CSharpCodeFixVerifier<
 namespace Akade.IndexedSet.Analyzers.Test;
 
 /// <summary>
-/// Basic tests that test one occurence for each diagnostics
+/// Basic tests that test one occurrence for each diagnostics
 /// </summary>
 [TestClass]
 public class SimpleAnalyzerTests
@@ -20,14 +20,13 @@ public class SimpleAnalyzerTests
             using Akade.IndexedSet;
 
             IndexedSet<int> test = new[]{5,10,20}.ToIndexedSet()
-                                                 .WithIndex({|#0:y|} => y)
+                                                 .WithIndex({|#0:y => y|})
                                                  .Build();
             """;
 
         DiagnosticResult name = VerifyCS.Diagnostic(IndexNamingRulesAnalyzer.UseXAsIdentifierInLambdaRuleId)
                                         .WithLocation(0)
                                         .WithArguments("y");
-
 
         await VerifyCS.VerifyAnalyzerAsync(code, name);
     }
@@ -39,13 +38,12 @@ public class SimpleAnalyzerTests
         using Akade.IndexedSet;
 
         IndexedSet<int> test = new[]{5,10,20}.ToIndexedSet()
-                                             .WithIndex({|#0:(x)|} => x)
+                                             .WithIndex({|#0:(x) => x|})
                                              .Build();
         """;
 
         DiagnosticResult name = VerifyCS.Diagnostic(IndexNamingRulesAnalyzer.DoNotUseParenthesesInLambdaRuleId)
                                         .WithLocation(0);
-
 
         await VerifyCS.VerifyAnalyzerAsync(code, name);
     }
@@ -63,7 +61,6 @@ public class SimpleAnalyzerTests
 
         DiagnosticResult name = VerifyCS.Diagnostic(IndexNamingRulesAnalyzer.DoNotUseBlockBodiedLambdaRuleId)
                                         .WithLocation(0);
-
 
         await VerifyCS.VerifyAnalyzerAsync(code, name);
     }

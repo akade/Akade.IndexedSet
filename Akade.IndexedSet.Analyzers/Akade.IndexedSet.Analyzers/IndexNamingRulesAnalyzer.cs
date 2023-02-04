@@ -100,9 +100,9 @@ public class IndexNamingRulesAnalyzer : DiagnosticAnalyzer
 
     private void CheckForParenthesized(SyntaxNodeAnalysisContext context, LambdaExpressionSyntax lambda)
     {
-        if (lambda is ParenthesizedLambdaExpressionSyntax parenthesizedLambda)
+        if (lambda is ParenthesizedLambdaExpressionSyntax)
         {
-            context.ReportDiagnostic(Diagnostic.Create(_doNotUseParenthesesDescriptor, parenthesizedLambda.ParameterList.GetLocation()));
+            context.ReportDiagnostic(Diagnostic.Create(_doNotUseParenthesesDescriptor, lambda.GetLocation()));
         }
     }
 
@@ -121,7 +121,7 @@ public class IndexNamingRulesAnalyzer : DiagnosticAnalyzer
 
         if (parameterSyntax?.Identifier.ValueText is string name && name != "x")
         {
-            context.ReportDiagnostic(Diagnostic.Create(_useXInLambdaDescriptor, parameterSyntax.GetLocation(), name));
+            context.ReportDiagnostic(Diagnostic.Create(_useXInLambdaDescriptor, lambda.GetLocation(), name));
         }
     }
 }

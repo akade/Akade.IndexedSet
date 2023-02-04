@@ -16,7 +16,7 @@ public class SimpleCodeFixTests
             using Akade.IndexedSet;
 
             IndexedSet<int> test = new[]{5,10,20}.ToIndexedSet()
-                                                 .WithIndex({|{{IndexNamingRulesAnalyzer.UseXAsIdentifierInLambdaRuleId}}:y|} => y)
+                                                 .WithIndex({|{{IndexNamingRulesAnalyzer.UseXAsIdentifierInLambdaRuleId}}:y => y|})
                                                  .Build();
             """;
 
@@ -38,7 +38,7 @@ public class SimpleCodeFixTests
         using Akade.IndexedSet;
 
         IndexedSet<int> test = new[]{5,10,20}.ToIndexedSet()
-                                             .WithIndex({|{{IndexNamingRulesAnalyzer.DoNotUseParenthesesInLambdaRuleId}}:(x)|} => x)
+                                             .WithIndex({|{{IndexNamingRulesAnalyzer.DoNotUseParenthesesInLambdaRuleId}}:(x) => x|})
                                              .Build();
         """;
 
@@ -74,5 +74,4 @@ public class SimpleCodeFixTests
 
         await VerifyCS.VerifyCodeFixAsync(code, fixedCode);
     }
-
 }

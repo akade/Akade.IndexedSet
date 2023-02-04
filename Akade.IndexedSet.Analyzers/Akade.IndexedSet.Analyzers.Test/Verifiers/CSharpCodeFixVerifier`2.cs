@@ -61,9 +61,8 @@ public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
         var test = new Test
         {
             TestCode = source,
-            FixedCode = fixedSource,
+            FixedCode = fixedSource
         };
-
         test.ExpectedDiagnostics.AddRange(expected);
         await test.RunAsync(CancellationToken.None);
     }
