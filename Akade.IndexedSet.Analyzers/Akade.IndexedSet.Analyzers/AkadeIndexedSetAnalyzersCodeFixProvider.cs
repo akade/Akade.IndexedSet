@@ -68,10 +68,23 @@ public class AkadeIndexedSetAnalyzersCodeFixProvider : CodeFixProvider
 
     private CodeAction FixUseXNaming(CodeFixContext context, SyntaxNode root, TextSpan diagnosticSpan)
     {
-        throw new NotImplementedException();
+        LambdaExpressionSyntax? lambda = root.FindToken(diagnosticSpan.Start).Parent?
+                                                                             .AncestorsAndSelf()
+                                                                             .OfType<LambdaExpressionSyntax>()
+                                                                             .First();
+
+        if (lambda is null)
+        {
+            throw new InvalidOperationException("Codefix cannot find associated node from diagnostic");
+        }
+
+        return CodeAction.Create(
+                title: "Rename to x",
+                createChangedSolution: cancellationToken => RenameToXAsync(context.Document, lambda, cancellationToken),
+                equivalenceKey: nameof(IndexNamingRulesAnalyzer.UseXAsIdentifierInLambdaRuleId));
     }
 
-    private async Task<Solution> RenameToXAsync(Document document, ParameterSyntax parameter, CancellationToken cancellationToken)
+    private async Task<Solution> RenameToXAsync(Document document, LambdaExpressionSyntax lambda, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
