@@ -9,7 +9,7 @@
 	<PropertyGroup>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<Version>0.7.0</Version>
+		<Version>0.8.0</Version>
 		<VersionSuffix>beta</VersionSuffix>
 		<Description>Provides an In-Memory data structure, the IndexedSet, that allows to easily add indices to allow efficient querying. Currently supports unique and non-unique indices, range indices as well as fuzzy string matching for single attributes, compound or computed keys.</Description>
 		<Copyright>Copyright © Akade 2023</Copyright>
@@ -23,9 +23,7 @@
 	
 	<ItemGroup>
 		<None Include="..\README.md" Pack="true" PackagePath="\" />
-		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-			<_Parameter1>Akade.IndexedSet.Tests</_Parameter1>
-		</AssemblyAttribute>
+		<InternalsVisibleTo Include="Akade.IndexedSet.Tests" />
 	</ItemGroup>
 	
 	<ItemGroup>
@@ -33,5 +31,17 @@
 	    <PrivateAssets>all</PrivateAssets>
 	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	  </PackageReference>
+	</ItemGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\Akade.IndexedSet.Analyzers\Akade.IndexedSet.Analyzers\Akade.IndexedSet.Analyzers.csproj"
+						  ReferenceOutputAssembly="false" />
+	</ItemGroup>
+
+	<ItemGroup Label="Package">
+		<None Include="..\Akade.IndexedSet.Analyzers\Akade.IndexedSet.Analyzers\bin\$(Configuration)\netstandard2.0\Akade.IndexedSet.Analyzers.dll" 
+			  PackagePath="analyzers/dotnet/cs"
+			  Pack="true"
+			  Visible="false"/>
 	</ItemGroup>
 </Project>
