@@ -252,7 +252,13 @@ We are using the [CallerArgumentExpression](https://docs.microsoft.com/en-us/dot
 of .Net 6/C# 10 to provide convention-based naming of the indices:
 - `set.Where(x => (x.Prop1, x.Prop2), (1, 2))` tries to use an index named `"x => (x.Prop1, x.Prop2)"`
 - `set.Where(ComputedKeys.NumberOfDays, 5)` tries to use an index named `"ComputedKeys.NumberOfDays"`
-- **Hence, be careful what you pass in. The convention is to always use a lambda with x as variable name or use static methods.**
+- **Hence, be careful what you pass in. 
+> :information_source: The following naming conventions are recommended:
+> - Use x as parameter name in any lambdas that determines an index name.
+> - Do not use parentheses in any lambda that determines an index name.
+> - Do not use block bodied in any lambda that determines an index name. 
+> - For complex indices, use a static method.
+> [C# Analyzers](./Akade.IndexedSet.Analyzers/Readme.md) are shipped with the package to spot incorrect index names.
 
 Reasons
 - Simple and yet effective:

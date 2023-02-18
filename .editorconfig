@@ -40,10 +40,11 @@ csharp_style_unused_value_assignment_preference = discard_variable:suggestion
 csharp_prefer_static_local_function = true:suggestion
 csharp_style_prefer_not_pattern = true:suggestion
 csharp_style_prefer_top_level_statements = true:silent
+csharp_style_conditional_delegate_call = true:suggestion
 [*.{cs,vb}]
 dotnet_style_prefer_auto_properties= true:suggestion
-dotnet_style_prefer_conditional_expression_over_assignment= true:suggestion
-dotnet_style_prefer_conditional_expression_over_return= true:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment= false:suggestion
+dotnet_style_prefer_conditional_expression_over_return= false:suggestion
 dotnet_style_readonly_field= true:warning
 dotnet_style_predefined_type_for_locals_parameters_members= true:suggestion
 dotnet_style_predefined_type_for_member_access= true:suggestion
