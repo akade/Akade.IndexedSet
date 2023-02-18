@@ -7,7 +7,7 @@ IndexedSet ships with analyzers that help to avoid common mistakes with index na
 > :information_source: IndexedSet uses `[CallerArgumentExpression]` to obtain the name of an index.
 For example, `.WithIndex(x => x.ToLowerInvariant())` and `.WithIndex(y => y.ToLowerInvariant())` are functionally equivalent, but will result
 in two different index names. This "literal naming" allows IndexedSet to be expression- and reflection-free, as well as allowing pretty much anything as a key
-within an index. However, this is different to other popular libraries such as EF, which is expression based and can be easily forgotten and will result
+within an index. However, this is different to other popular libraries such as EF (which is expression based) and can be easily forgotten and will result
 in an `IndexNotFoundException`.
 
 1. Use x as parameter name in any lambdas that determines an index name. [AkadeIndexedSet0001](#AkadeIndexedSet0001)
