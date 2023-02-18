@@ -25,6 +25,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Akade.IndexedSet.Analyzers.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Akade.IndexedSet.Analyzers.Vsix", "Akade.IndexedSet.Analyzers\Akade.IndexedSet.Analyzers.Vsix\Akade.IndexedSet.Analyzers.Vsix.csproj", "{71BE73BD-968F-4CA2-A8A1-FF53EB829359}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzer", "Analyzer", "{7F8BE28E-51E4-4818-B0C9-BDD357CCDAFA}"
+	ProjectSection(SolutionItems) = preProject
+		Akade.IndexedSet.Analyzers\Readme.md = Akade.IndexedSet.Analyzers\Readme.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +63,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1C54B6C3-85C8-4C2C-A5F0-648A91CCD4B9} = {7F8BE28E-51E4-4818-B0C9-BDD357CCDAFA}
+		{D349E59F-7FC9-4A2D-9CBF-7AB40D14D16E} = {7F8BE28E-51E4-4818-B0C9-BDD357CCDAFA}
+		{71BE73BD-968F-4CA2-A8A1-FF53EB829359} = {7F8BE28E-51E4-4818-B0C9-BDD357CCDAFA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C65ABA45-764F-4D07-A2A5-800115204611}

@@ -20,7 +20,7 @@ public class IndexNamingRulesAnalyzer : DiagnosticAnalyzer
 
     private static readonly DiagnosticDescriptor _useXInLambdaDescriptor = new DiagnosticDescriptor(
         id: UseXAsIdentifierInLambdaRuleId,
-        title: "Convention: Use x as parameter name in any lambda's that determines an index name",
+        title: "Convention: Use x as parameter name in any lambda that determines an index name",
         messageFormat: "Use x instead of {0} to follow the recommended convention for naming indices",
         category: RulesCategory,
         defaultSeverity: DiagnosticSeverity.Warning,
@@ -30,7 +30,7 @@ public class IndexNamingRulesAnalyzer : DiagnosticAnalyzer
 
     private static readonly DiagnosticDescriptor _doNotUseParenthesesDescriptor = new DiagnosticDescriptor(
         id: DoNotUseParenthesesInLambdaRuleId,
-        title: "Convention: Do not use parentheses in any lambda's that determines an index name",
+        title: "Convention: Do not use parentheses in any lambda that determines an index name",
         messageFormat: "Use a lambda parameters without parentheses to follow the recommended convention for naming indices",
         category: RulesCategory,
         defaultSeverity: DiagnosticSeverity.Warning,
@@ -40,7 +40,7 @@ public class IndexNamingRulesAnalyzer : DiagnosticAnalyzer
 
     private static readonly DiagnosticDescriptor _doNotUseBlockBodiedLambdaDescriptor = new DiagnosticDescriptor(
         id: DoNotUseBlockBodiedLambdaRuleId,
-        title: "Convention: Do not use block bodied in any lambda's that determines an index name",
+        title: "Convention: Do not use block bodied in any lambda that determines an index name",
         messageFormat: "Use expression bodied lambdas for simple indices and static methods for more complex ones to follow the recommended convention for naming indices",
         category: RulesCategory,
         defaultSeverity: DiagnosticSeverity.Warning,

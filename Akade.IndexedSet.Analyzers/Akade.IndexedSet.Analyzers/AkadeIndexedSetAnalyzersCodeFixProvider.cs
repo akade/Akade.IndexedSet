@@ -69,7 +69,8 @@ public class AkadeIndexedSetAnalyzersCodeFixProvider : CodeFixProvider
     private CodeAction? RemoveBlockBodiedLambda(CodeFixContext context, LambdaExpressionSyntax lambda)
     {
         if (lambda.Body is BlockSyntax block
-            && block.Statements.SingleOrDefault() is ReturnStatementSyntax returnStatement
+            && block.Statements.Count() == 1
+            && block.Statements.Single() is ReturnStatementSyntax returnStatement
             && returnStatement.Expression != null)
         {
             return CodeAction.Create(
