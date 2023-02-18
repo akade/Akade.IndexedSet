@@ -1,4 +1,4 @@
-# Supporting Analyzer
+# Analyzers
 
 IndexedSet ships with analyzers that help to avoid common mistakes with index naming.
 
@@ -9,6 +9,10 @@ For example, `.WithIndex(x => x.ToLowerInvariant())` and `.WithIndex(y => y.ToLo
 in two different index names. This "literal naming" allows IndexedSet to be expression- and reflection-free, as well as allowing pretty much anything as a key
 within an index. However, this is different to other popular libraries such as EF, which is expression based and can be easily forgotten and will result
 in an `IndexNotFoundException`.
+
+1. Use x as parameter name in any lambdas that determines an index name. [AkadeIndexedSet0001](#AkadeIndexedSet0001)
+1. Do not use parentheses in any lambda that determines an index name. [AkadeIndexedSet0002](#AkadeIndexedSet0002)
+1. Do not use block bodied in any lambda that determines an index name. For complex indices, use a static method. [AkadeIndexedSet0003](#AkadeIndexedSet0003)
 
 ## AkadeIndexedSet0001
 
