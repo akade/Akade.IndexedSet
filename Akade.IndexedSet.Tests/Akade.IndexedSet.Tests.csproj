@@ -19,7 +19,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Akade.IndexedSet\Akade.IndexedSet.csproj" />
+	  <ProjectReference Include="..\Akade.IndexedSet\Akade.IndexedSet.csproj" ExcludeAssets="Analyzer" />
 	</ItemGroup>
 
 </Project>
