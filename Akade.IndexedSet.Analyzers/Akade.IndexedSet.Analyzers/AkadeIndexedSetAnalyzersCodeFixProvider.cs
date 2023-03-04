@@ -41,16 +41,10 @@ public class AkadeIndexedSetAnalyzersCodeFixProvider : CodeFixProvider
         foreach (Diagnostic diagnostic in context.Diagnostics)
         {
             TextSpan diagnosticSpan = diagnostic.Location.SourceSpan;
-            LambdaExpressionSyntax? lambda = root.FindToken(diagnosticSpan.Start).Parent?
+            LambdaExpressionSyntax? lambda = (root.FindToken(diagnosticSpan.Start).Parent?
                                                  .AncestorsAndSelf()
                                                  .OfType<LambdaExpressionSyntax>()
-                                                 .First();
-
-            if (lambda is null)
-            {
-                throw new InvalidOperationException("Codefix cannot find associated node from diagnostic");
-            }
-
+                                                 .First()) ?? throw new InvalidOperationException("Codefix cannot find associated node from diagnostic");
             CodeAction? action = diagnostic.Id switch
             {
                 IndexNamingRulesAnalyzer.UseXAsIdentifierInLambdaRuleId => FixUseXNaming(context, lambda),

@@ -17,7 +17,7 @@
 		<EnablePackageValidation>true</EnablePackageValidation>
 		<RepositoryUrl>https://github.com/akade/Akade.IndexedSet</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageTags>data structure;indices;range query;unique index;range index;non-unique index;multi-value;dictionary;collections;computed keys;fuzzy;fuzzy search;approximate string matching;search;concurrency</PackageTags>
+		<PackageTags>data structure;indices;range query;unique index;range index;non-unique index;multi-value;dictionary;collections;computed keys;fuzzy;fuzzy search;approximate string matching;search;concurrency;multiple keys; fast lookup;performance</PackageTags>
 		<PackageReadmeFile>/README.md</PackageReadmeFile>
 	</PropertyGroup>
 	
@@ -39,9 +39,6 @@
 	</ItemGroup>
 
 	<ItemGroup Label="Package">
-		<None Include="..\Akade.IndexedSet.Analyzers\Akade.IndexedSet.Analyzers\bin\$(Configuration)\netstandard2.0\Akade.IndexedSet.Analyzers.dll" 
-			  PackagePath="analyzers/dotnet/cs"
-			  Pack="true"
-			  Visible="false"/>
+		<None Include="..\Akade.IndexedSet.Analyzers\Akade.IndexedSet.Analyzers\bin\$(Configuration)\netstandard2.0\Akade.IndexedSet.Analyzers.dll" PackagePath="analyzers/dotnet/cs" Pack="true" Visible="false" />
 	</ItemGroup>
 </Project>
