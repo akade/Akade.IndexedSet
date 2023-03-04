@@ -1,6 +1,6 @@
 ﻿namespace Akade.IndexedSet.Concurrency;
 
-internal sealed class ReaderWriterLockEx
+internal sealed class ReaderWriterLockEx : IDisposable
 {
     private readonly ReaderWriterLockSlim _lock = new();
     private readonly ReaderDisposable _readerDisposable;
@@ -10,6 +10,12 @@ internal sealed class ReaderWriterLockEx
     {
         _readerDisposable = new(this);
         _writerDisposable = new(this);
+    }
+
+    public void Dispose()
+    {
+        _readerDisposable.Dispose();
+        _writerDisposable.Dispose();
     }
 
     public IDisposable EnterReadLock()

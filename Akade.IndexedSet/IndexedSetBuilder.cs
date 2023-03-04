@@ -1,5 +1,6 @@
 ﻿using Akade.IndexedSet.Concurrency;
 using Akade.IndexedSet.Indices;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace Akade.IndexedSet;
@@ -7,6 +8,9 @@ namespace Akade.IndexedSet;
 /// <summary>
 /// Helper class to support type inference for element <see cref="IndexedSetBuilder{TElement}"/> and primary key type for <see cref="IndexedSetBuilder{TPrimaryKey, TElement}"/>
 /// </summary>
+#if NET7_0_OR_GREATER
+[SuppressMessage("Style", "IDE0280:Use 'nameof'", Justification = ".NET 6 is still supported")]
+#endif
 public static class IndexedSetBuilder
 {
     /// <summary>
@@ -53,6 +57,9 @@ public static class IndexedSetBuilder
 /// <summary>
 /// Helper class to support type inference for the primary key type for <see cref="IndexedSetBuilder{TPrimaryKey, TElement}"/>
 /// </summary>
+#if NET7_0_OR_GREATER
+[SuppressMessage("Style", "IDE0280:Use 'nameof'", Justification = ".NET 6 is still supported")]
+#endif
 public class IndexedSetBuilder<TElement>
 {
     private readonly IndexedSet<TElement> _result;
@@ -257,6 +264,9 @@ public class IndexedSetBuilder<TElement>
 /// Helper class to create <see cref="IndexedSet{TPrimaryKey, TElement}"/> with a fluent syntax.
 /// Use <see cref="IndexedSetBuilder{TElement}" /> and <see cref="IndexedSetBuilder{TPrimaryKey, TElement}"/> to obtain a builder.
 /// </summary>
+#if NET7_0_OR_GREATER
+[SuppressMessage("Style", "IDE0280:Use 'nameof'", Justification = ".NET 6 is still supported")]
+#endif
 public class IndexedSetBuilder<TPrimaryKey, TElement> : IndexedSetBuilder<TElement>
     where TPrimaryKey : notnull
 {

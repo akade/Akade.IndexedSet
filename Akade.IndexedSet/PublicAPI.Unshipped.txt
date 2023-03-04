@@ -1,1 +1,2 @@
 ﻿#nullable enable
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Dispose() -> void

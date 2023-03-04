@@ -8,7 +8,10 @@ namespace Akade.IndexedSet.Concurrency;
 /// Adds thread-safety, the trade off is, that all reading operations materialize the results into a collection.
 /// 
 /// </summary>
-public class ConcurrentIndexedSet<TElement>
+#if NET7_0_OR_GREATER
+[SuppressMessage("Style", "IDE0280:Use 'nameof'", Justification = ".NET 6 is still supported")]
+#endif
+public class ConcurrentIndexedSet<TElement> : IDisposable
 {
     private readonly ReaderWriterLockEx _lock = new();
     private readonly IndexedSet<TElement> _indexedSet;
@@ -511,6 +514,13 @@ public class ConcurrentIndexedSet<TElement>
     protected IDisposable AcquireReaderLock()
     {
         return _lock.EnterReadLock();
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        _lock.Dispose();
+        GC.SuppressFinalize(this);
     }
 }
 /// <summary>
