@@ -27,18 +27,17 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.3">
+	  <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4">
 	    <PrivateAssets>all</PrivateAssets>
 	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	  </PackageReference>
 	</ItemGroup>
 	
 	<ItemGroup>
-		<ProjectReference Include="..\Akade.IndexedSet.Analyzers\Akade.IndexedSet.Analyzers\Akade.IndexedSet.Analyzers.csproj"
-						  ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\Analyzers\Akade.IndexedSet.Analyzers\Akade.IndexedSet.Analyzers.csproj" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
 	<ItemGroup Label="Package">
-		<None Include="..\Akade.IndexedSet.Analyzers\Akade.IndexedSet.Analyzers\bin\$(Configuration)\netstandard2.0\Akade.IndexedSet.Analyzers.dll" PackagePath="analyzers/dotnet/cs" Pack="true" Visible="false" />
+		<None Include="..\Analyzers\Akade.IndexedSet.Analyzers\bin\$(Configuration)\netstandard2.0\Akade.IndexedSet.Analyzers.dll" PackagePath="analyzers/dotnet/cs" Pack="true" Visible="false" />
 	</ItemGroup>
 </Project>
