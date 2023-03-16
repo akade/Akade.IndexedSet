@@ -24,7 +24,7 @@ public partial class ConcurrentIndexedSet<TElement>
     {
         using (AcquireReaderLock())
         {
-            return _indexedSet.TryGetSingle(indexAccessor, indexKey, element, indexName);
+            return _indexedSet.TryGetSingle(indexAccessor, indexKey, out element, indexName);
         }
     }
 }

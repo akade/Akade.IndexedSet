@@ -109,7 +109,7 @@ public class ConcurrentSetSourceGenerator : IIncrementalGenerator
                                  .Append(method.Identifier.Text);
 
                 _ = stringBuilder.Append("(")
-                                 .AppendJoin(", ", method.ParameterList.Parameters.Select(p => p.Identifier.Text))
+                                 .AppendJoin(", ", method.ParameterList.Parameters.Select(p => (p.Modifiers.Any(SyntaxKind.OutKeyword) ? "out " : "") + p.Identifier.Text))
                                  .Append(")");
 
                 if (method.ReturnType is GenericNameSyntax { Arity: 1, Identifier.Text: "IEnumerable" })
