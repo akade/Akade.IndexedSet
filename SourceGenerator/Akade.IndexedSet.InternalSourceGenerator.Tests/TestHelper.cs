@@ -34,17 +34,25 @@ public static class TestHelper
 
         public Task ForSource<TSourceGen>(string source) where TSourceGen : IIncrementalGenerator, new()
         {
-            PortableExecutableReference[] refs = new[]
-            {
-                MetadataReference.CreateFromFile(typeof(IndexedSet<int>).Assembly.Location)
-            };
+            SyntaxTree attributeSyntaxTree = CSharpSyntaxTree.ParseText(
+                """
+                using System.Diagnostics;
 
+                namespace Akade.IndexedSet.Concurrency;
+
+                [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+                [Conditional("RemovedFromBuiltCode")]
+                internal class ReadAccessAttribute : Attribute { }
+
+                [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+                [Conditional("RemovedFromBuiltCode")]
+                internal class WriteAccessAttribute : Attribute { }
+                """);
             SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source);
 
             var compilation = CSharpCompilation.Create(
                 assemblyName: "Tests",
-                syntaxTrees: new[] { syntaxTree },
-                references: refs
+                syntaxTrees: new[] { attributeSyntaxTree, syntaxTree }
                 );
 
             TSourceGen generator = new();

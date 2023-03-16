@@ -1,4 +1,5 @@
-﻿using Akade.IndexedSet.Indices;
+﻿using Akade.IndexedSet.Concurrency;
+using Akade.IndexedSet.Indices;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
@@ -34,6 +35,7 @@ public class IndexedSet<TElement>
     /// want to add multiple items at once.
     /// </summary>
     /// <param name="element">The new element to add</param>
+    [WriteAccess]
     public bool Add(TElement element)
     {
         if (!_data.Add(element))
@@ -56,6 +58,7 @@ public class IndexedSet<TElement>
     /// </summary>
     /// <param name="elements">The elements to insert</param>
     /// <returns>Returns the number of inserted elements</returns>
+    [WriteAccess]
     public int AddRange(IEnumerable<TElement> elements)
     {
         List<TElement> elementsToAdd;
@@ -91,6 +94,7 @@ public class IndexedSet<TElement>
     /// </summary>
     /// <param name="element">The element to remove</param>
     /// <returns>True if an element was removed otherwise, false.</returns>
+    [WriteAccess]
     public bool Remove(TElement element)
     {
         if (!_data.Remove(element))
@@ -114,6 +118,7 @@ public class IndexedSet<TElement>
     /// <param name="indexKey">The key within the index.</param>
     /// <param name="element">The element if found, otherwise null.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
+    [ReadAccess]
     public bool TryGetSingle<TIndexKey>(
         Func<TElement, TIndexKey> indexAccessor,
         TIndexKey indexKey,
@@ -133,6 +138,7 @@ public class IndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexKey">The key within the index.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
+    [ReadAccess]
     public TElement Single<TIndexKey>(
         Func<TElement, TIndexKey> indexAccessor,
         TIndexKey indexKey,
@@ -151,6 +157,7 @@ public class IndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="contains">The key within the index. The convention is to write the parameter name for increased readability i.e. .Single(x => x.Prop, contains: value).</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
     public TElement Single<TIndexKey>(
         Func<TElement, IEnumerable<TIndexKey>> indexAccessor,
         TIndexKey contains,
@@ -169,6 +176,7 @@ public class IndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexKey">The key within the index.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
     public IEnumerable<TElement> Where<TIndexKey>(
         Func<TElement, TIndexKey> indexAccessor,
         TIndexKey indexKey,
@@ -187,6 +195,7 @@ public class IndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="contains">The key within the index. The convention is to write the parameter name for increased readability i.e. .Where(x => x.Prop, contains: value).</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
     public IEnumerable<TElement> Where<TIndexKey>(
         Func<TElement, IEnumerable<TIndexKey>> indexAccessor,
         TIndexKey contains,
@@ -209,6 +218,7 @@ public class IndexedSet<TElement>
     /// <param name="inclusiveStart">True, if the query should include the start, otherwise false.</param>
     /// <param name="inclusiveEnd">True, if the query should include the end, otherwise false.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
     public IEnumerable<TElement> Range<TIndexKey>(
         Func<TElement, TIndexKey> indexAccessor,
         TIndexKey start,
@@ -230,6 +240,7 @@ public class IndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="value">The key value to compare other keys with.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
     public IEnumerable<TElement> LessThan<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
@@ -245,6 +256,7 @@ public class IndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="value">The key value to compare other keys with.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
     public IEnumerable<TElement> LessThanOrEqual<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
@@ -260,6 +272,7 @@ public class IndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="value">The key value to compare other keys with.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
     public IEnumerable<TElement> GreaterThan<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
@@ -275,6 +288,7 @@ public class IndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="value">The key value to compare other keys with.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
     public IEnumerable<TElement> GreaterThanOrEqual<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
@@ -289,6 +303,7 @@ public class IndexedSet<TElement>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
     public TIndexKey Max<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
@@ -303,6 +318,7 @@ public class IndexedSet<TElement>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
     public TIndexKey Min<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
@@ -317,6 +333,7 @@ public class IndexedSet<TElement>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
     public IEnumerable<TElement> MaxBy<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
@@ -331,6 +348,7 @@ public class IndexedSet<TElement>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
     public IEnumerable<TElement> MinBy<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
@@ -346,6 +364,7 @@ public class IndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="skip">Allows to efficiently skip a number of elements. Default is 0</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
     public IEnumerable<TElement> OrderBy<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, int skip = 0, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
@@ -361,6 +380,7 @@ public class IndexedSet<TElement>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
     public IEnumerable<TElement> OrderByDescending<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, int skip = 0, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
@@ -375,6 +395,7 @@ public class IndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="prefix">The prefix to use</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
     public IEnumerable<TElement> StartsWith(Func<TElement, string> indexAccessor, ReadOnlySpan<char> prefix, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
     {
         TypedIndex<TElement, string> typedIndex = GetIndex<string>(indexName);
@@ -389,6 +410,7 @@ public class IndexedSet<TElement>
     /// <param name="prefix">The prefix to use</param>
     /// <param name="maxDistance">The maximum distance (e.g. Levenshtein) between the input prefix and matches</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
     public IEnumerable<TElement> FuzzyStartsWith(Func<TElement, string> indexAccessor, ReadOnlySpan<char> prefix, int maxDistance, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
     {
         TypedIndex<TElement, string> typedIndex = GetIndex<string>(indexName);
@@ -402,6 +424,7 @@ public class IndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="infix">The infix to use</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
     public IEnumerable<TElement> Contains(Func<TElement, string> indexAccessor, ReadOnlySpan<char> infix, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
     {
         TypedIndex<TElement, string> typedIndex = GetIndex<string>(indexName);
@@ -416,6 +439,7 @@ public class IndexedSet<TElement>
     /// <param name="infix">The infix to use</param>
     /// <param name="maxDistance">The maximum distance (e.g. Levenshtein) between the input infix and matches</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
     public IEnumerable<TElement> FuzzyContains(Func<TElement, string> indexAccessor, ReadOnlySpan<char> infix, int maxDistance, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
     {
         TypedIndex<TElement, string> typedIndex = GetIndex<string>(indexName);
@@ -451,6 +475,7 @@ public class IndexedSet<TElement>
     /// <summary>
     /// Returns true if the element is present in the current set, otherwise, false.
     /// </summary>
+    [ReadAccess]
     public bool Contains(TElement element)
     {
         return _data.Contains(element);
@@ -459,6 +484,7 @@ public class IndexedSet<TElement>
     /// <summary>
     /// Removes all elements
     /// </summary>
+    [WriteAccess]
     public void Clear()
     {
         _data.Clear();
@@ -498,7 +524,7 @@ public class IndexedSet<TElement>
     }
 
     /// <summary>
-    /// Helper function that allows to safely update mutable, indexed keys within <paramref name="updateFunc"/>.
+    /// Helper function that allows to safely update immutable, indexed keys within <paramref name="updateFunc"/>.
     /// </summary>
     /// <param name="element">The element to update. Is passed to <paramref name="updateFunc"/>.</param>
     /// <param name="updateFunc">The update function, can return the same or a new instance that will be in the set after the function completes.</param>
@@ -511,7 +537,7 @@ public class IndexedSet<TElement>
     }
 
     /// <summary>
-    /// Helper function that allows to safely update mutable, indexed keys within <paramref name="updateFunc"/>.
+    /// Helper function that allows to safely update immutable, indexed keys within <paramref name="updateFunc"/>.
     /// </summary>
     /// <param name="element">The element to update. Is passed to <paramref name="updateFunc"/>.</param>
     /// <param name="state">User defined state that is passed to <paramref name="updateFunc"/>.</param>

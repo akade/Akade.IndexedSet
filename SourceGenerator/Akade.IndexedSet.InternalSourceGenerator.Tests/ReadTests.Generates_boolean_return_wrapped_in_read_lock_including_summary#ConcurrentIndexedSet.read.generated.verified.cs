@@ -1,7 +1,9 @@
 ﻿//HintName: ConcurrentIndexedSet.read.generated.cs
-using Akade.IndexedSet.Concurrency;
-namespace Akade.IndexedSet.Concurrency;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
+namespace Akade.IndexedSet.Concurrency;
+#nullable enable
 public partial class ConcurrentIndexedSet<TElement>
 {
     /// <summary>
@@ -13,15 +15,17 @@ public partial class ConcurrentIndexedSet<TElement>
     /// <param name="indexKey">The key within the index.</param>
     /// <param name="element">The element if found, otherwise null.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    public bool TryGetSingle(
+    public bool TryGetSingle<TIndexKey>(
         Func<TElement, TIndexKey> indexAccessor,
         TIndexKey indexKey,
         [NotNullWhen(true)] out TElement? element,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null) 
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        where TIndexKey : notnull
     {
-        using(AcquireReaderLock())
+        using (AcquireReaderLock())
         {
             return _indexedSet.TryGetSingle(indexAccessor, indexKey, element, indexName);
         }
     }
 }
+#nullable restore

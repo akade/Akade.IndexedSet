@@ -11,7 +11,7 @@ namespace Akade.IndexedSet.Concurrency;
 #if NET7_0_OR_GREATER
 [SuppressMessage("Style", "IDE0280:Use 'nameof'", Justification = ".NET 6 is still supported")]
 #endif
-public class ConcurrentIndexedSet<TElement> : IDisposable
+public partial class ConcurrentIndexedSet<TElement> : IDisposable
 {
     private readonly ReaderWriterLockEx _lock = new();
     private readonly IndexedSet<TElement> _indexedSet;
@@ -24,68 +24,14 @@ public class ConcurrentIndexedSet<TElement> : IDisposable
     /// <summary>
     /// Returns the number of elements currently within the set.
     /// </summary>
-    public int Count => _indexedSet.Count;
-
-    /// <summary>
-    /// Adds a new item to the set. Use <see cref="AddRange(IEnumerable{TElement})"/> if you
-    /// want to add multiple items at once.
-    /// </summary>
-    /// <param name="element">The new element to add</param>
-    public bool Add(TElement element)
+    public int Count
     {
-        using (AcquireWriterLock())
+        get
         {
-            return _indexedSet.Add(element);
-        }
-    }
-
-    /// <summary>
-    /// Adds multiple elements at once. In contrast to <see cref="Add(TElement)"/>, this method
-    /// allows indices to perform the insertion in a preferable way, for example, by ordering
-    /// the elements prior to insertion.
-    /// </summary>
-    /// <param name="elements">The elements to insert</param>
-    /// <returns>Returns the number of inserted elements</returns>
-    public int AddRange(IEnumerable<TElement> elements)
-    {
-        using (AcquireWriterLock())
-        {
-            return _indexedSet.AddRange(elements);
-        }
-    }
-
-    /// <summary>
-    /// Tries to remove an element from the set.
-    /// </summary>
-    /// <param name="element">The element to remove</param>
-    /// <returns>True if an element was removed otherwise, false.</returns>
-    public bool Remove(TElement element)
-    {
-        using (AcquireWriterLock())
-        {
-            return _indexedSet.Remove(element);
-        }
-    }
-
-    /// <summary>
-    /// Searches for an element via an index.
-    /// </summary>
-    /// <typeparam name="TIndexKey">The type of the index key</typeparam>
-    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
-    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
-    /// <param name="indexKey">The key within the index.</param>
-    /// <param name="element">The element if found, otherwise null.</param>
-    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    public bool TryGetSingle<TIndexKey>(
-        Func<TElement, TIndexKey> indexAccessor,
-        TIndexKey indexKey,
-        [NotNullWhen(true)] out TElement? element,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
-        where TIndexKey : notnull
-    {
-        using (AcquireReaderLock())
-        {
-            return _indexedSet.TryGetSingle(indexAccessor, indexKey, out element, indexName);
+            using (AcquireReaderLock())
+            {
+                return _indexedSet.Count;
+            }
         }
     }
 
@@ -387,24 +333,6 @@ public class ConcurrentIndexedSet<TElement> : IDisposable
     }
 
     /// <summary>
-    /// Returns all elements that start with the given char sequence
-    /// </summary>
-    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
-    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
-    /// <param name="prefix">The prefix to use</param>
-    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
-    public IEnumerable<TElement> StartsWith(
-        Func<TElement, string> indexAccessor,
-        ReadOnlySpan<char> prefix,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
-    {
-        using (AcquireReaderLock())
-        {
-            return _indexedSet.StartsWith(indexAccessor, prefix, indexName).ToList();
-        }
-    }
-
-    /// <summary>
     /// Returns all elements that start with the given char sequence or a similar one.
     /// </summary>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
@@ -459,17 +387,6 @@ public class ConcurrentIndexedSet<TElement> : IDisposable
         using (AcquireReaderLock())
         {
             return _indexedSet.FuzzyContains(indexAccessor, infix, maxDistance, indexName).ToList();
-        }
-    }
-
-    /// <summary>
-    /// Removes all elements
-    /// </summary>
-    public void Clear()
-    {
-        using (AcquireWriterLock())
-        {
-            _indexedSet.Clear();
         }
     }
 
