@@ -1,4 +1,4 @@
-﻿//HintName: ConcurrentIndexedSet.write.generated.cs
+﻿//HintName: ConcurrentIndexedSet.read.generated.cs
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
@@ -6,11 +6,11 @@ namespace Akade.IndexedSet.Concurrency;
 #nullable enable
 public partial class ConcurrentIndexedSet<TPrimaryKey, TElement>
 {
-    public bool Remove(TPrimaryKey key)
+    public TElement Single(TPrimaryKey key)
     {
-        using (AcquireWriterLock())
+        using (AcquireReaderLock())
         {
-            return _indexedSet.Remove(key);
+            return _primaryKeyIndexedSet.Single(key);
         }
     }
 }

@@ -77,7 +77,7 @@ public class ConcurrentSetSourceGenerator : IIncrementalGenerator
             {
                 foreach (MethodDeclarationSyntax method in methods)
                 {
-                    WriteMethodDelegation(stringBuilder, method, isReader);
+                    WriteMethodDelegation(stringBuilder, method, isReader, isPrimaryKeySet);
                 }
             }
         }
@@ -88,9 +88,10 @@ public class ConcurrentSetSourceGenerator : IIncrementalGenerator
         return method.FirstAncestorOrSelf<ClassDeclarationSyntax>()?.TypeParameterList?.Parameters.Count == 2;
     }
 
-    private void WriteMethodDelegation(IntendedStringBuilder stringBuilder, MethodDeclarationSyntax method, bool isReader)
+    private void WriteMethodDelegation(IntendedStringBuilder stringBuilder, MethodDeclarationSyntax method, bool isReader, bool isPrimaryKeySet)
     {
         string acquireLock = $"using ({(isReader ? "AcquireReaderLock()" : "AcquireWriterLock()")})";
+        string setVariable = isPrimaryKeySet ? "_primaryKeyIndexedSet" : "_indexedSet";
 
         WriteMethodHeader(method, stringBuilder);
         using (stringBuilder.StartCodeBlock())
@@ -105,7 +106,8 @@ public class ConcurrentSetSourceGenerator : IIncrementalGenerator
                     _ = stringBuilder.Append("return ");
                 }
 
-                _ = stringBuilder.Append("_indexedSet.")
+                _ = stringBuilder.Append(setVariable)
+                                 .Append(".")
                                  .Append(method.Identifier.Text);
 
                 _ = stringBuilder.Append("(")
@@ -149,17 +151,5 @@ public class ConcurrentSetSourceGenerator : IIncrementalGenerator
         }
 
         _ = stringBuilder.AppendLine();
-    }
-
-    private static bool IsMethodWithinIndexedSet(MethodDeclarationSyntax method)
-    {
-        static bool IsWithinIndexedSet(SyntaxNode node) => node switch
-        {
-            ClassDeclarationSyntax { Identifier.Text: "IndexedSet" } => true,
-            { Parent: SyntaxNode parent } => IsWithinIndexedSet(parent),
-            _ => false
-        };
-
-        return IsWithinIndexedSet(method);
     }
 }

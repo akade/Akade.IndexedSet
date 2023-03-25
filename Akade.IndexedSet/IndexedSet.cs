@@ -364,7 +364,6 @@ public class IndexedSet<TElement>
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="skip">Allows to efficiently skip a number of elements. Default is 0</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
-    [ReadAccess]
     public IEnumerable<TElement> OrderBy<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, int skip = 0, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
@@ -380,7 +379,6 @@ public class IndexedSet<TElement>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
-    [ReadAccess]
     public IEnumerable<TElement> OrderByDescending<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, int skip = 0, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
@@ -500,6 +498,7 @@ public class IndexedSet<TElement>
     /// <param name="element">The element to update. Is passed to <paramref name="updateFunc"/>.</param>
     /// <param name="updateFunc">The update function</param>
     /// <returns>True, if the element was present before. False if the element was added.</returns>
+    [WriteAccess]
     public bool Update(TElement element, Action<TElement> updateFunc)
     {
         bool result = Remove(element);
@@ -515,6 +514,7 @@ public class IndexedSet<TElement>
     /// <param name="state">User defined state that is passed to <paramref name="updateFunc"/>.</param>
     /// <param name="updateFunc">The update function</param>
     /// <returns>True, if the element was present before. False if the element was added.</returns>
+    [WriteAccess]
     public bool Update<TState>(TElement element, TState state, Action<TElement, TState> updateFunc)
     {
         bool result = Remove(element);
@@ -529,6 +529,7 @@ public class IndexedSet<TElement>
     /// <param name="element">The element to update. Is passed to <paramref name="updateFunc"/>.</param>
     /// <param name="updateFunc">The update function, can return the same or a new instance that will be in the set after the function completes.</param>
     /// <returns>True, if the element was present before. False if the element was added.</returns>
+    [WriteAccess]
     public bool Update(TElement element, Func<TElement, TElement> updateFunc)
     {
         bool result = Remove(element);
@@ -543,6 +544,7 @@ public class IndexedSet<TElement>
     /// <param name="state">User defined state that is passed to <paramref name="updateFunc"/>.</param>
     /// <param name="updateFunc">The update function, can return the same or a new instance that will be in the set after the function completes.</param>
     /// <returns>True, if the element was present before. False if the element was added.</returns>
+    [WriteAccess]
     public bool Update<TState>(TElement element, TState state, Func<TElement, TState, TElement> updateFunc)
     {
         bool result = Remove(element);
@@ -601,6 +603,7 @@ public class IndexedSet<TPrimaryKey, TElement> : IndexedSet<TElement>
     /// <summary>
     /// Attempts to remove an item with the given primary key and returns true, if one was found and removed. Otherwise, false.
     /// </summary>
+    [WriteAccess]
     public bool Remove(TPrimaryKey key)
     {
         return TryGetSingle(_primaryKeyAccessor, key, out TElement? result, _primaryKeyIndexName) && Remove(result);
@@ -610,6 +613,7 @@ public class IndexedSet<TPrimaryKey, TElement> : IndexedSet<TElement>
     /// Returns the element associated to the given primary key.
     /// </summary>
     /// <param name="key">The primary key to obtain the item for</param>
+    [ReadAccess]
     public TElement Single(TPrimaryKey key)
     {
         return Single(_primaryKeyAccessor, key, _primaryKeyIndexName);
@@ -618,6 +622,7 @@ public class IndexedSet<TPrimaryKey, TElement> : IndexedSet<TElement>
     /// <summary>
     /// Returns true if an element with the given primary key is present in the current set, otherwise, false.
     /// </summary>
+    [ReadAccess]
     public bool Contains(TPrimaryKey key)
     {
         return Where(_primaryKeyAccessor, key, _primaryKeyIndexName).Any();
