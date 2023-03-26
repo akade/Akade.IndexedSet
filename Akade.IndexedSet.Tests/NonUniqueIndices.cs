@@ -85,4 +85,17 @@ public class NonUniqueIndices
         _indexedSet.AssertMultipleItems(x => x.StringProperty, expectedElements: new[] { _c, _d, _e });
         Assert.AreEqual(_a, _indexedSet.Where(x => x.StringProperty, "AA").Single());
     }
+
+    [TestMethod]
+    public void TryGetSingle_on_secondary_key()
+    {
+        Assert.IsFalse(_indexedSet.TryGetSingle(x => x.IntProperty, 8, out TestData? data1));
+        Assert.IsNull(data1);
+
+        Assert.IsFalse(_indexedSet.TryGetSingle(x => x.IntProperty, 10, out TestData? data2));
+        Assert.IsNull(data2);
+
+        Assert.IsTrue(_indexedSet.TryGetSingle(x => x.IntProperty, 11, out TestData? data3));
+        Assert.IsNotNull(data3);
+    }
 }

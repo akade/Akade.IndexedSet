@@ -42,4 +42,24 @@ public class MultiValueIndices
         Assert.IsFalse(_indexedSet.Remove(0));
         Assert.IsFalse(_indexedSet.Contains(0));
     }
+
+    [TestMethod]
+    public void TryGetSingle()
+    {
+        Assert.IsTrue(_indexedSet.TryGetSingle(x => x.IntList, 4, out DenormalizedTestData? test1));
+        Assert.IsNotNull(test1);
+
+        Assert.IsFalse(_indexedSet.TryGetSingle(x => x.IntList, 1, out DenormalizedTestData? test2));
+        Assert.IsNull(test2);
+
+        Assert.IsFalse(_indexedSet.TryGetSingle(x => x.IntList, 5, out DenormalizedTestData? test3));
+        Assert.IsNull(test3);
+    }
+
+    [TestMethod]
+    public void Clear()
+    {
+        _indexedSet.Clear();
+        Assert.IsFalse(_indexedSet.TryGetSingle(x => x.IntList, 1, out _));
+    }
 }

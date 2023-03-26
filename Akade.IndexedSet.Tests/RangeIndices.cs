@@ -17,7 +17,7 @@ public class RangeIndices
     [TestInitialize]
     public void Init()
     {
-        TestData[] data = new[] {_a, _b, _c, _d, _e};
+        TestData[] data = new[] { _a, _b, _c, _d, _e };
         _indexedSet = data.ToIndexedSet(x => x.PrimaryKey)
                           .WithRangeIndex(x => x.IntProperty)
                           .WithRangeIndex(x => x.GuidProperty)
@@ -61,8 +61,6 @@ public class RangeIndices
         _indexedSet.AssertMultipleItemsViaRange(x => x.GuidProperty, GuidGen.Get(5), GuidGen.Get(8), inclusiveStart: true, inclusiveEnd: false, expectedElements: new[] { _d, _e });
     }
 
-
-
     [TestMethod]
     public void retrieval_via_secondary_int_key_returns_correct_items()
     {
@@ -91,7 +89,7 @@ public class RangeIndices
     [TestMethod]
     public void retrieval_via_compound_key_returns_correct_items()
     {
-        TestData[] data = new[] {_a, _b, _c, _d, _e};
+        TestData[] data = new[] { _a, _b, _c, _d, _e };
         _indexedSet = data.ToIndexedSet(x => x.PrimaryKey)
                           .WithRangeIndex(x => (x.IntProperty, x.StringProperty))
                           .Build();
@@ -192,5 +190,18 @@ public class RangeIndices
         Assert.IsTrue(_indexedSet.Remove(0));
         Assert.IsFalse(_indexedSet.Remove(0));
         Assert.IsFalse(_indexedSet.Contains(0));
+    }
+
+    [TestMethod]
+    public void TryGetSingle_on_secondary_key()
+    {
+        Assert.IsFalse(_indexedSet.TryGetSingle(x => x.IntProperty, 8, out TestData? data1));
+        Assert.IsNull(data1);
+
+        Assert.IsFalse(_indexedSet.TryGetSingle(x => x.IntProperty, 10, out TestData? data2));
+        Assert.IsNull(data2);
+
+        Assert.IsTrue(_indexedSet.TryGetSingle(x => x.IntProperty, 11, out TestData? data3));
+        Assert.IsNotNull(data3);
     }
 }

@@ -137,6 +137,27 @@ public class IndexedSet<TElement>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="indexKey">The key within the index.</param>
+    /// <param name="element">The element if found, otherwise null.</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
+    [ReadAccess]
+    public bool TryGetSingle<TIndexKey>(
+        Func<TElement, IEnumerable<TIndexKey>> indexAccessor,
+        TIndexKey indexKey,
+        [NotNullWhen(true)] out TElement? element,
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        return typedIndex.TryGetSingle(indexKey, out element);
+    }
+
+    /// <summary>
+    /// Searches for an element via an index.
+    /// </summary>
+    /// <typeparam name="TIndexKey">The type of the index key</typeparam>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="indexKey">The key within the index.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     [ReadAccess]
     public TElement Single<TIndexKey>(
@@ -599,6 +620,18 @@ public class IndexedSet<TPrimaryKey, TElement> : IndexedSet<TElement>
     /// Short-hand for <see cref="Single(TPrimaryKey)"/>.
     /// </summary>
     public TElement this[TPrimaryKey key] => Single(key);
+
+    /// <summary>
+    /// Tries to get an element associated to the given primary key
+    /// </summary>
+    /// <param name="key">The primary key to obtain the item for</param>
+    /// <param name="result">The found element if the method returns true, otherwise null.</param>
+    /// <returns>True if an element is found, otherwise false.</returns>
+    [ReadAccess]
+    public bool TryGetSingle(TPrimaryKey key, [NotNullWhen(true)] out TElement? result)
+    {
+        return TryGetSingle(_primaryKeyAccessor, key, out result, _primaryKeyIndexName);
+    }
 
     /// <summary>
     /// Attempts to remove an item with the given primary key and returns true, if one was found and removed. Otherwise, false.

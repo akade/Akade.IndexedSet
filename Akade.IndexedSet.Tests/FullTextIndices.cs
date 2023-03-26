@@ -90,4 +90,14 @@ public class FullTextIndices
         Animal[] actual = _indexedSet.FuzzyContains(x => x.Name, "Pan", 1).ToArray();
         CollectionAssert.AreEquivalent(new[] { _boomslang, _tarantula, _penguin, _parrot, _panther, _pangolin }, actual);
     }
+
+    [TestMethod]
+    public void TryGetSingle()
+    {
+        Assert.IsTrue(_indexedSet.TryGetSingle(x => x.Name, "Bonobo", out Animal? animal1));
+        Assert.IsNotNull(animal1);
+
+        Assert.IsFalse(_indexedSet.TryGetSingle(x => x.Name, "Elephant", out Animal? animal2));
+        Assert.IsNull(animal2);
+    }
 }
