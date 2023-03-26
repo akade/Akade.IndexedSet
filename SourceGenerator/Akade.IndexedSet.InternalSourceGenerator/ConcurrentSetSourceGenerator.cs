@@ -124,11 +124,6 @@ public class ConcurrentSetSourceGenerator : IIncrementalGenerator
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="method"></param>
-    /// <param name="stringBuilder"></param>
     private void WriteMethodHeader(MethodDeclarationSyntax method, IntendedStringBuilder stringBuilder)
     {
         _ = stringBuilder.Append(method.GetLeadingTrivia().ToString().TrimStart())
