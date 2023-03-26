@@ -1,2 +1,8 @@
 ﻿#nullable enable
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Dispose() -> void
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Update(TElement element, System.Action<TElement>! updateFunc) -> bool
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Update<TState>(TElement element, TState state, System.Action<TElement, TState>! updateFunc) -> bool
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Update(TElement element, System.Func<TElement, TElement>! updateFunc) -> bool
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Update<TState>(TElement element, TState state, System.Func<TElement, TState, TElement>! updateFunc) -> bool
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Contains(TElement element) -> bool
+
