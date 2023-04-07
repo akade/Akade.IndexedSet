@@ -77,4 +77,14 @@ public class PrefixIndices
         CollectionAssert.AreEquivalent(new[] { _bonobo, _booby, _boomslang, _borador }, _indexedSet.FuzzyStartsWith(x => x.Name, "Boo", 1).ToArray());
         CollectionAssert.AreEquivalent(new[] { _penguin, _parrot, _panther, _pangolin }, _indexedSet.FuzzyStartsWith(x => x.Name, "Pan", 1).ToArray());
     }
+
+    [TestMethod]
+    public void TryGetSingle()
+    {
+        Assert.IsTrue(_indexedSet.TryGetSingle(x => x.Name, "Bonobo", out Animal? animal1));
+        Assert.IsNotNull(animal1);
+
+        Assert.IsFalse(_indexedSet.TryGetSingle(x => x.Name, "Elephant", out Animal? animal2));
+        Assert.IsNull(animal2);
+    }
 }

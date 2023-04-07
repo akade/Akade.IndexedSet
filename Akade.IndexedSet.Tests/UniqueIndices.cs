@@ -81,4 +81,14 @@ public class UniqueIndices
         Assert.IsFalse(_indexedSet.Remove(0));
         Assert.IsFalse(_indexedSet.Contains(0));
     }
+
+    [TestMethod]
+    public void TryGetSingle_on_secondary_key()
+    {
+        Assert.IsFalse(_indexedSet.TryGetSingle(x => x.IntProperty, 8, out TestData? data1));
+        Assert.IsNull(data1);
+
+        Assert.IsTrue(_indexedSet.TryGetSingle(x => x.IntProperty, 10, out TestData? data2));
+        Assert.IsNotNull(data2);
+    }
 }

@@ -14,8 +14,7 @@ internal sealed class ReaderWriterLockEx : IDisposable
 
     public void Dispose()
     {
-        _readerDisposable.Dispose();
-        _writerDisposable.Dispose();
+        _lock.Dispose();
     }
 
     public IDisposable EnterReadLock()
