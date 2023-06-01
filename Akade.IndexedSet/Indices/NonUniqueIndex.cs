@@ -1,7 +1,7 @@
 ﻿namespace Akade.IndexedSet.Indices;
 
 /// <summary>
-/// Nonunique index implementation based on <see cref="Lookup{TKey, TElement}"/>
+/// Nonunique index implementation based on <see cref="DataStructures.Lookup{TKey, TElement}"/>
 /// </summary>
 internal class NonUniqueIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
     where TIndexKey : notnull
@@ -43,7 +43,7 @@ internal class NonUniqueIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndex
 
     internal override TElement Single(TIndexKey indexKey)
     {
-        return _data.GetValues(indexKey).Single();
+        return _data.Single(indexKey);
     }
 
     internal override bool TryGetSingle(TIndexKey indexKey, out TElement? element)

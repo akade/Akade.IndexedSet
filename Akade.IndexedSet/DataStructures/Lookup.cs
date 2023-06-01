@@ -32,6 +32,11 @@ internal class Lookup<TKey, TValue>
         return _values.TryGetValue(key, out HashSet<TValue>? keySet) ? keySet : Enumerable.Empty<TValue>();
     }
 
+    public TValue Single(TKey key)
+    {
+        return _values[key].Single();
+    }
+
     public int CountValues(TKey key)
     {
         return _values.TryGetValue(key, out HashSet<TValue>? keySet) ? keySet.Count : 0;

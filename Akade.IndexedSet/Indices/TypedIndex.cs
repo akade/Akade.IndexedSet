@@ -12,10 +12,9 @@ internal abstract class TypedIndex<TElement, TIndexKey> : Index<TElement>
     }
 
     internal abstract TElement Single(TIndexKey indexKey);
+    internal abstract bool TryGetSingle(TIndexKey indexKey, out TElement? element);
 
     internal abstract IEnumerable<TElement> Where(TIndexKey indexKey);
-
-    internal abstract bool TryGetSingle(TIndexKey indexKey, out TElement? element);
 
     internal virtual IEnumerable<TElement> Range(TIndexKey start, TIndexKey end, bool inclusiveStart, bool inclusiveEnd)
     {

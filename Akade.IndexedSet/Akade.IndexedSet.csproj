@@ -35,11 +35,14 @@
 	
 	<ItemGroup>
 		<ProjectReference Include="..\Analyzers\Akade.IndexedSet.Analyzers\Akade.IndexedSet.Analyzers.csproj" ReferenceOutputAssembly="false" />
-		<ProjectReference Include="..\SourceGenerator\Akade.IndexedSet.InternalSourceGenerator\Akade.IndexedSet.InternalSourceGenerator.csproj"
-						  OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\SourceGenerator\Akade.IndexedSet.InternalSourceGenerator\Akade.IndexedSet.InternalSourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
 	<ItemGroup Label="Package">
 		<None Include="..\Analyzers\Akade.IndexedSet.Analyzers\bin\$(Configuration)\netstandard2.0\Akade.IndexedSet.Analyzers.dll" PackagePath="analyzers/dotnet/cs" Pack="true" Visible="false" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="NewFolder\" />
 	</ItemGroup>
 </Project>
