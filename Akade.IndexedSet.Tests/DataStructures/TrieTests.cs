@@ -93,7 +93,7 @@ public class TrieTests
 
         IEnumerable<string> result = trie.FuzzySearch("Pan", 2, false);
 
-        CollectionAssert.AreEquivalent(new[] { "Penguin", "Panther", "Pangolin", "Parrot" }, result.ToArray());
+        CollectionAssert.AreEquivalent(new[] { "Penguin", "Panther", "Pangolin", "Parrot", "Tarantula" }, result.ToArray());
     }
 
     [TestMethod]
@@ -103,6 +103,16 @@ public class TrieTests
 
         IEnumerable<string> result = trie.FuzzySearch("Non", 1, false);
         Assert.IsFalse(result.Any());
+    }
+
+    [TestMethod]
+    public void inexact_fuzzy_search_and_multiple_result_with_first_character_changed()
+    {
+        Trie<string> trie = GetAnimalTrie();
+
+        IEnumerable<string> result = trie.FuzzySearch("Zan", 1, false);
+
+        CollectionAssert.AreEquivalent(new[] { "Panther", "Pangolin" }, result.ToArray());
     }
 
     private static bool AddToStringTrie(Trie<string> stringTrie, string value)

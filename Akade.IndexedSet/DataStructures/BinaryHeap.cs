@@ -93,7 +93,7 @@ internal class BinaryHeap<TValue> : ICollection<TValue>
 
     public Range GetRange(TValue start, TValue end, bool inclusiveStart = true, bool inclusiveEnd = false)
     {
-        if (_comparer.Compare(start, end) >= 0)
+        if (_comparer.Compare(start, end) > 0)
         {
             throw new ArgumentOutOfRangeException(nameof(end));
         }
@@ -110,7 +110,6 @@ internal class BinaryHeap<TValue> : ICollection<TValue>
         }
 
         startIndex = inclusiveStart ? GetFirstIndexWithValue(start, startIndex) : GetFirstIndexWithDifferentValue(start, startIndex);
-
 
         int endIndex = _data.BinarySearch(startIndex, _data.Count - startIndex, end, _comparer);
 

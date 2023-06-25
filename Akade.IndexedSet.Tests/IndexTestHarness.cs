@@ -29,6 +29,8 @@ internal abstract class BaseIndexTest<TIndexKey, TSearchKey, TElement, TIndex>
     protected abstract bool SupportsNonUniqueKeys { get; }
 
     protected virtual bool SupportsRangeBasedQueries => false;
+    protected virtual bool SupportsStartsWithQueries => false;
+    protected virtual bool SupportsContainsQueries => false;
 
     protected abstract TIndex CreateIndex();
 
@@ -192,6 +194,302 @@ internal abstract class BaseIndexTest<TIndexKey, TSearchKey, TElement, TIndex>
         {
             TIndex index = CreateIndex();
             Assert.IsFalse(index.Range(GetNotExistingKey(), GetNotExistingKey(), false, false).Any());
+        }
+    }
+
+    [TestMethod]
+    public void Range_returns_sorted_elements_respecting_boundary_parameters_for_unique_data()
+    {
+        if (SupportsRangeBasedQueries)
+        {
+            TIndex index = CreateIndex();
+            TElement[] data = GetUniqueData();
+            index.AddRange(data);
+
+            TElement[] orderedElements = data.OrderBy(_searchExpression).ToArray();
+
+            TSearchKey rangeStart = _searchExpression(orderedElements[1]);
+            TSearchKey rangeEnd = _searchExpression(orderedElements[^2]);
+            CollectionAssert.AreEqual(orderedElements[2..^2], index.Range(rangeStart, rangeEnd, inclusiveStart: false, inclusiveEnd: false).ToArray());
+            CollectionAssert.AreEqual(orderedElements[2..^1], index.Range(rangeStart, rangeEnd, inclusiveStart: false, inclusiveEnd: true).ToArray());
+            CollectionAssert.AreEqual(orderedElements[1..^2], index.Range(rangeStart, rangeEnd, inclusiveStart: true, inclusiveEnd: false).ToArray());
+            CollectionAssert.AreEqual(orderedElements[1..^1], index.Range(rangeStart, rangeEnd, inclusiveStart: true, inclusiveEnd: true).ToArray());
+        }
+    }
+
+    [TestMethod]
+    public void Comparison_queries_return_empty_result_if_no_element_is_present()
+    {
+        if (SupportsRangeBasedQueries)
+        {
+            TIndex index = CreateIndex();
+            Assert.IsFalse(index.LessThan(GetNotExistingKey()).Any());
+            Assert.IsFalse(index.LessThanOrEqual(GetNotExistingKey()).Any());
+            Assert.IsFalse(index.GreaterThan(GetNotExistingKey()).Any());
+            Assert.IsFalse(index.GreaterThanOrEqual(GetNotExistingKey()).Any());
+        }
+    }
+
+    [TestMethod]
+    public void Comparison_queries_return_sorted_elements_respecting_boundary()
+    {
+        if (SupportsRangeBasedQueries)
+        {
+            TIndex index = CreateIndex();
+            TElement[] data = GetUniqueData();
+            index.AddRange(data);
+            TElement[] orderedElements = data.OrderBy(_searchExpression).ToArray();
+
+            TSearchKey boundary = _searchExpression(orderedElements[3]);
+            CollectionAssert.AreEqual(orderedElements[0..3], index.LessThan(boundary).ToArray());
+            CollectionAssert.AreEqual(orderedElements[0..4], index.LessThanOrEqual(boundary).ToArray());
+            CollectionAssert.AreEqual(orderedElements[4..], index.GreaterThan(boundary).ToArray());
+            CollectionAssert.AreEqual(orderedElements[3..], index.GreaterThanOrEqual(boundary).ToArray());
+        }
+    }
+
+    [TestMethod]
+    public void MaxMin_throw_if_the_set_is_empty()
+    {
+        if (SupportsRangeBasedQueries)
+        {
+            TIndex index = CreateIndex();
+            _ = Assert.ThrowsException<InvalidOperationException>(() => index.Min());
+            _ = Assert.ThrowsException<InvalidOperationException>(() => index.Max());
+        }
+    }
+
+    [TestMethod]
+    public void MaxMin_return_empty_enumerable_if_the_set_is_empty()
+    {
+        if (SupportsRangeBasedQueries)
+        {
+            TIndex index = CreateIndex();
+            Assert.IsFalse(index.MinBy().Any());
+            Assert.IsFalse(index.MaxBy().Any());
+        }
+    }
+
+    [TestMethod]
+    public void MaxMin_return_correct_key_and_values()
+    {
+        if (SupportsRangeBasedQueries)
+        {
+            TIndex index = CreateIndex();
+            TElement[] data = GetUniqueData();
+            index.AddRange(data);
+            TElement[] orderedElements = data.OrderBy(_searchExpression).ToArray();
+
+            Assert.AreEqual(_searchExpression(orderedElements[0]), index.Min());
+            Assert.AreEqual(orderedElements[0], index.MinBy().Single());
+
+            Assert.AreEqual(_searchExpression(orderedElements[^1]), index.Max());
+            Assert.AreEqual(orderedElements[^1], index.MaxBy().Single());
+        }
+    }
+
+    [TestMethod]
+    public void OrderBy_returns_empty_values_with_no_data()
+    {
+        if (SupportsRangeBasedQueries)
+        {
+            TIndex index = CreateIndex();
+            Assert.IsFalse(index.OrderBy(0).Any());
+        }
+    }
+
+    [TestMethod]
+    public void OrderBy_throws_if_skip_value_is_too_large()
+    {
+        if (SupportsRangeBasedQueries)
+        {
+            TIndex index = CreateIndex();
+            TElement[] data = GetUniqueData();
+            index.AddRange(data);
+            _ = Assert.ThrowsException<ArgumentOutOfRangeException>(() => index.OrderBy(data.Length + 1).Any());
+        }
+    }
+
+    [TestMethod]
+    public void OrderBy_returns_sorted_values()
+    {
+        if (SupportsRangeBasedQueries)
+        {
+            TIndex index = CreateIndex();
+            TElement[] data = GetUniqueData();
+            index.AddRange(data);
+            TElement[] orderedElements = data.OrderBy(_searchExpression).ToArray();
+
+            for (int i = 0; i < orderedElements.Length; i++)
+            {
+                CollectionAssert.AreEqual(orderedElements[i..], index.OrderBy(i).ToArray());
+            }
+        }
+    }
+
+    [TestMethod]
+    public void OrderByDescending_returns_empty_values_with_no_data()
+    {
+        if (SupportsRangeBasedQueries)
+        {
+            TIndex index = CreateIndex();
+            Assert.IsFalse(index.OrderByDescending(0).Any());
+        }
+    }
+
+    [TestMethod]
+    public void OrderByDescending_throws_if_skip_value_is_too_large()
+    {
+        if (SupportsRangeBasedQueries)
+        {
+            TIndex index = CreateIndex();
+            TElement[] data = GetUniqueData();
+            index.AddRange(data);
+            _ = Assert.ThrowsException<ArgumentOutOfRangeException>(() => index.OrderByDescending(data.Length + 1).Any());
+        }
+    }
+
+    [TestMethod]
+    public void OrderByDescending_returns_sorted_values()
+    {
+        if (SupportsRangeBasedQueries)
+        {
+            TIndex index = CreateIndex();
+            TElement[] data = GetUniqueData();
+            index.AddRange(data);
+            TElement[] orderedElements = data.OrderByDescending(_searchExpression).ToArray();
+
+            for (int i = 0; i < orderedElements.Length; i++)
+            {
+                CollectionAssert.AreEqual(orderedElements[i..], index.OrderByDescending(i).ToArray());
+            }
+        }
+    }
+
+    [TestMethod]
+    public void StartsWith_based_methods_should_throw_if_not_supported()
+    {
+        if (!SupportsStartsWithQueries)
+        {
+            TIndex index = CreateIndex();
+            _ = Assert.ThrowsException<NotSupportedException>(() => index.StartsWith(GetNotExistingKey().ToString()));
+        }
+    }
+
+    [TestMethod]
+    public void StartsWith_returns_empty_set_if_set_is_empty()
+    {
+        if (SupportsStartsWithQueries)
+        {
+            TIndex index = CreateIndex();
+            Assert.IsFalse(index.StartsWith(GetNotExistingKey().ToString()).Any());
+        }
+    }
+
+    [TestMethod]
+    public void StartsWith_returns_empty_set_if_no_matching_key_is_available()
+    {
+        if (SupportsStartsWithQueries)
+        {
+            TIndex index = CreateIndex();
+            index.AddRange(GetUniqueData());
+            Assert.IsFalse(index.StartsWith(GetNotExistingKey().ToString()).Any());
+        }
+    }
+
+    [TestMethod]
+    public void StartsWith_returns_matching_item()
+    {
+        if (SupportsStartsWithQueries)
+        {
+            TIndex index = CreateIndex();
+            TElement[] data = GetUniqueData();
+
+            index.AddRange(data);
+            Assert.AreEqual(data[0], index.StartsWith(_searchExpression(data[0]).ToString()).Single());
+        }
+    }
+
+    [TestMethod]
+    public void StartsWith_returns_multiple_matching_item()
+    {
+        if (SupportsStartsWithQueries)
+        {
+            TIndex index = CreateIndex();
+            TElement[] data = GetUniqueData();
+            index.AddRange(data);
+
+            IGrouping<string, TElement> group = data.GroupBy(x => _searchExpression(x).ToString()![0..2])
+                                                    .First(group => group.Count() > 1);
+
+            CollectionAssert.AreEquivalent(group.ToArray(), index.StartsWith(group.Key).ToArray());
+        }
+    }
+
+    [TestMethod]
+    public void FuzzyStartsWith_based_methods_should_throw_if_not_supported()
+    {
+        if (!SupportsStartsWithQueries)
+        {
+            TIndex index = CreateIndex();
+            _ = Assert.ThrowsException<NotSupportedException>(() => index.FuzzyStartsWith(GetNotExistingKey().ToString(), 1));
+        }
+    }
+
+    [TestMethod]
+    public void FuzzyStartsWith_returns_empty_set_if_set_is_empty()
+    {
+        if (SupportsStartsWithQueries)
+        {
+            TIndex index = CreateIndex();
+            Assert.IsFalse(index.FuzzyStartsWith(GetNotExistingKey().ToString(), 1).Any());
+        }
+    }
+
+    [TestMethod]
+    public void FuzzyStartsWith_returns_empty_set_if_no_matching_key_is_available()
+    {
+        if (SupportsStartsWithQueries)
+        {
+            TIndex index = CreateIndex();
+            index.AddRange(GetUniqueData());
+            Assert.IsFalse(index.FuzzyStartsWith(GetNotExistingKey().ToString(), 1).Any());
+        }
+    }
+
+    [TestMethod]
+    public void FuzzyStartsWith_returns_matching_item()
+    {
+        if (SupportsStartsWithQueries)
+        {
+            TIndex index = CreateIndex();
+            TElement[] data = GetUniqueData();
+
+            index.AddRange(data);
+            string key = _searchExpression(data[0]).ToString() ?? throw new ArgumentException();
+            string distanceOneKey = "z" + key[1..];
+
+            Assert.AreEqual(data[0], index.FuzzyStartsWith(key, 0).Single());
+            Assert.AreEqual(data[0], index.FuzzyStartsWith(distanceOneKey, 1).Single());
+        }
+    }
+
+    [TestMethod]
+    public void FuzzyStartsWith_returns_multiple_matching_item()
+    {
+        if (SupportsStartsWithQueries)
+        {
+            TIndex index = CreateIndex();
+            TElement[] data = GetUniqueData();
+            index.AddRange(data);
+
+            IGrouping<string, TElement> group = data.GroupBy(x => _searchExpression(x).ToString()![0..2])
+                                                    .First(group => group.Count() > 1);
+
+            string distanceOneKey = "z" + group.Key[1..];
+
+            CollectionAssert.AreEquivalent(group.ToArray(), index.FuzzyStartsWith(group.Key, 0).ToArray());
+            CollectionAssert.AreEquivalent(group.ToArray(), index.FuzzyStartsWith(distanceOneKey, 1).ToArray());
         }
     }
 }

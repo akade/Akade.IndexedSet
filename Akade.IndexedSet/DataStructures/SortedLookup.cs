@@ -66,6 +66,19 @@ internal class SortedLookup<TKey, TValue>
         return GetValues(range);
     }
 
+    public TValue Single(TKey key)
+    {
+        Range range = _sortedKeys.GetRange(key);
+        (int offset, int length) = range.GetOffsetAndLength(_sortedKeys.Count);
+
+        return length switch
+        {
+            0 => throw new KeyNotFoundException(),
+            1 => _sortedValues[offset],
+            _ => throw new InvalidOperationException()
+        };
+    }
+
     public int CountValues(TKey key)
     {
         Range range = _sortedKeys.GetRange(key);

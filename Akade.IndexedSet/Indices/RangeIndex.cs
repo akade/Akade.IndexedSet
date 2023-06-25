@@ -37,7 +37,7 @@ internal class RangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
 
     internal override TElement Single(TIndexKey indexKey)
     {
-        return _lookup.GetValues(indexKey).Single();
+        return _lookup.Single(indexKey);
     }
 
     internal override bool TryGetSingle(TIndexKey indexKey, out TElement? element)

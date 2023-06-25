@@ -60,17 +60,23 @@ internal class Trie<TElement>
 
         PriorityQueue<TrieNode, int> results = new();
 
-        for (int i = 0; i < wordLength; i++)
+        foreach (KeyValuePair<char, TrieNode> child in _root.GetLocalChildren())
         {
-            if (_root.TryGetChild(word[i], out TrieNode? startNode))
-            {
-                FuzzySearchInternal(startNode, word[i], currentRow, word, results, maxDistance, exactMatches);
-            }
+            FuzzySearchInternal(child.Value, child.Key, currentRow, word, results, maxDistance, exactMatches);
         }
+
+        // cannot handle first character change at the moment => why?
+        //for (int i = 0; i < wordLength; i++)
+        //{
+        //    if (_root.TryGetChild(word[i], out TrieNode? startNode))
+        //    {
+        //        FuzzySearchInternal(_root, word[i], currentRow, word, results, maxDistance, exactMatches);
+        //    }
+        //}
 
         return exactMatches
             ? results.DequeueAsIEnumerable().SelectMany(node => node.GetLocalElements())
-            : results.DequeueAsIEnumerable().SelectMany(node => node.GetAllChildren().SelectMany(n => n.GetLocalElements()));
+            : results.DequeueAsIEnumerable().SelectMany(node => node.GetLocalElements().Concat(node.GetAllChildren().SelectMany(n => n.GetLocalElements())));
     }
 
     private void FuzzySearchInternal(TrieNode currentNode, char ch, int[] lastRow, ReadOnlySpan<char> word, PriorityQueue<TrieNode, int> results, int maxDistance, bool exploreSubTrees)
