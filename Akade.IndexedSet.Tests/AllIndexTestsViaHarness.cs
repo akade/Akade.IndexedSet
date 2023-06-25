@@ -16,7 +16,7 @@ internal class SimpleTestData
 [TestClass]
 public class HarnessUniqueIndex
 {
-    internal class UniqueIndexViaHarness : BaseIndexTest<int, SimpleTestData, UniqueIndex<SimpleTestData, int>>
+    internal class UniqueIndexViaHarness : BaseIndexTest<int, int, SimpleTestData, UniqueIndex<SimpleTestData, int>>
     {
         public UniqueIndexViaHarness() : base(x => x.Primitive)
         {
@@ -74,7 +74,7 @@ public class HarnessUniqueIndex
 [TestClass]
 public class HarnessNonUniqueIndex
 {
-    internal class NonUniqueIndexViaHarness : BaseIndexTest<int, SimpleTestData, NonUniqueIndex<SimpleTestData, int>>
+    internal class NonUniqueIndexViaHarness : BaseIndexTest<int, int, SimpleTestData, NonUniqueIndex<SimpleTestData, int>>
     {
         public NonUniqueIndexViaHarness() : base(x => x.Primitive)
         {
@@ -141,51 +141,45 @@ internal class MultiValueTestData
 [TestClass]
 public class HarnessMultiValueIndex
 {
-    internal class MultiValueIndexViaHarness : BaseIndexTest<int, MultiValueTestData, MultiValueIndex<MultiValueTestData, int>>
+    internal class MultiValueIndexViaHarness : BaseIndexTest<int[], int, MultiValueTestData, MultiValueIndex<MultiValueTestData, int>>
     {
         public MultiValueIndexViaHarness() : base(x => x.Primitive)
         {
 
         }
 
-        protected override bool SupportsMultiValueKeys => true;
-
-        protected override bool SupportsNonUniqueKeys => throw new NotImplementedException();
+        protected override bool SupportsNonUniqueKeys => true;
 
         protected override MultiValueIndex<MultiValueTestData, int> CreateIndex()
         {
             return new MultiValueIndex<MultiValueTestData, int>(x => x.Primitive, "x => x.Primitive");
         }
 
-        protected override MultiValueTestData[] GetMultiValueData()
+        protected override MultiValueTestData[] GetNonUniqueData()
         {
             return new MultiValueTestData[]
             {
-                new(11),
-                new(11),
-                new(12),
-                new(12),
-                new(13),
-                new(13),
+                new(1, 2),
+                new(2, 3),
+                new(2, 3),
+                new(3, 4),
             };
-        }
-
-        protected override MultiValueTestData[] GetNonUniqueData()
-        {
-            throw new NotImplementedException();
         }
 
         protected override MultiValueTestData[] GetUniqueData()
         {
             return new MultiValueTestData[]
             {
-                new(1),
-                new(2),
-                new(3),
-                new(4),
-                new(5),
-                new(6),
+                new(1, 2),
+                new(3, 4),
+                new(5, 6),
+                new(7, 8),
             };
+        }
+
+        protected override int SearchKeyFromIndexKey(int[] key)
+        {
+            return key[0];
         }
     }
 

@@ -3,22 +3,25 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Reflection;
 
 namespace Akade.IndexedSet.Tests;
-internal abstract class BaseIndexTest<TKey, TElement, TIndex>
-    where TIndex : TypedIndex<TElement, TKey>
-    where TKey : notnull
+internal abstract class BaseIndexTest<TIndexKey, TSearchKey, TElement, TIndex>
+    where TIndex : TypedIndex<TElement, TSearchKey>
+    where TIndexKey : notnull
+    where TSearchKey : notnull
 {
-    private readonly Func<TElement, TKey> _indexExpression;
+    private readonly Func<TElement, TIndexKey> _indexExpression;
+    private readonly Func<TElement, TSearchKey> _searchExpression;
 
-    public BaseIndexTest(Func<TElement, TKey> indexExpression)
+    public BaseIndexTest(Func<TElement, TIndexKey> indexExpression)
     {
         _indexExpression = indexExpression;
+        _searchExpression = element => SearchKeyFromIndexKey(indexExpression(element));
     }
 
     protected abstract TElement[] GetUniqueData();
 
     protected abstract TElement[] GetNonUniqueData();
 
-    protected virtual TKey GetNotExistingKey()
+    protected virtual TSearchKey GetNotExistingKey()
     {
         return default!;
     }
@@ -28,6 +31,15 @@ internal abstract class BaseIndexTest<TKey, TElement, TIndex>
     protected virtual bool SupportsRangeBasedQueries => false;
 
     protected abstract TIndex CreateIndex();
+
+    protected virtual TSearchKey SearchKeyFromIndexKey(TIndexKey key)
+    {
+        if (typeof(TSearchKey).IsAssignableFrom(typeof(TIndexKey)))
+        {
+            return (TSearchKey)(object)key;
+        }
+        throw new NotSupportedException($"{typeof(TIndexKey)} is not assignable to {typeof(TSearchKey)}");
+    }
 
     private TIndex CreateIndexWithData(TElement[] elements)
     {
@@ -50,7 +62,7 @@ internal abstract class BaseIndexTest<TKey, TElement, TIndex>
     {
         TElement[] data = GetUniqueData();
         TIndex index = CreateIndexWithData(data);
-        Assert.AreEqual(data[0], index.Single(_indexExpression(data[0])));
+        Assert.AreEqual(data[0], index.Single(_searchExpression(data[0])));
     }
 
     [TestMethod]
@@ -74,7 +86,7 @@ internal abstract class BaseIndexTest<TKey, TElement, TIndex>
         {
             TElement[] data = GetNonUniqueData();
             TIndex index = CreateIndexWithData(data);
-            TKey nonUniqueKey = data.GroupBy(_indexExpression).Where(x => x.Count() > 1).First().Key;
+            TSearchKey nonUniqueKey = data.GroupBy(_searchExpression).Where(x => x.Count() > 1).First().Key;
             _ = Assert.ThrowsException<InvalidOperationException>(() => index.Single(nonUniqueKey));
         }
     }
@@ -98,7 +110,7 @@ internal abstract class BaseIndexTest<TKey, TElement, TIndex>
     {
         TElement[] data = GetUniqueData();
         TIndex index = CreateIndexWithData(data);
-        Assert.IsTrue(index.TryGetSingle(_indexExpression(data[0]), out TElement? element));
+        Assert.IsTrue(index.TryGetSingle(_searchExpression(data[0]), out TElement? element));
         Assert.AreEqual(data[0], element);
     }
 
@@ -109,7 +121,7 @@ internal abstract class BaseIndexTest<TKey, TElement, TIndex>
         {
             TElement[] data = GetNonUniqueData();
             TIndex index = CreateIndexWithData(data);
-            TKey nonUniqueKey = data.GroupBy(_indexExpression).Where(x => x.Count() > 1).First().Key;
+            TSearchKey nonUniqueKey = data.GroupBy(_searchExpression).Where(x => x.Count() > 1).First().Key;
             Assert.IsFalse(index.TryGetSingle(nonUniqueKey, out _));
         }
     }
@@ -133,7 +145,7 @@ internal abstract class BaseIndexTest<TKey, TElement, TIndex>
     {
         TElement[] data = GetUniqueData();
         TIndex index = CreateIndexWithData(data);
-        Assert.AreEqual(data[0], index.Where(_indexExpression(data[0])).Single());
+        Assert.AreEqual(data[0], index.Where(_searchExpression(data[0])).Single());
     }
 
     [TestMethod]
@@ -142,21 +154,21 @@ internal abstract class BaseIndexTest<TKey, TElement, TIndex>
         if (SupportsNonUniqueKeys)
         {
             TElement[] data = GetNonUniqueData();
-            IGrouping<TKey, TElement>[] groups = data.GroupBy(_indexExpression).Where(g => g.Count() > 1).ToArray();
+            IGrouping<TIndexKey, TElement>[] groups = data.GroupBy(_indexExpression).Where(g => g.Count() > 1).ToArray();
 
             TIndex index = CreateIndexWithData(data);
 
-            foreach (IGrouping<TKey, TElement> group in groups)
+            foreach (IGrouping<TIndexKey, TElement> group in groups)
             {
-                CollectionAssert.AreEquivalent(group.ToArray(), index.Where(group.Key).ToArray());
+                CollectionAssert.AreEquivalent(group.ToArray(), index.Where(SearchKeyFromIndexKey(group.Key)).ToArray());
             }
         }
     }
 
     [TestMethod]
-    public void Range_based_mnethods_should_throw_if_not_supported()
+    public void Range_based_methods_should_throw_if_not_supported()
     {
-        if (SupportsRangeBasedQueries)
+        if (!SupportsRangeBasedQueries)
         {
             TIndex index = CreateIndex();
             _ = Assert.ThrowsException<NotSupportedException>(() => index.Range(GetNotExistingKey(), GetNotExistingKey(), false, false));
@@ -176,8 +188,11 @@ internal abstract class BaseIndexTest<TKey, TElement, TIndex>
     [TestMethod]
     public void Range_returns_empty_result_if_not_present()
     {
-        TIndex index = CreateIndex();
-        Assert.IsFalse(index.Range(GetNotExistingKey(), GetNotExistingKey(), false, false).Any());
+        if (SupportsRangeBasedQueries)
+        {
+            TIndex index = CreateIndex();
+            Assert.IsFalse(index.Range(GetNotExistingKey(), GetNotExistingKey(), false, false).Any());
+        }
     }
 }
 

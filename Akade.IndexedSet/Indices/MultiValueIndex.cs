@@ -48,7 +48,7 @@ internal class MultiValueIndex<TElement, TIndexKey> : TypedIndex<TElement, TInde
 
     internal override TElement Single(TIndexKey indexKey)
     {
-        return _data.GetValues(indexKey).Single();
+        return _data.Single(indexKey);
     }
 
     internal override bool TryGetSingle(TIndexKey indexKey, out TElement? element)
