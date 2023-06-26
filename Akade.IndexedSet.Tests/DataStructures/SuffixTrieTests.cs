@@ -112,6 +112,12 @@ public class SuffixTrieTests
         Assert.IsFalse(result.Any());
     }
 
+    [TestMethod]
+    public void inexact_fuzzy_search_and_multiple_result_with_first_character_changed()
+    {
+        IEnumerable<string> result = _trie.FuzzySearch("Zan", 1, false);
+        CollectionAssert.AreEquivalent(new[] { "Panther", "Pangolin", "Tarantula" }, result.ToArray());
+    }
 
     // https://murilo.wordpress.com/2011/02/01/fast-and-easy-levenshtein-distance-using-a-trie-in-c/
     private static bool AddToStringTrie(SuffixTrie<string> stringTrie, string value)

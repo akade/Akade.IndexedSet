@@ -8,4 +8,23 @@ internal static class IEnumerableExtensions
             yield return element;
         }
     }
+
+    public static TElement SingleThrowingKeyNotFoundException<TElement>(this IEnumerable<TElement> source)
+    {
+        using IEnumerator<TElement> enumerator = source.GetEnumerator();
+
+        if (!enumerator.MoveNext())
+        {
+            throw new KeyNotFoundException();
+        }
+
+        TElement result = enumerator.Current;
+
+        if (enumerator.MoveNext())
+        {
+            throw new InvalidOperationException();
+        }
+
+        return result;
+    }
 }

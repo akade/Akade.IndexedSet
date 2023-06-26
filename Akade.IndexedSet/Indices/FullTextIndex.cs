@@ -1,4 +1,5 @@
 ﻿using Akade.IndexedSet.DataStructures;
+using Akade.IndexedSet.Extensions;
 using Akade.IndexedSet.Utils;
 
 namespace Akade.IndexedSet.Indices;
@@ -27,7 +28,7 @@ internal class FullTextIndex<TElement> : TypedIndex<TElement, string>
 
     internal override TElement Single(string indexKey)
     {
-        return _suffixTrie.GetAll(indexKey).Single();
+        return _suffixTrie.GetAll(indexKey).SingleThrowingKeyNotFoundException();
     }
 
     internal override bool TryGetSingle(string indexKey, out TElement? element)
