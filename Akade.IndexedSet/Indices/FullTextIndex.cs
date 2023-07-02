@@ -84,12 +84,12 @@ internal class FullTextIndex<TElement> : TypedIndex<TElement, string>
 
     internal override IEnumerable<TElement> FuzzyContains(ReadOnlySpan<char> indexKey, int maxDistance)
     {
-        return _suffixTrie.FuzzySearch(indexKey, maxDistance, false).Distinct();
+        return _suffixTrie.FuzzySearch(indexKey, maxDistance, false);
     }
 
     internal override IEnumerable<TElement> Contains(ReadOnlySpan<char> indexKey)
     {
-        return _suffixTrie.GetAll(indexKey).Distinct();
+        return _suffixTrie.GetAll(indexKey);
     }
 
     public override void Clear()

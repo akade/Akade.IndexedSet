@@ -5,13 +5,13 @@ using BenchmarkDotNet.Running;
 using System.Reflection;
 
 _ = BenchmarkSwitcher.FromAssembly(Assembly.GetExecutingAssembly()).Run(args);
-//PrefixIndexBenchmarks test = new();
+//FullTextIndexBenchmarks test = new();
 //GC.Collect();
 //Console.WriteLine("Press to start");
 //Console.ReadKey();
 //Console.WriteLine("started");
 
-//for (int i = 0; i < 10000; i++)
+//for (int i = 0; i < 1000; i++)
 //{
-//    _ = test.StartsWith_IndexedSet();
+//    _ = test.FuzzyContains_IndexedSet();
 //}

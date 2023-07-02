@@ -18,7 +18,7 @@ public class FullTextIndexBenchmarks
     {
         Randomizer.Seed = new Random(42);
         _document = new Faker<Document>().CustomInstantiator(f => new Document(f.Rant.Review()))
-                                         .Generate(1000);
+                                         .Generate(5000);
 
         _indexedSet = _document.ToIndexedSet()
                                .WithFullTextIndex(x => x.Content)

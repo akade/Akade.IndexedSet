@@ -92,7 +92,10 @@ internal class Trie<TElement>
             {
                 if (currentNode._elements is not null)
                 {
-                    results.EnqueueRange(currentNode._elements, currentRow[^1]);
+                    foreach (TElement element in currentNode._elements)
+                    {
+                        results.Enqueue(element, currentRow[^1]);
+                    }
                 }
             }
             else
@@ -124,7 +127,10 @@ internal class Trie<TElement>
     {
         if (currentNode._elements is not null)
         {
-            results.EnqueueRange(currentNode._elements, distance);
+            foreach (TElement element in currentNode._elements)
+            {
+                results.Enqueue(element, distance);
+            }
         }
         if (currentNode._children is not null)
         {
