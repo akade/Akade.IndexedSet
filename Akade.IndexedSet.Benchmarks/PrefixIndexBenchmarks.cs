@@ -15,7 +15,7 @@ public class PrefixIndexBenchmarks
     public PrefixIndexBenchmarks()
     {
         Randomizer.Seed = new Random(42);
-        _persons = Enumerable.Range(0, 1000)
+        _persons = Enumerable.Range(0, 5000)
                              .Select(_ => new Person())
                              .ToList();
 
