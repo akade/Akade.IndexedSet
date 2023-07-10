@@ -1,4 +1,5 @@
 ﻿using Akade.IndexedSet.Extensions;
+using Akade.IndexedSet.Utils;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Akade.IndexedSet.DataStructures;
@@ -20,7 +21,7 @@ internal class Trie<TElement>
     public IEnumerable<TElement> Get(ReadOnlySpan<char> key)
     {
         TrieNode? matchingNode = _root.Find(key);
-        return matchingNode is null ? Enumerable.Empty<TElement>() : matchingNode.GetLocalElements();
+        return matchingNode is null || matchingNode._elements is null ? Enumerable.Empty<TElement>() : matchingNode._elements;
     }
 
     public bool Contains(ReadOnlySpan<char> key, TElement element)
@@ -37,45 +38,39 @@ internal class Trie<TElement>
             return Enumerable.Empty<TElement>();
         }
 
-        IEnumerable<TElement> result = matchingNode.GetLocalElements();
-
-        foreach (TrieNode node in matchingNode.GetAllChildren())
-        {
-            result = result.Concat(node.GetLocalElements());
-        }
-
+        List<TElement> result = new();
+        AddRecursivlyToResult(matchingNode, result);
         return result;
     }
 
     public IEnumerable<TElement> FuzzySearch(ReadOnlySpan<char> word, int maxDistance, bool exactMatches)
     {
-        int wordLength = word.Length;
+        int rowLength = word.Length + 1;
 
-        int[] currentRow = new int[wordLength + 1];
+        Span<int> currentRow = rowLength < LevenshteinDistance.MaxStackAlloc ? stackalloc int[rowLength] : new int[rowLength];
 
         for (int i = 0; i < currentRow.Length; i++)
         {
             currentRow[i] = i;
         }
 
-        PriorityQueue<TrieNode, int> results = new();
+        PriorityQueue<TElement, int> results = new();
 
-        for (int i = 0; i < wordLength; i++)
+        if (_root._children is not null)
         {
-            if (_root.TryGetChild(word[i], out TrieNode? startNode))
+            foreach (KeyValuePair<char, TrieNode> child in _root._children)
             {
-                FuzzySearchInternal(startNode, word[i], currentRow, word, results, maxDistance, exactMatches);
+                FuzzySearchInternal(child.Value, child.Key, currentRow, word, results, maxDistance, exactMatches);
             }
         }
 
-        return exactMatches
-            ? results.DequeueAsIEnumerable().SelectMany(node => node.GetLocalElements())
-            : results.DequeueAsIEnumerable().SelectMany(node => node.GetAllChildren().SelectMany(n => n.GetLocalElements()));
+        return results.DequeueAsIEnumerable();
     }
 
-    private void FuzzySearchInternal(TrieNode currentNode, char ch, int[] lastRow, ReadOnlySpan<char> word, PriorityQueue<TrieNode, int> results, int maxDistance, bool exploreSubTrees)
+    private void FuzzySearchInternal(TrieNode currentNode, char ch, ReadOnlySpan<int> lastRow, ReadOnlySpan<char> word, PriorityQueue<TElement, int> results, int maxDistance, bool exactMatches)
     {
-        int[] currentRow = new int[lastRow.Length];
+
+        Span<int> currentRow = lastRow.Length < LevenshteinDistance.MaxStackAlloc ? stackalloc int[lastRow.Length] : new int[lastRow.Length];
         currentRow[0] = lastRow[0] + 1;
 
         int minDistance = currentRow[0];
@@ -92,20 +87,72 @@ internal class Trie<TElement>
 
         if (currentRow[^1] <= maxDistance)
         {
-            results.Enqueue(currentNode, currentRow[^1]);
+
+            if (exactMatches)
+            {
+                if (currentNode._elements is not null)
+                {
+                    foreach (TElement element in currentNode._elements)
+                    {
+                        results.Enqueue(element, currentRow[^1]);
+                    }
+                }
+            }
+            else
+            {
+                AddRecursivlyToResult(currentNode, results, currentRow[^1]);
+            }
+
             found = true;
         }
 
-        if (!exploreSubTrees && found)
+        if (!exactMatches && found)
         {
             return;
         }
 
         if (minDistance <= maxDistance)
         {
-            foreach (KeyValuePair<char, TrieNode> child in currentNode.GetLocalChildren())
+            if (currentNode._children is not null)
             {
-                FuzzySearchInternal(child.Value, child.Key, currentRow, word, results, maxDistance, exploreSubTrees);
+                foreach (KeyValuePair<char, TrieNode> child in currentNode._children)
+                {
+                    FuzzySearchInternal(child.Value, child.Key, currentRow, word, results, maxDistance, exactMatches);
+                }
+            }
+        }
+    }
+
+    private static void AddRecursivlyToResult(Trie<TElement>.TrieNode currentNode, PriorityQueue<TElement, int> results, int distance)
+    {
+        if (currentNode._elements is not null)
+        {
+            foreach (TElement element in currentNode._elements)
+            {
+                results.Enqueue(element, distance);
+            }
+        }
+        if (currentNode._children is not null)
+        {
+            foreach ((_, Trie<TElement>.TrieNode child) in currentNode._children)
+            {
+                AddRecursivlyToResult(child, results, distance);
+            }
+        }
+    }
+
+    private static void AddRecursivlyToResult(Trie<TElement>.TrieNode currentNode, List<TElement> results)
+    {
+        if (currentNode._elements is not null)
+        {
+            results.AddRange(currentNode._elements);
+        }
+
+        if (currentNode._children is not null)
+        {
+            foreach ((_, Trie<TElement>.TrieNode child) in currentNode._children)
+            {
+                AddRecursivlyToResult(child, results);
             }
         }
     }
@@ -117,8 +164,8 @@ internal class Trie<TElement>
 
     private class TrieNode
     {
-        private SortedDictionary<char, TrieNode>? _children;
-        private HashSet<TElement>? _elements;
+        internal Dictionary<char, TrieNode>? _children;
+        internal HashSet<TElement>? _elements;
 
         internal bool Add(ReadOnlySpan<char> key, TElement element)
         {
@@ -151,34 +198,6 @@ internal class Trie<TElement>
             }
 
             return null;
-        }
-
-        internal IEnumerable<TrieNode> GetAllChildren()
-        {
-            if (_children is null)
-            {
-                yield break;
-            }
-
-            foreach (TrieNode node in _children.Values)
-            {
-                yield return node;
-
-                foreach (TrieNode child in node.GetAllChildren())
-                {
-                    yield return child;
-                }
-            }
-        }
-
-        internal IEnumerable<KeyValuePair<char, TrieNode>> GetLocalChildren()
-        {
-            return _children ?? Enumerable.Empty<KeyValuePair<char, TrieNode>>();
-        }
-
-        internal IEnumerable<TElement> GetLocalElements()
-        {
-            return _elements ?? Enumerable.Empty<TElement>();
         }
 
         internal bool Remove(ReadOnlySpan<char> key, TElement element)

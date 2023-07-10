@@ -2,13 +2,15 @@
 
 internal static class LevenshteinDistance
 {
+    public const int MaxStackAlloc = 256;
+
     /// <summary>
     /// Returns true if the strings have a levenshein distance smaller than <paramref name="maxDistance"/>.
     /// Does not calculate the entire distance if the minimum distance is already bigger.
     /// </summary>
     public static bool FuzzyMatch(ReadOnlySpan<char> a, ReadOnlySpan<char> b, int maxDistance)
     {
-        int wordLength = a.Length;
+        int rowLength = a.Length + 1;
 
         if (a.Length == 0 && b.Length == 0)
         {
@@ -20,7 +22,8 @@ internal static class LevenshteinDistance
             return false;
         }
 
-        int[] currentRow = new int[wordLength + 1];
+        Span<int> lastRow = rowLength < MaxStackAlloc ? stackalloc int[rowLength] : new int[rowLength];
+        Span<int> currentRow = rowLength < MaxStackAlloc ? stackalloc int[rowLength] : new int[rowLength];
         for (int i = 0; i < currentRow.Length; i++)
         {
             currentRow[i] = i;
@@ -28,8 +31,10 @@ internal static class LevenshteinDistance
 
         for (int j = 0; j < b.Length; j++)
         {
-            int[] lastRow = currentRow;
-            currentRow = new int[wordLength + 1];
+            Span<int> tmp = lastRow;
+            lastRow = currentRow;
+            currentRow = tmp;
+
             currentRow[0] = lastRow[0] + 1;
 
             int minDistance = currentRow[0];
