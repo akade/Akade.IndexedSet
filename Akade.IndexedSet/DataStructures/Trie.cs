@@ -164,7 +164,7 @@ internal class Trie<TElement>
 
     private class TrieNode
     {
-        internal SortedDictionary<char, TrieNode>? _children;
+        internal Dictionary<char, TrieNode>? _children;
         internal HashSet<TElement>? _elements;
 
         internal bool Add(ReadOnlySpan<char> key, TElement element)
