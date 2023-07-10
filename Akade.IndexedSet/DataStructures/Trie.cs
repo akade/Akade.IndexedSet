@@ -1,4 +1,8 @@
-﻿namespace Akade.IndexedSet.DataStructures;
+﻿using Akade.IndexedSet.Extensions;
+using Akade.IndexedSet.Utils;
+using System.Diagnostics.CodeAnalysis;
+
+namespace Akade.IndexedSet.DataStructures;
 
 internal class Trie<TElement>
 {

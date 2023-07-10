@@ -1,4 +1,7 @@
-﻿namespace Akade.IndexedSet.Tests.DataStructures;
+﻿using Akade.IndexedSet.DataStructures;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Akade.IndexedSet.Tests.DataStructures;
 
 [TestClass]
 public class TrieTests
@@ -105,16 +108,6 @@ public class TrieTests
     public void inexact_fuzzy_search_and_multiple_result_with_first_character_changed()
     {
         IEnumerable<string> result = _trie.FuzzySearch("Zan", 1, false);
-        CollectionAssert.AreEquivalent(new[] { "Panther", "Pangolin" }, result.ToArray());
-    }
-
-    [TestMethod]
-    public void inexact_fuzzy_search_and_multiple_result_with_first_character_changed()
-    {
-        Trie<string> trie = GetAnimalTrie();
-
-        IEnumerable<string> result = trie.FuzzySearch("Zan", 1, false);
-
         CollectionAssert.AreEquivalent(new[] { "Panther", "Pangolin" }, result.ToArray());
     }
 
