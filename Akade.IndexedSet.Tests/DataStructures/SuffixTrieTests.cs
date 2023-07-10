@@ -99,6 +99,14 @@ public class SuffixTrieTests
 
     [TestMethod]
 
+    public void inexact_fuzzy_search_and_single_result()
+    {
+        IEnumerable<string> result = _trie.FuzzySearch("Pangolin", 2, false);
+        CollectionAssert.AreEquivalent(new[] { "Pangolin" }, result.ToArray());
+    }
+
+    [TestMethod]
+
     public void inexact_fuzzy_search_and_multiple_result()
     {
         IEnumerable<string> result = _trie.FuzzySearch("Pan", 2, false);

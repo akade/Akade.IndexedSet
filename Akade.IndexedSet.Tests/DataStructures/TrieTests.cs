@@ -1,11 +1,10 @@
-﻿using Akade.IndexedSet.DataStructures;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace Akade.IndexedSet.Tests.DataStructures;
+﻿namespace Akade.IndexedSet.Tests.DataStructures;
 
 [TestClass]
 public class TrieTests
 {
+    private readonly Trie<string> _trie = GetAnimalTrie();
+
     private static Trie<string> GetAnimalTrie()
     {
         Trie<string> trie = new();
@@ -22,13 +21,11 @@ public class TrieTests
     [TestMethod]
     public void querying_common_prefixes_return_correct_elements()
     {
-        Trie<string> trie = GetAnimalTrie();
-
-        CollectionAssert.AreEquivalent(new string[] { "Tiger", "Tarantula" }, trie.GetAll("T").ToArray());
-        CollectionAssert.AreEquivalent(new string[] { "Penguin", "Panther", "Pangolin", "Parrot" }, trie.GetAll("P").ToArray());
-        CollectionAssert.AreEquivalent(new string[] { "Panther", "Pangolin", "Parrot" }, trie.GetAll("Pa").ToArray());
-        CollectionAssert.AreEquivalent(new string[] { "Panther", "Pangolin" }, trie.GetAll("Pan").ToArray());
-        CollectionAssert.AreEquivalent(new string[] { "Panther" }, trie.GetAll("Pant").ToArray());
+        CollectionAssert.AreEquivalent(new string[] { "Tiger", "Tarantula" }, _trie.GetAll("T").ToArray());
+        CollectionAssert.AreEquivalent(new string[] { "Penguin", "Panther", "Pangolin", "Parrot" }, _trie.GetAll("P").ToArray());
+        CollectionAssert.AreEquivalent(new string[] { "Panther", "Pangolin", "Parrot" }, _trie.GetAll("Pa").ToArray());
+        CollectionAssert.AreEquivalent(new string[] { "Panther", "Pangolin" }, _trie.GetAll("Pan").ToArray());
+        CollectionAssert.AreEquivalent(new string[] { "Panther" }, _trie.GetAll("Pant").ToArray());
     }
 
     [TestMethod]
@@ -71,38 +68,44 @@ public class TrieTests
     [TestMethod]
     public void exact_fuzzy_search_with_single_result()
     {
-        Trie<string> trie = GetAnimalTrie();
-
-        IEnumerable<string> result = trie.FuzzySearch("Panter", 1, true);
+        IEnumerable<string> result = _trie.FuzzySearch("Panter", 1, true);
         Assert.AreEqual("Panther", result.Single());
     }
 
     [TestMethod]
     public void exact_fuzzy_search_without_results()
     {
-        Trie<string> trie = GetAnimalTrie();
-
-        IEnumerable<string> result = trie.FuzzySearch("Panner", 1, true);
+        IEnumerable<string> result = _trie.FuzzySearch("Panner", 1, true);
         Assert.IsFalse(result.Any());
+    }
+
+    [TestMethod]
+
+    public void inexact_fuzzy_search_and_single_result()
+    {
+        IEnumerable<string> result = _trie.FuzzySearch("Pangolin", 2, false);
+        CollectionAssert.AreEquivalent(new[] { "Pangolin" }, result.ToArray());
     }
 
     [TestMethod]
     public void inexact_fuzzy_search_and_multiple_result()
     {
-        Trie<string> trie = GetAnimalTrie();
-
-        IEnumerable<string> result = trie.FuzzySearch("Pan", 2, false);
-
+        IEnumerable<string> result = _trie.FuzzySearch("Pan", 2, false);
         CollectionAssert.AreEquivalent(new[] { "Penguin", "Panther", "Pangolin", "Parrot", "Tarantula" }, result.ToArray());
     }
 
     [TestMethod]
     public void inexact_fuzzy_search_without_result()
     {
-        Trie<string> trie = GetAnimalTrie();
-
-        IEnumerable<string> result = trie.FuzzySearch("Non", 1, false);
+        IEnumerable<string> result = _trie.FuzzySearch("Non", 1, false);
         Assert.IsFalse(result.Any());
+    }
+
+    [TestMethod]
+    public void inexact_fuzzy_search_and_multiple_result_with_first_character_changed()
+    {
+        IEnumerable<string> result = _trie.FuzzySearch("Zan", 1, false);
+        CollectionAssert.AreEquivalent(new[] { "Panther", "Pangolin" }, result.ToArray());
     }
 
     [TestMethod]

@@ -26,29 +26,29 @@ public class PrefixIndexBenchmarks
 
     [Benchmark(Baseline = true)]
     [BenchmarkCategory("StartsWith")]
-    public int StartsWith_Linq()
+    public Person[] StartsWith_Linq()
     {
-        return _persons.Count(x => x.FullName.StartsWith("Peter", StringComparison.Ordinal));
+        return _persons.Where(x => x.FullName.StartsWith("Tiffany", StringComparison.Ordinal)).ToArray();
     }
 
     [Benchmark]
     [BenchmarkCategory("StartsWith")]
-    public int StartsWith_IndexedSet()
+    public Person[] StartsWith_IndexedSet()
     {
-        return _indexedSet.StartsWith(x => x.FullName, "Peter").Count();
+        return _indexedSet.StartsWith(x => x.FullName, "Tiffany").ToArray();
     }
 
     [Benchmark(Baseline = true)]
     [BenchmarkCategory("Fuzzy StartsWith")]
-    public int FuzzyStartsWith_Linq()
+    public Person[] FuzzyStartsWith_Linq()
     {
-        return _persons.Count(x => Fastenshtein.Levenshtein.Distance(x.FullName[..5], "Peter") <= 2);
+        return _persons.Where(x => Fastenshtein.Levenshtein.Distance(x.FullName[..Math.Min(7, x.FullName.Length)], "Tiffany") <= 2).ToArray();
     }
 
     [Benchmark]
     [BenchmarkCategory("Fuzzy StartsWith")]
-    public int FuzzyStartsWith_IndexedSet()
+    public Person[] FuzzyStartsWith_IndexedSet()
     {
-        return _indexedSet.FuzzyStartsWith(x => x.FullName, "Peter", 2).Count();
+        return _indexedSet.FuzzyStartsWith(x => x.FullName, "Tiffany", 2).ToArray();
     }
 }
