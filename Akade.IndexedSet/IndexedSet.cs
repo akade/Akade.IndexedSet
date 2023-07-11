@@ -43,9 +43,18 @@ public class IndexedSet<TElement>
             return false;
         }
 
-        foreach (Index<TElement> index in _indices.Values)
+        try
         {
-            index.Add(element);
+            foreach (Index<TElement> index in _indices.Values)
+            {
+                index.Add(element);
+            }
+        }
+        catch
+        {
+            _ = Remove(element);
+
+            throw;
         }
 
         return true;
@@ -81,9 +90,20 @@ public class IndexedSet<TElement>
             }
         }
 
-        foreach (Index<TElement> index in _indices.Values)
+        try
         {
-            index.AddRange(elementsToAdd);
+            foreach (Index<TElement> index in _indices.Values)
+            {
+                index.AddRange(elementsToAdd);
+            }
+        }
+        catch
+        {
+            foreach (TElement element in elementsToAdd)
+            {
+                _ = Remove(element);
+            }
+            throw;
         }
 
         return elementsToAdd.Count;
