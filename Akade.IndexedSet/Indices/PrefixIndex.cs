@@ -1,4 +1,5 @@
 ﻿using Akade.IndexedSet.DataStructures;
+using Akade.IndexedSet.Extensions;
 
 namespace Akade.IndexedSet.Indices;
 internal class PrefixIndex<TElement> : TypedIndex<TElement, string>
@@ -26,7 +27,7 @@ internal class PrefixIndex<TElement> : TypedIndex<TElement, string>
 
     internal override TElement Single(string indexKey)
     {
-        return _trie.GetAll(indexKey).Single();
+        return _trie.GetAll(indexKey).SingleThrowingKeyNotFoundException();
     }
 
     internal override bool TryGetSingle(string indexKey, out TElement? element)
