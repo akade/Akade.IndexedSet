@@ -80,7 +80,8 @@ public class IndexNamingRulesAnalyzer : DiagnosticAnalyzer
                 && namedType.IsGenericType
                 && _relevantTypes.Contains(namedType.OriginalDefinition))
             {
-                if (node.ArgumentList.Arguments.FirstOrDefault()?.Expression is LambdaExpressionSyntax lambda)
+                if (node.ArgumentList.Arguments.FirstOrDefault()?.Expression is LambdaExpressionSyntax lambda
+                    && !IsExcludedMethod(memberAccess.Name.Identifier))
                 {
                     CheckParameterName(context, lambda);
                     CheckForParenthesized(context, lambda);
@@ -88,6 +89,11 @@ public class IndexNamingRulesAnalyzer : DiagnosticAnalyzer
                 }
             }
         }
+    }
+
+    private bool IsExcludedMethod(SyntaxToken identifier)
+    {
+        return identifier.ValueText is "Update";
     }
 
     private void CheckForBlockBodiedLambda(SyntaxNodeAnalysisContext context, LambdaExpressionSyntax lambda)
