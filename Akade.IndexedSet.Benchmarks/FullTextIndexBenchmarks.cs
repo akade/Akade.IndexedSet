@@ -7,6 +7,7 @@ namespace Akade.IndexedSet.Benchmarks;
 [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net60)]
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net70)]
+[JsonExporter]
 public class FullTextIndexBenchmarks
 {
     public record class Document(string Content);

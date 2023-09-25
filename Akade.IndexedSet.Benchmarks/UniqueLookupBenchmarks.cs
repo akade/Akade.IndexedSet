@@ -6,6 +6,7 @@ namespace Akade.IndexedSet.Benchmarks;
 [DisassemblyDiagnoser]
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net60)]
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net70)]
+[JsonExporter]
 public class UniqueIndexBenchmarks
 {
     private record Product(int Id, int Stock);

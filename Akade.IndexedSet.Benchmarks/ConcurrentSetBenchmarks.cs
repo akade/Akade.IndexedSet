@@ -9,6 +9,7 @@ namespace Akade.IndexedSet.Benchmarks;
 [MemoryDiagnoser]
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net60)]
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net70)]
+[JsonExporter]
 public class ConcurrentSetBenchmarks
 {
     private readonly List<Person> _persons;
