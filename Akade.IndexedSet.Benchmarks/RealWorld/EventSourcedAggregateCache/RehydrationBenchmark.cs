@@ -17,10 +17,10 @@ public class RehydrationBenchmark
                                                                                                      .BuildConcurrent();
 
     [Benchmark]
-    public void CompleteRehydration()
+    public void Rehydration()
     {
         _set.Clear();
-        EventHandlers.HandleEvents(_set, DataGenerator.GenerateEvents());
+        EventHandlers.HandleEvents(_set, DataGenerator.GenerateEvents(30000));
     }
     
 }

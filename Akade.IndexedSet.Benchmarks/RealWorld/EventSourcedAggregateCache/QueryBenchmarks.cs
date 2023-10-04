@@ -10,6 +10,7 @@ public class QueryBenchmarks
 {
     private readonly ConcurrentIndexedSet<AggregateId, Aggregate> _set = IndexedSetBuilder<Aggregate>.Create(x => x.Id)
                                                                                                      .WithIndex(AggregateIndices.TenantsWithAccess)
+                                                                                                     .WithFullTextIndex(AggregateIndices.FullName)
                                                                                                      .BuildConcurrent();
 
     public QueryBenchmarks()
@@ -41,7 +42,7 @@ public class QueryBenchmarks
     [Benchmark]
     public AggregateDto[] Search()
     {
-        return _set.FuzzyContains(AggregateIndices.FullName, "Peter", 2)
+        return _set.FuzzyContains(AggregateIndices.FullName, "Carol Ondricka", 2)
                    .Select(ToDto)
                    .ToArray();
     }

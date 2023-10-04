@@ -12,10 +12,11 @@ internal static class DataGenerator
         const double sharedWithTwoProbability = 0.005;
         Random random = new(seed);
         Randomizer.Seed = random;
+        Bogus.DataSets.Name name = new();
         for (int i = 1; i <= aggregateCount; i++)
         {
-            Person person = new();
-            yield return new AggregateAdded(new(i), new(random.Next(1, exclusiveTenantIdBound)), new(i << 1, i << 2), person.FirstName, person.LastName);
+            
+            yield return new AggregateAdded(new(i), new(random.Next(1, exclusiveTenantIdBound)), new(i << 1, i << 2), name.FirstName(), name.LastName());
 
             switch (random.NextDouble())
             {
