@@ -4,6 +4,7 @@
 [![CI Build](https://github.com/akade/Akade.IndexedSet/actions/workflows/ci-build.yml/badge.svg?branch=master)](https://github.com/akade/Akade.IndexedSet/actions/workflows/ci-build.yml)
 [![NuGet version (Akade.IndexedSet)](https://img.shields.io/nuget/v/Akade.IndexedSet.svg)](https://www.nuget.org/packages/Akade.IndexedSet/)
 [![MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/akade/Akade.IndexedSet#readme)
+[![Static Badge](https://img.shields.io/badge/API%20Docs-DNDocs-43bc00?logo=readme&logoColor=white)](https://www.robiniadocs.com/d/akadeinde/api/Akade.IndexedSet.IndexedSet-1.html)
 
 
 A convenient data structure supporting efficient in-memory indexing and querying, including range queries and fuzzy string matching.
