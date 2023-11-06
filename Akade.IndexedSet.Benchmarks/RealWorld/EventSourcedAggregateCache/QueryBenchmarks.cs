@@ -6,6 +6,7 @@ namespace Akade.IndexedSet.Benchmarks.RealWorld.EventSourcedAggregateCache;
 
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net60)]
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net70)]
+[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net80)]
 public class QueryBenchmarks
 {
     private readonly ConcurrentIndexedSet<AggregateId, Aggregate> _set = IndexedSetBuilder<Aggregate>.Create(x => x.Id)

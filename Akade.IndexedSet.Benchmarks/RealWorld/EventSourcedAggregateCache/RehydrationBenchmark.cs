@@ -7,6 +7,7 @@ namespace Akade.IndexedSet.Benchmarks.RealWorld;
 
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net60)]
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net70)]
+[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net80)]
 public class RehydrationBenchmark
 {
     private readonly ConcurrentIndexedSet<AggregateId, Aggregate> _set = IndexedSetBuilder<Aggregate>.Create(x => x.Id)
