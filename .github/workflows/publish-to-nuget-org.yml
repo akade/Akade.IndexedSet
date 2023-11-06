@@ -17,6 +17,7 @@ jobs:
         dotnet-version: |
           6.x
           7.x
+          8.x
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
