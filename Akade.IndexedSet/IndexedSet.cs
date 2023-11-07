@@ -1,5 +1,8 @@
 ﻿using Akade.IndexedSet.Concurrency;
 using Akade.IndexedSet.Indices;
+#if NET8_0_OR_GREATER
+using System.Collections.Frozen;
+#endif
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
@@ -16,8 +19,11 @@ namespace Akade.IndexedSet;
 public class IndexedSet<TElement>
 {
     private readonly HashSet<TElement> _data = new();
+#if NET8_0_OR_GREATER
+    private FrozenDictionary<string, Index<TElement>> _indices = FrozenDictionary<string, Index<TElement>>.Empty;
+#else
     private readonly Dictionary<string, Index<TElement>> _indices = new();
-
+#endif
     /// <summary>
     /// Creates a new, empty instance of an <see cref="IndexedSet{TElement}"/>. 
     /// </summary>
@@ -596,7 +602,13 @@ public class IndexedSet<TElement>
     internal void AddIndex(Index<TElement> index)
     {
         ThrowIfNonEmpty();
+
+#if NET8_0_OR_GREATER
+        _indices = _indices.Append(new KeyValuePair<string, Index<TElement>>(index.Name, index)).ToFrozenDictionary();
+#else
         _indices.Add(index.Name, index);
+
+#endif
     }
 
     private void ThrowIfNonEmpty()

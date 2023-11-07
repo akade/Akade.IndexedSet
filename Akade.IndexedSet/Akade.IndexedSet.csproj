@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+		<TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -20,6 +20,12 @@
 		<PackageTags>data structure;indices;range query;unique index;range index;non-unique index;multi-value;dictionary;collections;computed keys;fuzzy;fuzzy search;approximate string matching;search;concurrency;multiple keys; fast lookup;performance</PackageTags>
 		<PackageReadmeFile>/README.md</PackageReadmeFile>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="NewFolder\**" />
+	  <EmbeddedResource Remove="NewFolder\**" />
+	  <None Remove="NewFolder\**" />
+	</ItemGroup>
 	
 	<ItemGroup>
 		<None Include="..\README.md" Pack="true" PackagePath="\" />
@@ -40,9 +46,5 @@
 
 	<ItemGroup Label="Package">
 		<None Include="..\Analyzers\Akade.IndexedSet.Analyzers\bin\$(Configuration)\netstandard2.0\Akade.IndexedSet.Analyzers.dll" PackagePath="analyzers/dotnet/cs" Pack="true" Visible="false" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="NewFolder\" />
 	</ItemGroup>
 </Project>

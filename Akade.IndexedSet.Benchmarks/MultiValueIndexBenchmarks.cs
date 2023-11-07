@@ -6,6 +6,8 @@ namespace Akade.IndexedSet.Benchmarks;
 [DisassemblyDiagnoser]
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net60)]
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net70)]
+[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net80)]
+[JsonExporter]
 public class MultiValueIndexBenchmarks
 {
     private record Order(int ProductId, decimal Price);
