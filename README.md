@@ -329,8 +329,8 @@ Potential features (not ordered):
 - [x] Refactoring to allow a primarykey-less set: this was an artifical restriction that is not necessary
 - [x] Benchmarks
 - [x] Simplification of string indices, i.e. Span/String based overloads to avoid `AsMemory()`...
+- [x] Analyzers to help with best practices
 - [ ] Tree-based range index for better insertion performance
-- [ ] Analyzers to help with best practices
 - [ ] Aggregates (i.e. sum or average: interface based on state & add/removal state update functions)
 - [ ] Custom (equality) comparators for indices
 

@@ -1,6 +1,5 @@
 ﻿using Akade.IndexedSet.Analyzers.Test.Verifiers;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -13,11 +12,10 @@ using System.IO;
 
 namespace Akade.IndexedSet.Analyzers.Test;
 
-public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
+public static partial class CSharpAnalyzerVerifier<TAnalyzer>
     where TAnalyzer : DiagnosticAnalyzer, new()
-    where TCodeFix : CodeFixProvider, new()
 {
-    public class Test : CSharpCodeFixTest<TAnalyzer, TCodeFix, MSTestVerifier>
+    public class Test : CSharpAnalyzerTest<TAnalyzer, MSTestVerifier>
     {
         public Test()
         {
@@ -31,7 +29,7 @@ public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
             SolutionTransforms.Add((solution, projectId) =>
             {
                 Project project = solution.GetProject(projectId);
-                
+
                 var parseOptions = (CSharpParseOptions)project.ParseOptions;
                 parseOptions = parseOptions.WithLanguageVersion(LanguageVersion.Latest);
 

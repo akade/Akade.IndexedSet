@@ -1,6 +1,6 @@
 # Analyzers
 
-IndexedSet ships with analyzers that help to avoid common mistakes with index naming.
+IndexedSet ships with analyzers that help to avoid common mistakes.
 
 # Index Naming Conventions
 
@@ -117,3 +117,32 @@ public static sealed class IntIndices
 }
 
 ```
+# Concurrency rules
+
+## AkadeIndexedSet0004
+
+:x: Do not perform writes within a read-lock
+
+### Example
+
+#### Violates
+
+```csharp
+ConcurrentIndexedSet<int> set = IndexedSetBuilder<int>.Create(x => x)
+                                                      .WithIndex(x => x / 2)
+                                                      .WithIndex(IntIndices.CosTimesSin)
+                                                      .Build();
+
+_ = set.Read(set =>
+{
+    set.Add(1);
+});
+```
+
+#### Rationale
+
+The concurrent set does not directly expose the `FullScan()`-method of the underlying set because it has to 
+materialize all returned collections to guarantee thread safety. For large sets, this is undesired, as most of
+the times, the results of `FullScan()` are eventually filtered. The `Read()`-Methods solve this issue by allowing
+to apply filtering within a read-lock, only paying materialization for the returned elements. As multiple reads can
+happen simultaneously, any `write`-method within `Read` may yield incorrect results, or even corrupted state.

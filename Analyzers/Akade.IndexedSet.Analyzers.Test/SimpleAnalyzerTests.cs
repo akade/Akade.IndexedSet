@@ -89,4 +89,25 @@ public class SimpleAnalyzerTests
 
         await VerifyCS.VerifyAnalyzerAsync(code);
     }
+
+    [TestMethod]
+    public async Task No_diagnostic_reported_for_concurrent_set_read()
+    {
+        string code = $$"""
+         using Akade.IndexedSet;
+         using Akade.IndexedSet.Concurrency;
+         using System.Linq;
+     
+
+         ConcurrentIndexedSet<int> test = new[]{5,10,20}.ToIndexedSet()
+                                                        .WithIndex(x => x)
+                                                        .BuildConcurrent();
+
+         test.Read(set => { 
+            return Enumerable.Empty<int>();
+         });
+         """;
+
+        await VerifyCS.VerifyAnalyzerAsync(code);
+    }
 }

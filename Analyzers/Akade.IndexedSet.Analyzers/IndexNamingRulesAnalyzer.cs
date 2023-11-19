@@ -9,7 +9,7 @@ namespace Akade.IndexedSet.Analyzers;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0090:Use 'new(...)'", Justification = "Does not work with Microsoft.CodeAnalysis.Analyzers")]
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class IndexNamingRulesAnalyzer : DiagnosticAnalyzer
+public sealed class IndexNamingRulesAnalyzer : DiagnosticAnalyzer
 {
     public const string RulesCategory = "Akade.IndexedSet.IndexNaming";
     public const string HelpLinkBase = "https://github.com/akade/Akade.IndexedSet/tree/main/Akade.IndexedSet.Analyzers/Readme.md#";
@@ -48,8 +48,7 @@ public class IndexNamingRulesAnalyzer : DiagnosticAnalyzer
         description: "Use the convention of expression bodied lambdas for simple indices or static methods for more complex indices to consistently name indices.",
         helpLinkUri: HelpLinkBase + DoNotUseBlockBodiedLambdaRuleId);
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
-        => ImmutableArray.Create(_useXInLambdaDescriptor, _doNotUseParenthesesDescriptor, _doNotUseBlockBodiedLambdaDescriptor);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(_useXInLambdaDescriptor, _doNotUseParenthesesDescriptor, _doNotUseBlockBodiedLambdaDescriptor);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -80,8 +79,8 @@ public class IndexNamingRulesAnalyzer : DiagnosticAnalyzer
                 && namedType.IsGenericType
                 && _relevantTypes.Contains(namedType.OriginalDefinition))
             {
-                if (node.ArgumentList.Arguments.FirstOrDefault()?.Expression is LambdaExpressionSyntax lambda
-                    && !IsExcludedMethod(memberAccess.Name.Identifier))
+                if (!IsExcludedMethod(memberAccess.Name.Identifier)
+                    && node.ArgumentList.Arguments.FirstOrDefault()?.Expression is LambdaExpressionSyntax lambda)
                 {
                     CheckParameterName(context, lambda);
                     CheckForParenthesized(context, lambda);
@@ -93,7 +92,7 @@ public class IndexNamingRulesAnalyzer : DiagnosticAnalyzer
 
     private bool IsExcludedMethod(SyntaxToken identifier)
     {
-        return identifier.ValueText is "Update";
+        return identifier.ValueText is "Update" or "Read";
     }
 
     private void CheckForBlockBodiedLambda(SyntaxNodeAnalysisContext context, LambdaExpressionSyntax lambda)
