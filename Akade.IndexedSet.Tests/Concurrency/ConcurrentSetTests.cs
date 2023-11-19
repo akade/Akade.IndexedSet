@@ -59,8 +59,8 @@ public class ConcurrentSetTests
     [TestMethod]
     public async Task Update_method_allows_to_execute_code_in_isolation()
     {
-        ConcurrentIndexedSet<int, TestData> sut = IndexedSetBuilder<TestData>.Create(t => t.PrimaryKey)
-                                                                             .WithIndex(t => t.IntProperty)
+        ConcurrentIndexedSet<int, TestData> sut = IndexedSetBuilder<TestData>.Create(x => x.PrimaryKey)
+                                                                             .WithIndex(x => x.IntProperty)
                                                                              .BuildConcurrent();
         var element = new TestData(1, 0, GuidGen.Get(1), "Test");
         _ = sut.Add(element);
@@ -72,6 +72,29 @@ public class ConcurrentSetTests
         }))));
 
         Assert.AreEqual(1000, sut.Single(1).IntProperty);
+    }
+
+    [TestMethod]
+    public async Task Parallel_reads_and_writes_with_read_method()
+    {
+        ConcurrentIndexedSet<int, TestData> sut = IndexedSetBuilder<TestData>.Create(x => x.PrimaryKey)
+                                                                             .WithIndex(x => x.IntProperty)
+                                                                             .WithIndex(x => x.GuidProperty)
+                                                                             .BuildConcurrent();
+        _ = sut.Add(new TestData(1, 0, GuidGen.Get(1), "Test"));
+        _ = sut.Add(new TestData(2, 0, GuidGen.Get(1), "Test"));
+
+        IEnumerable<Task> tasks = Enumerable.Range(0, 100).Select(i => i % 2 == 0
+            ? Task.Run(() => sut.Update(set =>
+                {
+                    TestData dataToUpdate = set[1];
+                    _ = set.Update(dataToUpdate, x => x with { IntProperty = x.IntProperty + 10 });
+                }))
+            : Task.Run(() => Assert.AreEqual(2, sut.Read(set => set.Where(x => x.GuidProperty, GuidGen.Get(1))).Count()))
+        );
+        await Task.WhenAll(tasks);
+
+        Assert.AreEqual(500, sut.Single(1).IntProperty);
     }
 
     private static ConcurrentIndexedSet<Person> CreateSet()

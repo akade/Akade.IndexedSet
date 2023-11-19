@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace Akade.IndexedSet.Concurrency;
@@ -110,7 +111,21 @@ public partial class ConcurrentIndexedSet<TElement> : IDisposable
     /// </summary>
     /// <param name="updateFunc">Update function</param>
     /// <param name="state">User defined state that is passed to <paramref name="updateFunc"/>.</param>
+    [Obsolete("May be removed in a future version.")]
     public void Update<TState>(Action<IndexedSet<TElement>, TState> updateFunc, TState state)
+    {
+        using (AcquireWriterLock())
+        {
+            updateFunc(_indexedSet, state);
+        }
+    }
+
+    /// <summary>
+    /// Allows to update the underlying indexed set while being protected by the write lock
+    /// </summary>
+    /// <param name="updateFunc">Update function</param>
+    /// <param name="state">User defined state that is passed to <paramref name="updateFunc"/>.</param>
+    public void Update<TState>(TState state, Action<IndexedSet<TElement>, TState> updateFunc)
     {
         using (AcquireWriterLock())
         {
@@ -134,6 +149,37 @@ public partial class ConcurrentIndexedSet<TElement> : IDisposable
     protected IDisposable AcquireReaderLock()
     {
         return _lock.EnterReadLock();
+    }
+
+    /// <summary>
+    /// Allows access to the underlying indexed set while being protected by a read lock. Use it if you need
+    /// to query based on different indices, only paying the materialized collection cost for the returned results.
+    /// Accessing any update methods may result in undefined behavior. 
+    /// </summary>
+    /// <param name="readFunc">Read function: Do not materialize the results</param>
+    /// <returns>The materialized results returned by <paramref name="readFunc"/></returns>
+    public IEnumerable<TElement> Read(Func<IndexedSet<TElement>, IEnumerable<TElement>> readFunc)
+    {
+        using (AcquireReaderLock())
+        {
+            return readFunc(_indexedSet).ToArray();
+        }
+    }
+
+    /// <summary>
+    /// Allows access to the underlying indexed set while being protected by a read lock. Use it if you need
+    /// to query based on different indices, only paying the materialized collection cost for the returned results.
+    /// Accessing any update methods may result in undefined behavior. 
+    /// </summary>
+    /// <param name="readFunc">Read function: Do not materialize the results</param>
+    /// <param name="state">State passed to the read function</param>
+    /// <returns>The materialized results returned by <paramref name="readFunc"/></returns>
+    public IEnumerable<TElement> Read<TState>(TState state, Func<IndexedSet<TElement>, TState, IEnumerable<TElement>> readFunc)
+    {
+        using (AcquireReaderLock())
+        {
+            return readFunc(_indexedSet, state).ToArray();
+        }
     }
 
     /// <inheritdoc />
