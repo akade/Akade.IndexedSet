@@ -259,7 +259,7 @@ of .Net 6/C# 10 to provide convention-based naming of the indices:
 > - Do not use parentheses in any lambda that determines an index name.
 > - Do not use block bodied in any lambda that determines an index name. 
 > - For complex indices, use a static method.
-> [C# Analyzers](./Akade.IndexedSet.Analyzers/Readme.md) are shipped with the package to spot incorrect index names.
+> [C# Analyzers](./Analyzers/Readme.md) are shipped with the package to spot incorrect index names.
 
 Reasons
 - Simple and yet effective:

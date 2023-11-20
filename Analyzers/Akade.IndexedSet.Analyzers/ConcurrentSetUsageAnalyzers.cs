@@ -13,7 +13,7 @@ namespace Akade.IndexedSet.Analyzers;
 public sealed class ConcurrentSetUsageAnalyzers : DiagnosticAnalyzer
 {
     public const string RulesCategory = "Akade.IndexedSet.ConcurrencyRules";
-    public const string HelpLinkBase = "https://github.com/akade/Akade.IndexedSet/tree/main/Akade.IndexedSet.Analyzers/Readme.md#";
+    public const string HelpLinkBase = "https://github.com/akade/Akade.IndexedSet/tree/main/Analyzers/Readme.md#";
 
     public const string DoNotPerformWritesWithinReadLockRuleId = "AkadeIndexedSet0004";
 
