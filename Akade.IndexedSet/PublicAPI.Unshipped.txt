@@ -1,12 +1,1 @@
 ﻿#nullable enable
-Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Dispose() -> void
-Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Read(System.Func<Akade.IndexedSet.IndexedSet<TElement>!, System.Collections.Generic.IEnumerable<TElement>!>! readFunc) -> System.Collections.Generic.IEnumerable<TElement>!
-Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Read<TState>(TState state, System.Func<Akade.IndexedSet.IndexedSet<TElement>!, TState, System.Collections.Generic.IEnumerable<TElement>!>! readFunc) -> System.Collections.Generic.IEnumerable<TElement>!
-Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Update(TElement element, System.Action<TElement>! updateFunc) -> bool
-Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Update<TState>(TElement element, TState state, System.Action<TElement, TState>! updateFunc) -> bool
-Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Update(TElement element, System.Func<TElement, TElement>! updateFunc) -> bool
-Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Update<TState>(TElement element, TState state, System.Func<TElement, TState, TElement>! updateFunc) -> bool
-Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Contains(TElement element) -> bool
-Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Update<TState>(TState state, System.Action<Akade.IndexedSet.IndexedSet<TElement>!, TState>! updateFunc) -> void
-Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TPrimaryKey, TElement>.TryGetSingle(TPrimaryKey key, out TElement? result) -> bool
-Akade.IndexedSet.IndexedSet<TPrimaryKey, TElement>.TryGetSingle(TPrimaryKey key, out TElement? result) -> bool
