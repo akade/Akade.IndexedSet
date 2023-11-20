@@ -4,7 +4,9 @@ Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Add(TElement element
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.AddRange(System.Collections.Generic.IEnumerable<TElement>! elements) -> int
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Clear() -> void
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Contains(System.Func<TElement, string!>! indexAccessor, System.ReadOnlySpan<char> infix, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Contains(TElement element) -> bool
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Count.get -> int
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Dispose() -> void
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.FuzzyContains(System.Func<TElement, string!>! indexAccessor, System.ReadOnlySpan<char> infix, int maxDistance, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.FuzzyStartsWith(System.Func<TElement, string!>! indexAccessor, System.ReadOnlySpan<char> prefix, int maxDistance, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.GreaterThan<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, TIndexKey value, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
@@ -18,14 +20,21 @@ Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.MinBy<TIndexKey>(Sys
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.OrderBy<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, int skip = 0, int count = -1, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.OrderByDescending<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, int skip = 0, int count = -1, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Range<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, TIndexKey start, TIndexKey end, bool inclusiveStart = true, bool inclusiveEnd = false, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Read(System.Func<Akade.IndexedSet.IndexedSet<TElement>!, System.Collections.Generic.IEnumerable<TElement>!>! readFunc) -> System.Collections.Generic.IEnumerable<TElement>!
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Read<TState>(TState state, System.Func<Akade.IndexedSet.IndexedSet<TElement>!, TState, System.Collections.Generic.IEnumerable<TElement>!>! readFunc) -> System.Collections.Generic.IEnumerable<TElement>!
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Remove(TElement element) -> bool
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Single<TIndexKey>(System.Func<TElement, System.Collections.Generic.IEnumerable<TIndexKey>!>! indexAccessor, TIndexKey contains, string? indexName = null) -> TElement
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Single<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, TIndexKey indexKey, string? indexName = null) -> TElement
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.StartsWith(System.Func<TElement, string!>! indexAccessor, System.ReadOnlySpan<char> prefix, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
-Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.TryGetSingle<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, TIndexKey indexKey, out TElement? element, string? indexName = null) -> bool
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.TryGetSingle<TIndexKey>(System.Func<TElement, System.Collections.Generic.IEnumerable<TIndexKey>!>! indexAccessor, TIndexKey indexKey, out TElement? element, string? indexName = null) -> bool
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.TryGetSingle<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, TIndexKey indexKey, out TElement? element, string? indexName = null) -> bool
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Update(System.Action<Akade.IndexedSet.IndexedSet<TElement>!>! updateFunc) -> void
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Update(TElement element, System.Action<TElement>! updateFunc) -> bool
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Update(TElement element, System.Func<TElement, TElement>! updateFunc) -> bool
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Update<TState>(System.Action<Akade.IndexedSet.IndexedSet<TElement>!, TState>! updateFunc, TState state) -> void
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Update<TState>(TElement element, TState state, System.Action<TElement, TState>! updateFunc) -> bool
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Update<TState>(TElement element, TState state, System.Func<TElement, TState, TElement>! updateFunc) -> bool
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Update<TState>(TState state, System.Action<Akade.IndexedSet.IndexedSet<TElement>!, TState>! updateFunc) -> void
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Where<TIndexKey>(System.Func<TElement, System.Collections.Generic.IEnumerable<TIndexKey>!>! indexAccessor, TIndexKey contains, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Where<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, TIndexKey indexKey, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TPrimaryKey, TElement>
@@ -33,6 +42,7 @@ Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TPrimaryKey, TElement>.Contain
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TPrimaryKey, TElement>.Remove(TPrimaryKey key) -> bool
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TPrimaryKey, TElement>.Single(TPrimaryKey key) -> TElement
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TPrimaryKey, TElement>.this[TPrimaryKey key].get -> TElement
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TPrimaryKey, TElement>.TryGetSingle(TPrimaryKey key, out TElement? result) -> bool
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TPrimaryKey, TElement>.Update(System.Action<Akade.IndexedSet.IndexedSet<TPrimaryKey, TElement>!>! updateFunc) -> void
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TPrimaryKey, TElement>.Update<TState>(System.Action<Akade.IndexedSet.IndexedSet<TPrimaryKey, TElement>!, TState>! updateFunc, TState state) -> void
 Akade.IndexedSet.IndexedSet<TElement>
@@ -61,8 +71,8 @@ Akade.IndexedSet.IndexedSet<TElement>.Remove(TElement element) -> bool
 Akade.IndexedSet.IndexedSet<TElement>.Single<TIndexKey>(System.Func<TElement, System.Collections.Generic.IEnumerable<TIndexKey>!>! indexAccessor, TIndexKey contains, string? indexName = null) -> TElement
 Akade.IndexedSet.IndexedSet<TElement>.Single<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, TIndexKey indexKey, string? indexName = null) -> TElement
 Akade.IndexedSet.IndexedSet<TElement>.StartsWith(System.Func<TElement, string!>! indexAccessor, System.ReadOnlySpan<char> prefix, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
-Akade.IndexedSet.IndexedSet<TElement>.TryGetSingle<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, TIndexKey indexKey, out TElement? element, string? indexName = null) -> bool
 Akade.IndexedSet.IndexedSet<TElement>.TryGetSingle<TIndexKey>(System.Func<TElement, System.Collections.Generic.IEnumerable<TIndexKey>!>! indexAccessor, TIndexKey indexKey, out TElement? element, string? indexName = null) -> bool
+Akade.IndexedSet.IndexedSet<TElement>.TryGetSingle<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, TIndexKey indexKey, out TElement? element, string? indexName = null) -> bool
 Akade.IndexedSet.IndexedSet<TElement>.Update(TElement element, System.Action<TElement>! updateFunc) -> bool
 Akade.IndexedSet.IndexedSet<TElement>.Update(TElement element, System.Func<TElement, TElement>! updateFunc) -> bool
 Akade.IndexedSet.IndexedSet<TElement>.Update<TState>(TElement element, TState state, System.Action<TElement, TState>! updateFunc) -> bool
@@ -75,6 +85,7 @@ Akade.IndexedSet.IndexedSet<TPrimaryKey, TElement>.IndexedSet(System.Func<TEleme
 Akade.IndexedSet.IndexedSet<TPrimaryKey, TElement>.Remove(TPrimaryKey key) -> bool
 Akade.IndexedSet.IndexedSet<TPrimaryKey, TElement>.Single(TPrimaryKey key) -> TElement
 Akade.IndexedSet.IndexedSet<TPrimaryKey, TElement>.this[TPrimaryKey key].get -> TElement
+Akade.IndexedSet.IndexedSet<TPrimaryKey, TElement>.TryGetSingle(TPrimaryKey key, out TElement? result) -> bool
 Akade.IndexedSet.IndexedSetBuilder
 Akade.IndexedSet.IndexedSetBuilder<TElement>
 Akade.IndexedSet.IndexedSetBuilder<TPrimaryKey, TElement>

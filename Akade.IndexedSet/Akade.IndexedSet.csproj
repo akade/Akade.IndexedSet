@@ -9,8 +9,7 @@
 	<PropertyGroup>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<Version>1.0.1</Version>
-		<VersionSuffix>beta</VersionSuffix>
+		<Version>1.1.0</Version>
 		<Description>Provides an In-Memory data structure, the IndexedSet, that allows to easily add indices to allow efficient querying. Currently supports unique and non-unique indices, range indices as well as fuzzy string matching for single attributes, compound or computed keys.</Description>
 		<Copyright>Copyright © Akade 2023</Copyright>
 		<Authors>Akade</Authors>
