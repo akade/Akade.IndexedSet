@@ -12,7 +12,7 @@ namespace Akade.IndexedSet.Analyzers;
 public sealed class IndexNamingRulesAnalyzer : DiagnosticAnalyzer
 {
     public const string RulesCategory = "Akade.IndexedSet.IndexNaming";
-    public const string HelpLinkBase = "https://github.com/akade/Akade.IndexedSet/tree/main/Akade.IndexedSet.Analyzers/Readme.md#";
+    public const string HelpLinkBase = "https://github.com/akade/Akade.IndexedSet/tree/main/Analyzers/Readme.md#";
 
     public const string UseXAsIdentifierInLambdaRuleId = "AkadeIndexedSet0001";
     public const string DoNotUseParenthesesInLambdaRuleId = "AkadeIndexedSet0002";
