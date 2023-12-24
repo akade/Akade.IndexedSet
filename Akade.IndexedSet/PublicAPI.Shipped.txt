@@ -112,3 +112,7 @@ virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithIndex<TIndexKey>(System
 virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithPrefixIndex(System.Func<TElement, string!>! keyAccessor, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!
 virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithRangeIndex<TIndexKey>(System.Func<TElement, TIndexKey>! keyAccessor, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!
 virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithUniqueIndex<TIndexKey>(System.Func<TElement, TIndexKey>! keyAccessor, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!
+
+
+virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithPrefixIndex(System.Func<TElement, System.Collections.Generic.IEnumerable<string!>!>! keyAccessor, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!
+virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithUniqueIndex<TIndexKey>(System.Func<TElement, System.Collections.Generic.IEnumerable<TIndexKey>!>! keyAccessor, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!

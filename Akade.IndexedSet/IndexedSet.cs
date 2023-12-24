@@ -1,4 +1,6 @@
-﻿using Akade.IndexedSet.Concurrency;
+﻿// Ignore Spelling: Accessor
+
+using Akade.IndexedSet.Concurrency;
 using Akade.IndexedSet.Indices;
 #if NET8_0_OR_GREATER
 using System.Collections.Frozen;
@@ -21,8 +23,10 @@ public class IndexedSet<TElement>
     private readonly HashSet<TElement> _data = new();
 #if NET8_0_OR_GREATER
     private FrozenDictionary<string, Index<TElement>> _indices = FrozenDictionary<string, Index<TElement>>.Empty;
+    private FrozenDictionary<string, IndexWriter<TElement>> _indexWriters = FrozenDictionary<string, IndexWriter<TElement>>.Empty;
 #else
     private readonly Dictionary<string, Index<TElement>> _indices = new();
+    private readonly Dictionary<string, IndexWriter<TElement>> _indexWriters = new();
 #endif
     /// <summary>
     /// Creates a new, empty instance of an <see cref="IndexedSet{TElement}"/>. 
@@ -51,9 +55,9 @@ public class IndexedSet<TElement>
 
         try
         {
-            foreach (Index<TElement> index in _indices.Values)
+            foreach (IndexWriter<TElement> writer in _indexWriters.Values)
             {
-                index.Add(element);
+                writer.Add(element);
             }
         }
         catch
@@ -98,9 +102,9 @@ public class IndexedSet<TElement>
 
         try
         {
-            foreach (Index<TElement> index in _indices.Values)
+            foreach (IndexWriter<TElement> writer in _indexWriters.Values)
             {
-                index.AddRange(elementsToAdd);
+                writer.AddRange(elements);
             }
         }
         catch
@@ -128,9 +132,9 @@ public class IndexedSet<TElement>
             return false;
         }
 
-        foreach (Index<TElement> index in _indices.Values)
+        foreach (IndexWriter<TElement> writer in _indexWriters.Values)
         {
-            index.Remove(element);
+            writer.Remove(element);
         }
         return true;
     }
@@ -599,14 +603,30 @@ public class IndexedSet<TElement>
         return result;
     }
 
-    internal void AddIndex(Index<TElement> index)
+    internal void AddIndex<TIndexKey, TIndex>(Func<TElement, TIndexKey> indexAccessor, TIndex index)
+        where TIndexKey : notnull
+        where TIndex : TypedIndex<TElement, TIndexKey>
+    {
+        AddIndex(new SingleKeyIndexWriter<TElement, TIndexKey, TIndex>(indexAccessor, index), index);
+    }
+
+    internal void AddIndex<TIndexKey, TIndex>(Func<TElement, IEnumerable<TIndexKey>> indexAccessor, TIndex index)
+        where TIndexKey : notnull
+        where TIndex : TypedIndex<TElement, TIndexKey>
+    {
+        AddIndex(new MultiKeyIndexWriter<TElement, TIndexKey, TIndex>(indexAccessor, index), index);
+    }
+
+    internal void AddIndex(IndexWriter<TElement> writer, Index<TElement> index)
     {
         ThrowIfNonEmpty();
 
 #if NET8_0_OR_GREATER
         _indices = _indices.Append(new KeyValuePair<string, Index<TElement>>(index.Name, index)).ToFrozenDictionary();
+        _indexWriters = _indexWriters.Append(new KeyValuePair<string, IndexWriter<TElement>>(index.Name, writer)).ToFrozenDictionary();
 #else
         _indices.Add(index.Name, index);
+        _indexWriters.Add(index.Name, writer);
 
 #endif
     }
@@ -644,7 +664,7 @@ public class IndexedSet<TPrimaryKey, TElement> : IndexedSet<TElement>
         _primaryKeyAccessor = primaryKeyAccessor;
         _primaryKeyIndexName = primaryKeyIndexName;
 
-        AddIndex(new UniqueIndex<TElement, TPrimaryKey>(_primaryKeyAccessor, primaryKeyIndexName));
+        AddIndex(_primaryKeyAccessor, new UniqueIndex<TElement, TPrimaryKey>(primaryKeyIndexName));
     }
 
     /// <summary>

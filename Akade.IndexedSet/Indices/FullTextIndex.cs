@@ -3,7 +3,7 @@ using Akade.IndexedSet.Extensions;
 using Akade.IndexedSet.Utils;
 
 namespace Akade.IndexedSet.Indices;
-internal class FullTextIndex<TElement> : TypedIndex<TElement, string>
+internal sealed class FullTextIndex<TElement> : TypedIndex<TElement, string>
 {
     private readonly SuffixTrie<TElement> _suffixTrie;
     private readonly Func<TElement, string> _keyAccessor;
@@ -14,15 +14,13 @@ internal class FullTextIndex<TElement> : TypedIndex<TElement, string>
         _suffixTrie = new();
     }
 
-    public override void Add(TElement value)
+    internal override void Add(string key, TElement value)
     {
-        string key = _keyAccessor(value);
         _ = _suffixTrie.Add(key, value);
     }
 
-    public override void Remove(TElement value)
+    internal override void Remove(string key, TElement value)
     {
-        string key = _keyAccessor(value);
         _ = _suffixTrie.Remove(key, value);
     }
 

@@ -10,24 +10,24 @@ internal class RangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
 {
     private readonly SortedLookup<TIndexKey, TElement> _lookup;
 
-    public RangeIndex(Func<TElement, TIndexKey> keyAccessor, string name) : base(name)
+    public RangeIndex(string name) : base(name)
     {
-        _lookup = new SortedLookup<TIndexKey, TElement>(keyAccessor);
+        _lookup = new();
     }
 
-    public override void Add(TElement value)
+    internal override void Add(TIndexKey key, TElement value)
     {
-        _lookup.Add(value);
+        _lookup.Add(key, value);
     }
 
-    public override void AddRange(IEnumerable<TElement> elementsToAdd)
+    internal override void AddRange(IEnumerable<KeyValuePair<TIndexKey, TElement>> elementsToAdd)
     {
         _lookup.AddRange(elementsToAdd);
     }
 
-    public override void Remove(TElement value)
+    internal override void Remove(TIndexKey key, TElement value)
     {
-        _ = _lookup.Remove(value);
+        _ = _lookup.Remove(key, value);
     }
 
     internal override IEnumerable<TElement> Range(TIndexKey start, TIndexKey end, bool inclusiveStart, bool inclusiveEnd)

@@ -3,24 +3,21 @@
 /// <summary>
 /// Nonunique index implementation based on <see cref="DataStructures.Lookup{TKey, TElement}"/>
 /// </summary>
-internal class NonUniqueIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
+internal sealed class NonUniqueIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
     where TIndexKey : notnull
 {
     private readonly DataStructures.Lookup<TIndexKey, TElement> _data = new();
-    private readonly Func<TElement, TIndexKey> _keyAccessor;
 
-    public NonUniqueIndex(Func<TElement, TIndexKey> keyAccessor, string name) : base(name)
+    public NonUniqueIndex(string name) : base(name)
     {
-        _keyAccessor = keyAccessor;
     }
 
-    public override void Add(TElement value)
+    internal override void Add(TIndexKey key, TElement value)
     {
-        TIndexKey key = _keyAccessor(value);
         _ = _data.Add(key, value);
     }
 
-    public override void AddRange(IEnumerable<TElement> elementsToAdd)
+    internal override void AddRange(IEnumerable<KeyValuePair<TIndexKey, TElement>> elementsToAdd)
     {
         if (elementsToAdd.TryGetNonEnumeratedCount(out int count))
         {
@@ -35,9 +32,8 @@ internal class NonUniqueIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndex
         _data.Clear();
     }
 
-    public override void Remove(TElement value)
+    internal override void Remove(TIndexKey key, TElement value)
     {
-        TIndexKey key = _keyAccessor(value);
         _ = _data.Remove(key, value);
     }
 

@@ -46,7 +46,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
     private TIndex CreateIndexWithData(TElement[] elements)
     {
         TIndex result = CreateIndex();
-        result.AddRange(elements);
+        result.AddRange(elements.Select(element => KeyValuePair.Create(_searchExpression(element), element)));
         return result;
     }
 

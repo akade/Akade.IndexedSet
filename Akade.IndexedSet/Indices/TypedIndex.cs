@@ -11,6 +11,18 @@ internal abstract class TypedIndex<TElement, TIndexKey> : Index<TElement>
 
     }
 
+    internal abstract void Add(TIndexKey key, TElement value);
+    internal abstract void Remove(TIndexKey key, TElement value);
+    
+    internal virtual void AddRange(IEnumerable<KeyValuePair<TIndexKey, TElement>> enumerable)
+    {
+        foreach(KeyValuePair<TIndexKey, TElement> kvp in enumerable)
+        {
+            Add(kvp.Key, kvp.Value);
+        }
+    }
+
+
     internal abstract TElement Single(TIndexKey indexKey);
     internal abstract bool TryGetSingle(TIndexKey indexKey, out TElement? element);
 
@@ -90,4 +102,5 @@ internal abstract class TypedIndex<TElement, TIndexKey> : Index<TElement>
     {
         throw new NotSupportedException($"Contain queries are not supported on {GetType().Name}-indices. Use a full text to support this scenario.");
     }
+
 }
