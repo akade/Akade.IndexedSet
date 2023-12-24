@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
-internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, TIndex>
+internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
 {
     [TestMethod]
     public void Contains_based_methods_should_throw_if_not_supported()
@@ -28,8 +28,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
     {
         if (SupportsContainsQueries)
         {
-            TIndex index = CreateIndex();
-            index.AddRange(GetUniqueData());
+            TIndex index = CreateIndexWithData(GetUniqueData());
             Assert.IsFalse(index.Contains(GetNotExistingKey().ToString()).Any());
         }
     }
@@ -41,9 +40,8 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
         {
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
-
-            index.AddRange(data);
-            Assert.AreEqual(data[0], index.Contains(_searchExpression(data[0]).ToString()).Single());
+            AddElements(data, index);
+            Assert.AreEqual(data[0], index.Contains(_keyAccessor(data[0]).ToString()).Single());
         }
     }
 
@@ -54,9 +52,9 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
         {
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
-            index.AddRange(data);
+            AddElements(data, index);
 
-            IGrouping<string, TElement> group = data.GroupBy(x => _searchExpression(x).ToString()![1..3])
+            IGrouping<string, TElement> group = data.GroupBy(x => _keyAccessor(x).ToString()![1..3])
                                                     .First(group => group.Count() > 1);
 
             CollectionAssert.AreEquivalent(group.ToArray(), index.Contains(group.Key).ToArray());
@@ -88,8 +86,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
     {
         if (SupportsContainsQueries)
         {
-            TIndex index = CreateIndex();
-            index.AddRange(GetUniqueData());
+            TIndex index = CreateIndexWithData(GetUniqueData());
             Assert.IsFalse(index.FuzzyContains(GetNotExistingKey().ToString(), 1).Any());
         }
     }
@@ -102,8 +99,8 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
 
-            index.AddRange(data);
-            string key = _searchExpression(data[0]).ToString() ?? throw new ArgumentException();
+            AddElements(data, index);
+            string key = _keyAccessor(data[0]).ToString() ?? throw new ArgumentException();
             string distanceOneKey = key[..2] + "z" + key[3..];
 
             Assert.AreEqual(data[0], index.FuzzyContains(key, 0).Single());
@@ -118,9 +115,9 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
         {
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
-            index.AddRange(data);
+            AddElements(data, index);
 
-            IGrouping<string, TElement> group = data.GroupBy(x => _searchExpression(x).ToString()![0..2])
+            IGrouping<string, TElement> group = data.GroupBy(x => _keyAccessor(x).ToString()![0..2])
                                                     .First(group => group.Count() > 1);
 
             string distanceOneKey = group.Key[0] + "z" + group.Key[1];

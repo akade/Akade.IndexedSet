@@ -6,7 +6,7 @@ namespace Akade.IndexedSet.Tests.CommonIndexTests;
 [TestClass]
 public partial class CommonIndexTests
 {
-    internal class UniqueIndexTest : BaseIndexTest<int, int, Container<int>, UniqueIndex<Container<int>, int>>
+    internal class UniqueIndexTest : BaseIndexTest<int, Container<int>, UniqueIndex<Container<int>, int>>
     {
         public UniqueIndexTest() : base(x => x.Value)
         {
@@ -17,7 +17,7 @@ public partial class CommonIndexTests
 
         protected override UniqueIndex<Container<int>, int> CreateIndex()
         {
-            return new UniqueIndex<Container<int>, int>(x => x.Value, "x => x.Value");
+            return new UniqueIndex<Container<int>, int>("x => x.Value");
         }
 
         protected override Container<int>[] GetNonUniqueData()

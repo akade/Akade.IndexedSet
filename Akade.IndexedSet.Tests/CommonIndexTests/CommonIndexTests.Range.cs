@@ -5,7 +5,7 @@ namespace Akade.IndexedSet.Tests.CommonIndexTests;
 
 public partial class CommonIndexTests
 {
-    internal class RangeIndexTest : BaseIndexTest<int, int, Container<int>, RangeIndex<Container<int>, int>>
+    internal class RangeIndexTest : BaseIndexTest<int, Container<int>, RangeIndex<Container<int>, int>>
     {
         public RangeIndexTest() : base(x => x.Value)
         {
@@ -18,7 +18,7 @@ public partial class CommonIndexTests
 
         protected override RangeIndex<Container<int>, int> CreateIndex()
         {
-            return new RangeIndex<Container<int>, int>(x => x.Value, "Test");
+            return new RangeIndex<Container<int>, int>("Test");
         }
 
         protected override Container<int>[] GetNonUniqueData()

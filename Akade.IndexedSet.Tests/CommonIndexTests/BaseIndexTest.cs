@@ -3,25 +3,21 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Reflection;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
-internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, TIndex>
-    where TIndex : TypedIndex<TElement, TSearchKey>
+internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
+    where TIndex : TypedIndex<TElement, TIndexKey>
     where TIndexKey : notnull
-    where TSearchKey : notnull
 {
-    private readonly Func<TElement, TIndexKey> _indexExpression;
-    private readonly Func<TElement, TSearchKey> _searchExpression;
-
-    public BaseIndexTest(Func<TElement, TIndexKey> indexExpression)
+    private readonly Func<TElement, TIndexKey> _keyAccessor;
+    public BaseIndexTest(Func<TElement, TIndexKey> keyAccessor)
     {
-        _indexExpression = indexExpression;
-        _searchExpression = element => SearchKeyFromIndexKey(indexExpression(element));
+        _keyAccessor = keyAccessor;
     }
 
     protected abstract TElement[] GetUniqueData();
 
     protected abstract TElement[] GetNonUniqueData();
 
-    protected virtual TSearchKey GetNotExistingKey()
+    protected virtual TIndexKey GetNotExistingKey()
     {
         return default!;
     }
@@ -34,20 +30,16 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
 
     protected abstract TIndex CreateIndex();
 
-    protected virtual TSearchKey SearchKeyFromIndexKey(TIndexKey key)
-    {
-        if (typeof(TSearchKey).IsAssignableFrom(typeof(TIndexKey)))
-        {
-            return (TSearchKey)(object)key;
-        }
-        throw new NotSupportedException($"{typeof(TIndexKey)} is not assignable to {typeof(TSearchKey)}");
-    }
-
     private TIndex CreateIndexWithData(TElement[] elements)
     {
         TIndex result = CreateIndex();
-        result.AddRange(elements.Select(element => KeyValuePair.Create(_searchExpression(element), element)));
+        AddElements(elements, result);
         return result;
+    }
+
+    protected void AddElements(TElement[] elements, TIndex index)
+    {
+        index.AddRange(elements.Select(element => KeyValuePair.Create(_keyAccessor(element), element)));
     }
 
     [TestMethod]
