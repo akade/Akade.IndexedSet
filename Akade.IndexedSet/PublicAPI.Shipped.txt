@@ -116,3 +116,7 @@ virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithUniqueIndex<TIndexKey>(
 
 virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithPrefixIndex(System.Func<TElement, System.Collections.Generic.IEnumerable<string!>!>! keyAccessor, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!
 virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithUniqueIndex<TIndexKey>(System.Func<TElement, System.Collections.Generic.IEnumerable<TIndexKey>!>! keyAccessor, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!
+override Akade.IndexedSet.IndexedSetBuilder<TPrimaryKey, TElement>.WithRangeIndex<TIndexKey>(System.Func<TElement, System.Collections.Generic.IEnumerable<TIndexKey>!>! keyAccessor, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TPrimaryKey, TElement>!
+override Akade.IndexedSet.IndexedSetBuilder<TPrimaryKey, TElement>.WithUniqueIndex<TIndexKey>(System.Func<TElement, System.Collections.Generic.IEnumerable<TIndexKey>!>! keyAccessor, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TPrimaryKey, TElement>!
+virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithFullTextIndex(System.Func<TElement, System.Collections.Generic.IEnumerable<string!>!>! keyAccessor, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!
+virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithRangeIndex<TIndexKey>(System.Func<TElement, System.Collections.Generic.IEnumerable<TIndexKey>!>! keyAccessor, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!
