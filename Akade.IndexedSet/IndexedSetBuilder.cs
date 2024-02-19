@@ -278,6 +278,7 @@ public class IndexedSetBuilder<TElement>
     /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="keyAccessor"/> is automatically passed by the compiler.</param>
     /// <returns>The instance on which this method is called is returned to support the fluent syntax.</returns>
+    [Experimental(Experiments.TextSearchImprovements, UrlFormat = Experiments.UrlTemplate)]
     public virtual IndexedSetBuilder<TElement> WithFullTextIndex(Func<TElement, IEnumerable<string>> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
     {
         if (indexName is null)
@@ -324,6 +325,7 @@ public class IndexedSetBuilder<TElement>
     /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="keyAccessor"/> is automatically passed by the compiler.</param>
     /// <returns>The instance on which this method is called is returned to support the fluent syntax.</returns>
+    [Experimental(Experiments.TextSearchImprovements, UrlFormat = Experiments.UrlTemplate)]
     public virtual IndexedSetBuilder<TElement> WithPrefixIndex(Func<TElement, IEnumerable<string>> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
     {
         if (indexName is null)

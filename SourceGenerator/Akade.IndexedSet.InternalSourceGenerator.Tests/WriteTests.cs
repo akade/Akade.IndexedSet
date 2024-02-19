@@ -58,17 +58,17 @@ public class WriteTests : VerifyBase
     public async Task Generates_boolean_return_wrapped_in_write_lock_for_primary_key_set()
     {
         await this.VerifySourceGen().ForSource<ConcurrentSetSourceGenerator>("""
-     public class IndexedSet<TPrimaryKey, TElement>
-     {
-         [Akade.IndexedSet.Concurrency.WriteAccess]
-         /// <summary>
-         /// Attempts to remove an item with the given primary key and returns true, if one was found and removed. Otherwise, false.
-         /// </summary>
-         public bool Remove(TPrimaryKey key)
+         public class IndexedSet<TPrimaryKey, TElement>
          {
-             return TryGetSingle(_primaryKeyAccessor, key, out TElement? result, _primaryKeyIndexName) && Remove(result);
+             [Akade.IndexedSet.Concurrency.WriteAccess]
+             /// <summary>
+             /// Attempts to remove an item with the given primary key and returns true, if one was found and removed. Otherwise, false.
+             /// </summary>
+             public bool Remove(TPrimaryKey key)
+             {
+                 return TryGetSingle(_primaryKeyAccessor, key, out TElement? result, _primaryKeyIndexName) && Remove(result);
+             }
          }
-     }
- """);
+        """);
     }
 }

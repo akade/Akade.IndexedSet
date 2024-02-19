@@ -19,12 +19,6 @@
 		<PackageTags>data structure;indices;range query;unique index;range index;non-unique index;multi-value;dictionary;collections;computed keys;fuzzy;fuzzy search;approximate string matching;search;concurrency;multiple keys; fast lookup;performance</PackageTags>
 		<PackageReadmeFile>/README.md</PackageReadmeFile>
 	</PropertyGroup>
-
-	<ItemGroup>
-	  <Compile Remove="NewFolder\**" />
-	  <EmbeddedResource Remove="NewFolder\**" />
-	  <None Remove="NewFolder\**" />
-	</ItemGroup>
 	
 	<ItemGroup>
 		<None Include="..\README.md" Pack="true" PackagePath="\" />
@@ -45,5 +39,16 @@
 
 	<ItemGroup Label="Package">
 		<None Include="..\Analyzers\Akade.IndexedSet.Analyzers\bin\$(Configuration)\netstandard2.0\Akade.IndexedSet.Analyzers.dll" PackagePath="analyzers/dotnet/cs" Pack="true" Visible="false" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <AdditionalFiles Remove="PublicAPI\net6.0\PublicAPI.Shipped.txt" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
+		<AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
+		<AdditionalFiles Include="PublicAPI/PublicAPI.Shipped.txt" />
+		<AdditionalFiles Include="PublicAPI/PublicAPI.Unshipped.txt" />
 	</ItemGroup>
 </Project>

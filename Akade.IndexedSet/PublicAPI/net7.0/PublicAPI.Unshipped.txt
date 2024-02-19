@@ -1,0 +1,4 @@
+Akade.IndexedSet.ExperimentalAttribute.UrlFormat.get -> string?
+Akade.IndexedSet.ExperimentalAttribute.UrlFormat.set -> void
+override Akade.IndexedSet.ExperimentalAttribute.ToString() -> string!
+Akade.IndexedSet.ExperimentalAttribute

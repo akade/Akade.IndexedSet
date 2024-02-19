@@ -110,7 +110,7 @@ use FullText indices if you really require it.
 
 ## Features
 
-### Unique index (single entity, single key)
+### Unique index
 Dictionary-based, O(1), access on keys:
 
 ```csharp
@@ -132,7 +132,7 @@ but provides convenient access to the automatically added unique index: `set[pri
 of `set.Single(x => x.PrimaryKey, primaryKey)`.
 
 
-### Non-unique index (multiple entities, single key)
+### Non-unique index
 Dictionary-based, O(1), access on keys (single value) with multiple values (multiple keys):
 
 ```csharp
@@ -143,33 +143,6 @@ IndexedSet<int, Data> set = new Data[] { new(PrimaryKey: 1, SecondaryKey: 5), ne
 
 // fast access via secondary key
 IEnumerable<Data> data = set.Where(x => x.SecondaryKey, 5);
-```
-
-### Non-unique index (multiple entities, multiple keys)
-Dictionary-based, O(1), access on denormalized keys i.e. multiple keys for multiple entities:
-```csharp
-
-IndexedSet<int, GraphNode> set = IndexedSetBuilder<GraphNode>.Create(a => a.Id)
-                                                                .WithIndex(x => x.ConnectsTo) // Where ConnectsTo returns an IEnumerable<int>
-                                                                .Build();
-
-//   1   2
-//   |\ /
-//   | 3
-//    \|
-//     4
-
-_ = set.Add(new(Id: 1, ConnectsTo: new[] { 3, 4 }));
-_ = set.Add(new(Id: 2, ConnectsTo: new[] { 3 }));
-_ = set.Add(new(Id: 3, ConnectsTo: new[] { 1, 2, 3 }));
-_ = set.Add(new(Id: 4, ConnectsTo: new[] { 1, 3 }));
-
-// For readability, it is recommended to write the name for the parameter contains
-IEnumerable<GraphNode> nodesThatConnectTo1 = set.Where(x => x.ConnectsTo, contains: 1); // returns nodes 3 & 4
-IEnumerable<GraphNode> nodesThatConnectTo3 = set.Where(x => x.ConnectsTo, contains: 1); // returns nodes 1 & 2 & 3
-
-// Non-optimized Where(x => x.Contains(...)) query:
-nodesThatConnectTo1 = set.FullScan().Where(x => x.ConnectsTo.Contains(1)); // returns nodes 3 & 4, but enumerates through the entire set
 ```
 
 ### Range index
@@ -214,6 +187,51 @@ _ = data.Contains(x => x.FullName, "Int");
 _ = data.FuzzyStartsWith(x => x.Name, "Strang", 1);
 _ = data.FuzzyContains(x => x.FullName, "Strang", 1);
 ```
+
+### Multi-key indices: All indices can be used with multiple keys
+There are overloads for all indices that allow to use multiple keys. 
+
+You can have a unique index where each element can have multiple keys:
+
+```csharp
+
+IndexedSet<int, Data> set = IndexedSetBuilder<Data>.Create(a => a.PrimaryKey)
+												   .WithUniqueIndex(x => x.AlternativeKeys) // Where AlternativeKeys returns an IEnumerable<int>
+												   .Build();
+
+_ = set.Add(new(PrimaryKey: 1, AlternativeKeys: new[] { 3, 4 }));
+set.Single(x => x.AlternativeKeys, 3); // returns above element
+```
+
+The same applies for all other index types, for example for non-unique indices:
+
+```csharp
+IndexedSet<int, GraphNode> set = IndexedSetBuilder<GraphNode>.Create(a => a.Id)
+                                                             .WithIndex(x => x.ConnectsTo) // Where ConnectsTo returns an IEnumerable<int>
+                                                             .Build();
+
+//   1   2
+//   |\ /
+//   | 3
+//    \|
+//     4
+
+_ = set.Add(new(Id: 1, ConnectsTo: new[] { 3, 4 }));
+_ = set.Add(new(Id: 2, ConnectsTo: new[] { 3 }));
+_ = set.Add(new(Id: 3, ConnectsTo: new[] { 1, 2, 3 }));
+_ = set.Add(new(Id: 4, ConnectsTo: new[] { 1, 3 }));
+
+// For readability, it is recommended to write the name for the parameter contains
+IEnumerable<GraphNode> nodesThatConnectTo1 = set.Where(x => x.ConnectsTo, contains: 1); // returns nodes 3 & 4
+IEnumerable<GraphNode> nodesThatConnectTo3 = set.Where(x => x.ConnectsTo, contains: 1); // returns nodes 1 & 2 & 3
+
+// Non-optimized Where(x => x.Contains(...)) query:
+nodesThatConnectTo1 = set.FullScan().Where(x => x.ConnectsTo.Contains(1)); // returns nodes 3 & 4, but enumerates through the entire set
+```
+
+> ⚠ For range queries, this introduces a small overhead as the results are filtered to be distinct: 
+> i.e. `O(log n + m log m)` instead of `O(log n + m)`.
+
 
 ### Computed or compound key
 

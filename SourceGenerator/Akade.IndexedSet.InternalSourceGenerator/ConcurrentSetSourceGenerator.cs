@@ -126,8 +126,18 @@ public class ConcurrentSetSourceGenerator : IIncrementalGenerator
 
     private void WriteMethodHeader(MethodDeclarationSyntax method, IntendedStringBuilder stringBuilder)
     {
-        _ = stringBuilder.Append(method.GetLeadingTrivia().ToString().TrimStart())
-                         .Append(method.Modifiers.ToString()).Append(" ")
+        _ = stringBuilder.Append(method.GetLeadingTrivia().ToString().TrimStart());
+
+
+        if (method.AttributeLists.Select(a => a.Attributes.SingleOrDefault(a => a.Name is IdentifierNameSyntax { Identifier.Text: "Experimental" }))
+                                 .FirstOrDefault(a => a is not null) is AttributeSyntax experimentalAttribute)
+        {
+            _ = stringBuilder.Append("[");
+            _ = stringBuilder.Append(experimentalAttribute.ToString());
+            _ = stringBuilder.AppendLine("]");
+        }
+
+        _ = stringBuilder.Append(method.Modifiers.ToString()).Append(" ")
                          .Append(method.ReturnType.ToString()).Append(" ")
                          .Append(method.Identifier.ToString());
 

@@ -31,7 +31,7 @@ public class IntendedStringBuilder
 
         return this;
     }
-
+    
     public IntendedStringBuilder AppendJoin(string delimeter, IEnumerable<string> values)
     {
         bool first = true;

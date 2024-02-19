@@ -65,6 +65,37 @@ public partial class ConcurrentIndexedSet<TElement> : IDisposable
         }
     }
 
+
+    /// <summary>
+    /// Returns the elements in the order defined by the index.
+    /// </summary>
+    /// <typeparam name="TIndexKey">The type of the index key</typeparam>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="skip">Allows to efficiently skip a number of elements. Default is 0</param>
+    /// <param name="count">The concurrent implementation performs enumeration on the results. If this value is bigger than zero, at max the specified amount of items is returned.</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
+    public IEnumerable<TElement> OrderBy<TIndexKey>(
+        Func<TElement, IEnumerable<TIndexKey>> indexAccessor,
+        int skip = 0,
+        int count = -1,
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        using (AcquireReaderLock())
+        {
+            IEnumerable<TElement> result = _indexedSet.OrderBy(indexAccessor, skip, indexName);
+
+            if (count > 0)
+            {
+                result = result.Take(count);
+            }
+
+            return result.ToList();
+        }
+    }
+
+
     /// <summary>
     /// Returns the elements in the descending order defined by the index.
     /// </summary>
@@ -76,6 +107,35 @@ public partial class ConcurrentIndexedSet<TElement> : IDisposable
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
     public IEnumerable<TElement> OrderByDescending<TIndexKey>(
         Func<TElement, TIndexKey> indexAccessor,
+        int skip = 0,
+        int count = -1,
+        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        using (AcquireReaderLock())
+        {
+            IEnumerable<TElement> result = _indexedSet.OrderByDescending(indexAccessor, skip, indexName);
+
+            if (count > 0)
+            {
+                result = result.Take(count);
+            }
+
+            return result.ToList();
+        }
+    }
+
+    /// <summary>
+    /// Returns the elements in the descending order defined by the index.
+    /// </summary>
+    /// <typeparam name="TIndexKey">The type of the index key</typeparam>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="skip">Allows to efficiently skip a number of elements. Default is 0</param>
+    /// <param name="count">The concurrent implementation performs enumeration on the results. If this value is bigger than zero, at max the specified amount of items is returned.</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>
+    public IEnumerable<TElement> OrderByDescending<TIndexKey>(
+        Func<TElement, IEnumerable<TIndexKey>> indexAccessor,
         int skip = 0,
         int count = -1,
         [CallerArgumentExpression("indexAccessor")] string? indexName = null)
