@@ -15,9 +15,9 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
             _ = Assert.ThrowsException<NotSupportedException>(() => index.GreaterThan(GetNotExistingKey()));
             _ = Assert.ThrowsException<NotSupportedException>(() => index.GreaterThanOrEqual(GetNotExistingKey()));
             _ = Assert.ThrowsException<NotSupportedException>(() => index.Min());
-            _ = Assert.ThrowsException<NotSupportedException>(index.MinBy);
+            _ = Assert.ThrowsException<NotSupportedException>(() => index.MinBy());
             _ = Assert.ThrowsException<NotSupportedException>(() => index.Max());
-            _ = Assert.ThrowsException<NotSupportedException>(index.MaxBy);
+            _ = Assert.ThrowsException<NotSupportedException>(() => index.MaxBy());
             _ = Assert.ThrowsException<NotSupportedException>(() => index.OrderBy(0));
             _ = Assert.ThrowsException<NotSupportedException>(() => index.OrderByDescending(0));
         }
