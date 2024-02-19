@@ -1,4 +1,6 @@
-﻿namespace Akade.IndexedSet;
+﻿using System.Globalization;
+
+namespace Akade.IndexedSet;
 
 #if !NET8_0_OR_GREATER
 /// <summary>
@@ -33,7 +35,7 @@ public class ExperimentalAttribute : Attribute
     /// <inheritdoc/>
     public override string ToString()
     {
-        return UrlFormat is null ? _diagnosticsId : string.Format(UrlFormat, _diagnosticsId);
+        return UrlFormat is null ? _diagnosticsId : string.Format(CultureInfo.InvariantCulture, UrlFormat, _diagnosticsId);
     }
 
     /// <summary>

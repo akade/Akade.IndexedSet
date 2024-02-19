@@ -700,7 +700,7 @@ public class IndexedSet<TElement>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
     [ReadAccess]
     [Experimental(Experiments.TextSearchImprovements, UrlFormat = Experiments.UrlTemplate)]
-    public IEnumerable<TElement> Contains(Func<TElement, IEnumerator<string>> indexAccessor, ReadOnlySpan<char> infix, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+    public IEnumerable<TElement> Contains(Func<TElement, IEnumerable<string>> indexAccessor, ReadOnlySpan<char> infix, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
     {
         TypedIndex<TElement, string> typedIndex = GetIndex<string>(indexName);
         return typedIndex.Contains(infix);
@@ -731,7 +731,7 @@ public class IndexedSet<TElement>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
     [ReadAccess]
     [Experimental(Experiments.TextSearchImprovements, UrlFormat = Experiments.UrlTemplate)]
-    public IEnumerable<TElement> FuzzyContains(Func<TElement, IEnumerator<string>> indexAccessor, ReadOnlySpan<char> infix, int maxDistance, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+    public IEnumerable<TElement> FuzzyContains(Func<TElement, IEnumerable<string>> indexAccessor, ReadOnlySpan<char> infix, int maxDistance, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
     {
         TypedIndex<TElement, string> typedIndex = GetIndex<string>(indexName);
         return typedIndex.FuzzyContains(infix, maxDistance);

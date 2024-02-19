@@ -91,4 +91,19 @@ public class UniqueIndices
         Assert.IsTrue(_indexedSet.TryGetSingle(x => x.IntProperty, 10, out TestData? data2));
         Assert.IsNotNull(data2);
     }
+
+    [TestMethod]
+    public void Retrieval_via_multi_key_retrieves_correct_items()
+    {
+        static IEnumerable<int> Multikeys(TestData d) => new[] { d.PrimaryKey, d.IntProperty };
+
+        TestData[] data = new[] { _a, _b, _c };
+        _indexedSet = data.ToIndexedSet(x => x.PrimaryKey)
+                          .WithUniqueIndex(Multikeys)
+                          .Build();
+
+        _indexedSet.AssertSingleItem(Multikeys, _a);
+        _indexedSet.AssertSingleItem(Multikeys, _b);
+        _indexedSet.AssertSingleItem(Multikeys, _c);
+    }
 }
