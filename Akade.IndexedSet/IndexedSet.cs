@@ -306,7 +306,7 @@ public class IndexedSet<TElement>
         where TIndexKey : notnull
     {
         TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
-        return typedIndex.Range(start, end, inclusiveStart, inclusiveEnd).Distinct();
+        return typedIndex.Range(start, end, inclusiveStart, inclusiveEnd);
     }
 
     /// <summary>
@@ -338,7 +338,7 @@ public class IndexedSet<TElement>
         where TIndexKey : notnull
     {
         TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
-        return typedIndex.LessThan(value).Distinct();
+        return typedIndex.LessThan(value);
     }
 
     /// <summary>
@@ -370,7 +370,7 @@ public class IndexedSet<TElement>
         where TIndexKey : notnull
     {
         TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
-        return typedIndex.LessThanOrEqual(value).Distinct();
+        return typedIndex.LessThanOrEqual(value);
     }
 
     /// <summary>
@@ -402,7 +402,7 @@ public class IndexedSet<TElement>
         where TIndexKey : notnull
     {
         TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
-        return typedIndex.GreaterThan(value).Distinct();
+        return typedIndex.GreaterThan(value);
     }
 
     /// <summary>
@@ -434,7 +434,7 @@ public class IndexedSet<TElement>
         where TIndexKey : notnull
     {
         TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
-        return typedIndex.GreaterThanOrEqual(value).Distinct();
+        return typedIndex.GreaterThanOrEqual(value);
     }
 
     /// <summary>

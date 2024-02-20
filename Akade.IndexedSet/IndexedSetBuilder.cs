@@ -239,7 +239,7 @@ public class IndexedSetBuilder<TElement>
             throw new ArgumentNullException(nameof(indexName));
         }
 
-        _result.AddIndex(keyAccessor, new RangeIndex<TElement, TIndexKey>(indexName));
+        _result.AddIndex(keyAccessor, new MultiRangeIndex<TElement, TIndexKey>(indexName));
 
         return this;
     }
