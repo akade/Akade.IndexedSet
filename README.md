@@ -12,6 +12,25 @@ In a nutshell, it allows you to write LINQ-like queries *without* enumerating th
 through your data, expect huge [speedups](docs/Benchmarks.md) and much better scalability!
 
 <!--TOC-->
+  - [Overview](#overview)
+    - [Design Goals](#design-goals)
+    - [Performance and Operation-Support of the different indices:](#performance-and-operation-support-of-the-different-indices)
+      - [General queries](#general-queries)
+      - [String queries](#string-queries)
+  - [Features](#features)
+    - [Unique index](#unique-index)
+    - [Non-unique index](#non-unique-index)
+    - [Range index](#range-index)
+    - [String indices and fuzzy matching](#string-indices-and-fuzzy-matching)
+    - [Multi-key indices: All indices can be used with multiple keys](#multi-key-indices-all-indices-can-be-used-with-multiple-keys)
+    - [Computed or compound key](#computed-or-compound-key)
+    - [Concurrency and Thread-Safety](#concurrency-and-thread-safety)
+    - [No reflection and no expressions - convention-based index naming](#no-reflection-and-no-expressions-convention-based-index-naming)
+  - [FAQs](#faqs)
+    - [How do I use multiple index types for the same property?](#how-do-i-use-multiple-index-types-for-the-same-property)
+    - [How do I update key values if the elements are already in the set?](#how-do-i-update-key-values-if-the-elements-are-already-in-the-set)
+    - [How do I do case-insensitve (fuzzy) string matching (Prefix, FullTextIndex)?](#how-do-i-do-case-insensitve-fuzzy-string-matching-prefix-fulltextindex)
+  - [Roadmap](#roadmap)
 <!--/TOC-->
 
 ## Overview
