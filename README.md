@@ -12,26 +12,8 @@ In a nutshell, it allows you to write LINQ-like queries *without* enumerating th
 through your data, expect huge [speedups](docs/Benchmarks.md) and much better scalability!
 
 <!--TOC-->
-  - [Overview](#overview)
-    - [Design Goals](#design-goals)
-    - [Performance and Operation-Support of the different indices:](#performance-and-operation-support-of-the-different-indices)
-      - [General queries](#general-queries)
-      - [String queries](#string-queries)
-  - [Features](#features)
-    - [Unique index (single entity, single key)](#unique-index-single-entity-single-key)
-    - [Non-unique index (multiple entities, single key)](#non-unique-index-multiple-entities-single-key)
-    - [Non-unique index (multiple entities, multiple keys)](#non-unique-index-multiple-entities-multiple-keys)
-    - [Range index](#range-index)
-    - [String indices and fuzzy matching](#string-indices-and-fuzzy-matching)
-    - [Computed or compound key](#computed-or-compound-key)
-    - [Concurrency and Thread-Safety](#concurrency-and-thread-safety)
-    - [No reflection and no expressions - convention-based index naming](#no-reflection-and-no-expressions-convention-based-index-naming)
-  - [FAQs](#faqs)
-    - [How do I use multiple index types for the same property?](#how-do-i-use-multiple-index-types-for-the-same-property)
-    - [How do I update key values if the elements are already in the set?](#how-do-i-update-key-values-if-the-elements-are-already-in-the-set)
-    - [How do I do case-insensitve (fuzzy) string matching (Prefix, FullTextIndex)?](#how-do-i-do-case-insensitve-fuzzy-string-matching-prefix-fulltextindex)
-  - [Roadmap](#roadmap)
 <!--/TOC-->
+
 ## Overview
 
 A sample showing different queries as you might want do for a report:
@@ -229,8 +211,10 @@ IEnumerable<GraphNode> nodesThatConnectTo3 = set.Where(x => x.ConnectsTo, contai
 nodesThatConnectTo1 = set.FullScan().Where(x => x.ConnectsTo.Contains(1)); // returns nodes 3 & 4, but enumerates through the entire set
 ```
 
-> ⚠ For range queries, this introduces a small overhead as the results are filtered to be distinct: 
+> :information_source: For range queries, this introduces a small overhead as the results are filtered to be distinct: 
 > i.e. `O(log n + m log m)` instead of `O(log n + m)`.
+
+> :information_source: Multi-key string indices are marked experimental. Read more at [Experimental Features](docs/ExperimentalFeatures.md#AkadeIndexedSetEXP0001)
 
 
 ### Computed or compound key
@@ -348,6 +332,7 @@ Potential features (not ordered):
 - [x] Benchmarks
 - [x] Simplification of string indices, i.e. Span/String based overloads to avoid `AsMemory()`...
 - [x] Analyzers to help with best practices
+- [x] Multi-key everything: All index types can be used with multiple keys per element.
 - [ ] Tree-based range index for better insertion performance
 - [ ] Aggregates (i.e. sum or average: interface based on state & add/removal state update functions)
 - [ ] Custom (equality) comparators for indices
