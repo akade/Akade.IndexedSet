@@ -355,5 +355,7 @@ Potential features (not ordered):
 - [ ] Tree-based range index for better insertion performance
 - [ ] Aggregates (i.e. sum or average: interface based on state & add/removal state update functions)
 - [ ] Custom (equality) comparer for indices
+- [ ] Helper functions for search scenarios (Searching in multiple properties, text-reprocessing & result merging)
+- [ ] Becnhmark vs elastic search
 
 If you have any suggestion or found a bug / unexpected behavior, open an issue! I will also review PRs and integrate them if they fit the project.
