@@ -5,7 +5,7 @@ namespace Akade.IndexedSet.Tests.CommonIndexTests;
 
 public partial class CommonIndexTests
 {
-    internal class FullTextIndexTest : BaseIndexTest<string, string, Container<string>, FullTextIndex<Container<string>>>
+    internal class FullTextIndexTest : BaseIndexTest<string, Container<string>, FullTextIndex<Container<string>>>
     {
         public FullTextIndexTest() : base(x => x.Value)
         {

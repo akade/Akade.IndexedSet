@@ -7,16 +7,13 @@ internal class UniqueIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey
     where TIndexKey : notnull
 {
     private readonly Dictionary<TIndexKey, TElement> _data = new();
-    private readonly Func<TElement, TIndexKey> _keyAccessor;
 
-    public UniqueIndex(Func<TElement, TIndexKey> keyAccessor, string name) : base(name)
+    public UniqueIndex(string name) : base(name)
     {
-        _keyAccessor = keyAccessor;
     }
 
-    public override void Add(TElement value)
+    internal override void Add(TIndexKey key, TElement value)
     {
-        TIndexKey key = _keyAccessor(value);
         try
         {
             _data.Add(key, value);
@@ -27,7 +24,7 @@ internal class UniqueIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey
         }
     }
 
-    public override void AddRange(IEnumerable<TElement> elementsToAdd)
+    internal override void AddRange(IEnumerable<KeyValuePair<TIndexKey, TElement>> elementsToAdd)
     {
         if (elementsToAdd.TryGetNonEnumeratedCount(out int count))
         {
@@ -42,9 +39,8 @@ internal class UniqueIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey
         _data.Clear();
     }
 
-    public override void Remove(TElement value)
+    internal override void Remove(TIndexKey key, TElement value)
     {
-        TIndexKey key = _keyAccessor(value);
         _ = _data.Remove(key);
     }
 

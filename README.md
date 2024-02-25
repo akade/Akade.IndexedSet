@@ -8,7 +8,7 @@
 
 
 A convenient data structure supporting efficient in-memory indexing and querying, including range queries and fuzzy string matching.
-In a nutshell, it allows you to write LINQ-like queries *without* enumerating through the entire list. If you are currently completly enumerating
+In a nutshell, it allows you to write LINQ-like queries *without* enumerating through the entire list. If you are currently completely enumerating
 through your data, expect huge [speedups](docs/Benchmarks.md) and much better scalability!
 
 <!--TOC-->
@@ -18,20 +18,21 @@ through your data, expect huge [speedups](docs/Benchmarks.md) and much better sc
       - [General queries](#general-queries)
       - [String queries](#string-queries)
   - [Features](#features)
-    - [Unique index (single entity, single key)](#unique-index-single-entity-single-key)
-    - [Non-unique index (multiple entities, single key)](#non-unique-index-multiple-entities-single-key)
-    - [Non-unique index (multiple entities, multiple keys)](#non-unique-index-multiple-entities-multiple-keys)
+    - [Unique index](#unique-index)
+    - [Non-unique index](#non-unique-index)
     - [Range index](#range-index)
     - [String indices and fuzzy matching](#string-indices-and-fuzzy-matching)
+    - [Multi-key indices: All indices can be used with multiple keys](#multi-key-indices-all-indices-can-be-used-with-multiple-keys)
     - [Computed or compound key](#computed-or-compound-key)
     - [Concurrency and Thread-Safety](#concurrency-and-thread-safety)
     - [No reflection and no expressions - convention-based index naming](#no-reflection-and-no-expressions-convention-based-index-naming)
   - [FAQs](#faqs)
     - [How do I use multiple index types for the same property?](#how-do-i-use-multiple-index-types-for-the-same-property)
     - [How do I update key values if the elements are already in the set?](#how-do-i-update-key-values-if-the-elements-are-already-in-the-set)
-    - [How do I do case-insensitve (fuzzy) string matching (Prefix, FullTextIndex)?](#how-do-i-do-case-insensitve-fuzzy-string-matching-prefix-fulltextindex)
+    - [How do I do case-insensitive (fuzzy) string matching (Prefix, FullTextIndex)?](#how-do-i-do-case-insensitve-fuzzy-string-matching-prefix-fulltextindex)
   - [Roadmap](#roadmap)
 <!--/TOC-->
+
 ## Overview
 
 A sample showing different queries as you might want do for a report:
@@ -110,7 +111,7 @@ use FullText indices if you really require it.
 
 ## Features
 
-### Unique index (single entity, single key)
+### Unique index
 Dictionary-based, O(1), access on keys:
 
 ```csharp
@@ -132,7 +133,7 @@ but provides convenient access to the automatically added unique index: `set[pri
 of `set.Single(x => x.PrimaryKey, primaryKey)`.
 
 
-### Non-unique index (multiple entities, single key)
+### Non-unique index
 Dictionary-based, O(1), access on keys (single value) with multiple values (multiple keys):
 
 ```csharp
@@ -143,33 +144,6 @@ IndexedSet<int, Data> set = new Data[] { new(PrimaryKey: 1, SecondaryKey: 5), ne
 
 // fast access via secondary key
 IEnumerable<Data> data = set.Where(x => x.SecondaryKey, 5);
-```
-
-### Non-unique index (multiple entities, multiple keys)
-Dictionary-based, O(1), access on denormalized keys i.e. multiple keys for multiple entities:
-```csharp
-
-IndexedSet<int, GraphNode> set = IndexedSetBuilder<GraphNode>.Create(a => a.Id)
-                                                                .WithIndex(x => x.ConnectsTo) // Where ConnectsTo returns an IEnumerable<int>
-                                                                .Build();
-
-//   1   2
-//   |\ /
-//   | 3
-//    \|
-//     4
-
-_ = set.Add(new(Id: 1, ConnectsTo: new[] { 3, 4 }));
-_ = set.Add(new(Id: 2, ConnectsTo: new[] { 3 }));
-_ = set.Add(new(Id: 3, ConnectsTo: new[] { 1, 2, 3 }));
-_ = set.Add(new(Id: 4, ConnectsTo: new[] { 1, 3 }));
-
-// For readability, it is recommended to write the name for the parameter contains
-IEnumerable<GraphNode> nodesThatConnectTo1 = set.Where(x => x.ConnectsTo, contains: 1); // returns nodes 3 & 4
-IEnumerable<GraphNode> nodesThatConnectTo3 = set.Where(x => x.ConnectsTo, contains: 1); // returns nodes 1 & 2 & 3
-
-// Non-optimized Where(x => x.Contains(...)) query:
-nodesThatConnectTo1 = set.FullScan().Where(x => x.ConnectsTo.Contains(1)); // returns nodes 3 & 4, but enumerates through the entire set
 ```
 
 ### Range index
@@ -215,6 +189,53 @@ _ = data.FuzzyStartsWith(x => x.Name, "Strang", 1);
 _ = data.FuzzyContains(x => x.FullName, "Strang", 1);
 ```
 
+### Multi-key indices: All indices can be used with multiple keys
+There are overloads for all indices that allow to use multiple keys. 
+
+You can have a unique index where each element can have multiple keys:
+
+```csharp
+
+IndexedSet<int, Data> set = IndexedSetBuilder<Data>.Create(a => a.PrimaryKey)
+												   .WithUniqueIndex(x => x.AlternativeKeys) // Where AlternativeKeys returns an IEnumerable<int>
+												   .Build();
+
+_ = set.Add(new(PrimaryKey: 1, AlternativeKeys: new[] { 3, 4 }));
+set.Single(x => x.AlternativeKeys, 3); // returns above element
+```
+
+The same applies for all other index types, for example for non-unique indices:
+
+```csharp
+IndexedSet<int, GraphNode> set = IndexedSetBuilder<GraphNode>.Create(a => a.Id)
+                                                             .WithIndex(x => x.ConnectsTo) // Where ConnectsTo returns an IEnumerable<int>
+                                                             .Build();
+
+//   1   2
+//   |\ /
+//   | 3
+//    \|
+//     4
+
+_ = set.Add(new(Id: 1, ConnectsTo: new[] { 3, 4 }));
+_ = set.Add(new(Id: 2, ConnectsTo: new[] { 3 }));
+_ = set.Add(new(Id: 3, ConnectsTo: new[] { 1, 2, 3 }));
+_ = set.Add(new(Id: 4, ConnectsTo: new[] { 1, 3 }));
+
+// For readability, it is recommended to write the name for the parameter contains
+IEnumerable<GraphNode> nodesThatConnectTo1 = set.Where(x => x.ConnectsTo, contains: 1); // returns nodes 3 & 4
+IEnumerable<GraphNode> nodesThatConnectTo3 = set.Where(x => x.ConnectsTo, contains: 1); // returns nodes 1 & 2 & 3
+
+// Non-optimized Where(x => x.Contains(...)) query:
+nodesThatConnectTo1 = set.FullScan().Where(x => x.ConnectsTo.Contains(1)); // returns nodes 3 & 4, but enumerates through the entire set
+```
+
+> :information_source: For range queries, this introduces a small overhead as the results are filtered to be distinct: 
+> i.e. `O(log n + m log m)` instead of `O(log n + m)`.
+
+> :information_source: Multi-key string indices are marked experimental. Read more at [Experimental Features](docs/ExperimentalFeatures.md#AkadeIndexedSetEXP0001)
+
+
 ### Computed or compound key
 
 The data structure also allows to use computed or compound keys:
@@ -244,7 +265,7 @@ ConcurrentIndexedSet<RangeData> set = data.ToIndexedSet()
                                           .BuildConcurrent();
 ```
 
-> ⚠ The concurrent implmentation needs to materialize all query results.<br />
+> ⚠ The concurrent implementation needs to materialize all query results.<br />
 > `OrderBy` and `OrderByDescending` take an additional `count` parameter to avoid unnecessary materialization.
 > You can judge the overhead [here](docs/Benchmarks.md#ConcurrentSet)
 ### No reflection and no expressions - convention-based index naming
@@ -326,12 +347,15 @@ Potential features (not ordered):
 - [x] Easier updating of keys
 - [x] More index types (Trie)
 - [x] Range insertion and corresponding `.ToIndexedSet().WithIndex(x => ...).[...].Build()`
-- [x] Refactoring to allow a primarykey-less set: this was an artifical restriction that is not necessary
+- [x] Refactoring to allow a primarykey-less set: this was an artificial restriction that is not necessary
 - [x] Benchmarks
 - [x] Simplification of string indices, i.e. Span/String based overloads to avoid `AsMemory()`...
 - [x] Analyzers to help with best practices
+- [x] Multi-key everything: All index types can be used with multiple keys per element.
 - [ ] Tree-based range index for better insertion performance
 - [ ] Aggregates (i.e. sum or average: interface based on state & add/removal state update functions)
-- [ ] Custom (equality) comparators for indices
+- [ ] Custom (equality) comparer for indices
+- [ ] Helper functions for search scenarios (Searching in multiple properties, text-reprocessing & result merging)
+- [ ] Becnhmark vs elastic search
 
 If you have any suggestion or found a bug / unexpected behavior, open an issue! I will also review PRs and integrate them if they fit the project.

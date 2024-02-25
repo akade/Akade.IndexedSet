@@ -1,16 +1,18 @@
 ﻿using Akade.IndexedSet.DataStructures;
+using Akade.IndexedSet.Extensions;
 
 namespace Akade.IndexedSet.Indices;
 
 /// <summary>
-/// O(log(n)) range queries based on <see cref="SortedLookup{TKey, TValue}"/>.
+/// O(log(n)) range queries based on <see cref="SortedLookup{TKey, TValue}"/>. Filters for distinct values as it is used
+/// for indices where elements can have multiple keys.
 /// </summary>
-internal class RangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
+internal class MultiRangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
     where TIndexKey : notnull
 {
     private readonly SortedLookup<TIndexKey, TElement> _lookup;
 
-    public RangeIndex(string name) : base(name)
+    public MultiRangeIndex(string name) : base(name)
     {
         _lookup = new();
     }
@@ -32,30 +34,42 @@ internal class RangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
 
     internal override IEnumerable<TElement> Range(TIndexKey start, TIndexKey end, bool inclusiveStart, bool inclusiveEnd)
     {
-        return _lookup.GetValuesInRange(start, end, inclusiveStart, inclusiveEnd);
+        return _lookup.GetValuesInRange(start, end, inclusiveStart, inclusiveEnd).Distinct();
     }
 
     internal override TElement Single(TIndexKey indexKey)
     {
-        return _lookup.Single(indexKey);
+        return _lookup.GetValues(indexKey).Distinct().SingleThrowingKeyNotFoundException();
     }
 
     internal override bool TryGetSingle(TIndexKey indexKey, out TElement? element)
     {
-        element = default;
+        using IEnumerator<TElement> enumerator = _lookup.GetValues(indexKey).GetEnumerator();
 
-        if (_lookup.CountValues(indexKey) == 1)
+        if (enumerator.MoveNext())
         {
-            element = _lookup.GetValues(indexKey).Single();
+            element = enumerator.Current;
+            while (enumerator.MoveNext())
+            {
+                if (!EqualityComparer<TElement>.Default.Equals(element, enumerator.Current))
+                {
+                    element = default;
+                    return false;
+                }
+            }
+
             return true;
         }
-
-        return false;
+        else
+        {
+            element = default;
+            return false;
+        }
     }
 
     internal override IEnumerable<TElement> Where(TIndexKey indexKey)
     {
-        return _lookup.GetValues(indexKey);
+        return _lookup.GetValues(indexKey).Distinct();
     }
 
     internal override IEnumerable<TElement> GreaterThan(TIndexKey value)
@@ -69,7 +83,7 @@ internal class RangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
 
         return Comparer<TIndexKey>.Default.Compare(value, maxKey) >= 0
             ? Enumerable.Empty<TElement>()
-            : _lookup.GetValuesInRange(value, maxKey, false, true);
+            : _lookup.GetValuesInRange(value, maxKey, false, true).Distinct();
     }
 
     internal override IEnumerable<TElement> GreaterThanOrEqual(TIndexKey value)
@@ -83,7 +97,7 @@ internal class RangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
 
         return Comparer<TIndexKey>.Default.Compare(value, maxKey) > 0
             ? Enumerable.Empty<TElement>()
-            : _lookup.GetValuesInRange(value, maxKey, true, true);
+            : _lookup.GetValuesInRange(value, maxKey, true, true).Distinct();
     }
 
     internal override IEnumerable<TElement> LessThan(TIndexKey value)
@@ -97,7 +111,7 @@ internal class RangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
 
         return Comparer<TIndexKey>.Default.Compare(value, minKey) <= 0
             ? Enumerable.Empty<TElement>()
-            : _lookup.GetValuesInRange(minKey, value, true, false);
+            : _lookup.GetValuesInRange(minKey, value, true, false).Distinct();
     }
 
     internal override IEnumerable<TElement> LessThanOrEqual(TIndexKey value)
@@ -111,7 +125,7 @@ internal class RangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
 
         return Comparer<TIndexKey>.Default.Compare(value, minKey) < 0
             ? Enumerable.Empty<TElement>()
-            : _lookup.GetValuesInRange(minKey, value, true, true);
+            : _lookup.GetValuesInRange(minKey, value, true, true).Distinct();
     }
 
     internal override TIndexKey Max()
@@ -126,22 +140,22 @@ internal class RangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
 
     internal override IEnumerable<TElement> MaxBy()
     {
-        return _lookup.GetMaximumValues();
+        return _lookup.GetMaximumValues().Distinct();
     }
 
     internal override IEnumerable<TElement> MinBy()
     {
-        return _lookup.GetMinimumValues();
+        return _lookup.GetMinimumValues().Distinct();
     }
 
     internal override IEnumerable<TElement> OrderBy(int skip)
     {
-        return _lookup.GetValues(skip..);
+        return _lookup.GetValues(skip..).Distinct();
     }
 
     internal override IEnumerable<TElement> OrderByDescending(int skip)
     {
-        return _lookup.GetValuesDescending(skip..);
+        return _lookup.GetValuesDescending(skip..).Distinct();
     }
 
     public override void Clear()

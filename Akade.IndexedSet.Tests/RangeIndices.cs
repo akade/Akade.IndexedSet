@@ -204,4 +204,26 @@ public class RangeIndices
         Assert.IsTrue(_indexedSet.TryGetSingle(x => x.IntProperty, 11, out TestData? data3));
         Assert.IsNotNull(data3);
     }
+
+    [TestMethod]
+    public void Retrieval_via_multi_key_retrieves_correct_items()
+    {
+        // duplication of primary key is intentional => tests if the range index correctly returns & counts distinct elements
+        static IEnumerable<int> Multikeys(TestData x) => new[] { x.PrimaryKey, x.PrimaryKey, x.PrimaryKey + 1 };
+
+        TestData[] data = new[] { _a, _b, _c };
+        _indexedSet = data.ToIndexedSet(x => x.PrimaryKey)
+                          .WithRangeIndex(Multikeys)
+                          .Build();
+
+
+        CollectionAssert.AreEqual(new[] { _a, _b, _c }, _indexedSet.Range(Multikeys, _a.PrimaryKey, _c.PrimaryKey, inclusiveEnd: true).ToArray());
+
+        // matches _a
+        _ = _indexedSet.TryGetSingle(Multikeys, _a.PrimaryKey, out TestData? data1);
+        Assert.AreEqual(_a, data1);
+
+        // matches _a & _b
+        Assert.IsFalse(_indexedSet.TryGetSingle(Multikeys, _b.PrimaryKey, out _));
+    }
 }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
-internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, TIndex>
+internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
 {
     [TestMethod]
     public void Range_based_methods_should_throw_if_not_supported()
@@ -15,9 +15,9 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
             _ = Assert.ThrowsException<NotSupportedException>(() => index.GreaterThan(GetNotExistingKey()));
             _ = Assert.ThrowsException<NotSupportedException>(() => index.GreaterThanOrEqual(GetNotExistingKey()));
             _ = Assert.ThrowsException<NotSupportedException>(() => index.Min());
-            _ = Assert.ThrowsException<NotSupportedException>(index.MinBy);
+            _ = Assert.ThrowsException<NotSupportedException>(() => index.MinBy());
             _ = Assert.ThrowsException<NotSupportedException>(() => index.Max());
-            _ = Assert.ThrowsException<NotSupportedException>(index.MaxBy);
+            _ = Assert.ThrowsException<NotSupportedException>(() => index.MaxBy());
             _ = Assert.ThrowsException<NotSupportedException>(() => index.OrderBy(0));
             _ = Assert.ThrowsException<NotSupportedException>(() => index.OrderByDescending(0));
         }
@@ -40,12 +40,12 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
         {
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
-            index.AddRange(data);
+            AddElements(data, index);
 
-            TElement[] orderedElements = data.OrderBy(_searchExpression).ToArray();
+            TElement[] orderedElements = data.OrderBy(_keyAccessor).ToArray();
 
-            TSearchKey rangeStart = _searchExpression(orderedElements[1]);
-            TSearchKey rangeEnd = _searchExpression(orderedElements[^2]);
+            TIndexKey rangeStart = _keyAccessor(orderedElements[1]);
+            TIndexKey rangeEnd = _keyAccessor(orderedElements[^2]);
             CollectionAssert.AreEqual(orderedElements[2..^2], index.Range(rangeStart, rangeEnd, inclusiveStart: false, inclusiveEnd: false).ToArray());
             CollectionAssert.AreEqual(orderedElements[2..^1], index.Range(rangeStart, rangeEnd, inclusiveStart: false, inclusiveEnd: true).ToArray());
             CollectionAssert.AreEqual(orderedElements[1..^2], index.Range(rangeStart, rangeEnd, inclusiveStart: true, inclusiveEnd: false).ToArray());
@@ -73,10 +73,10 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
         {
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
-            index.AddRange(data);
-            TElement[] orderedElements = data.OrderBy(_searchExpression).ToArray();
+            AddElements(data, index);
+            TElement[] orderedElements = data.OrderBy(_keyAccessor).ToArray();
 
-            TSearchKey boundary = _searchExpression(orderedElements[3]);
+            TIndexKey boundary = _keyAccessor(orderedElements[3]);
             CollectionAssert.AreEqual(orderedElements[0..3], index.LessThan(boundary).ToArray());
             CollectionAssert.AreEqual(orderedElements[0..4], index.LessThanOrEqual(boundary).ToArray());
             CollectionAssert.AreEqual(orderedElements[4..], index.GreaterThan(boundary).ToArray());
@@ -113,13 +113,14 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
         {
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
-            index.AddRange(data);
-            TElement[] orderedElements = data.OrderBy(_searchExpression).ToArray();
+            AddElements(data, index);
 
-            Assert.AreEqual(_searchExpression(orderedElements[0]), index.Min());
+            TElement[] orderedElements = data.OrderBy(_keyAccessor).ToArray();
+
+            Assert.AreEqual(_keyAccessor(orderedElements[0]), index.Min());
             Assert.AreEqual(orderedElements[0], index.MinBy().Single());
 
-            Assert.AreEqual(_searchExpression(orderedElements[^1]), index.Max());
+            Assert.AreEqual(_keyAccessor(orderedElements[^1]), index.Max());
             Assert.AreEqual(orderedElements[^1], index.MaxBy().Single());
         }
     }
@@ -141,7 +142,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
         {
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
-            index.AddRange(data);
+            AddElements(data, index);
             _ = Assert.ThrowsException<ArgumentOutOfRangeException>(() => index.OrderBy(data.Length + 1).Any());
         }
     }
@@ -153,8 +154,8 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
         {
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
-            index.AddRange(data);
-            TElement[] orderedElements = data.OrderBy(_searchExpression).ToArray();
+            AddElements(data, index);
+            TElement[] orderedElements = data.OrderBy(_keyAccessor).ToArray();
 
             for (int i = 0; i < orderedElements.Length; i++)
             {
@@ -180,7 +181,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
         {
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
-            index.AddRange(data);
+            AddElements(data, index);
             _ = Assert.ThrowsException<ArgumentOutOfRangeException>(() => index.OrderByDescending(data.Length + 1).Any());
         }
     }
@@ -192,8 +193,8 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
         {
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
-            index.AddRange(data);
-            TElement[] orderedElements = data.OrderByDescending(_searchExpression).ToArray();
+            AddElements(data, index);
+            TElement[] orderedElements = data.OrderByDescending(_keyAccessor).ToArray();
 
             for (int i = 0; i < orderedElements.Length; i++)
             {

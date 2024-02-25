@@ -5,9 +5,9 @@ namespace Akade.IndexedSet.Tests.CommonIndexTests;
 
 public partial class CommonIndexTests
 {
-    internal class RangeIndexTest : BaseIndexTest<int, Container<int>, RangeIndex<Container<int>, int>>
+    internal class MultiRangeIndexTest : BaseIndexTest<int, Container<int>, MultiRangeIndex<Container<int>, int>>
     {
-        public RangeIndexTest() : base(x => x.Value)
+        public MultiRangeIndexTest() : base(x => x.Value)
         {
 
         }
@@ -16,9 +16,9 @@ public partial class CommonIndexTests
 
         protected override bool SupportsRangeBasedQueries => true;
 
-        protected override RangeIndex<Container<int>, int> CreateIndex()
+        protected override MultiRangeIndex<Container<int>, int> CreateIndex()
         {
-            return new RangeIndex<Container<int>, int>("Test");
+            return new MultiRangeIndex<Container<int>, int>("Test");
         }
 
         protected override Container<int>[] GetNonUniqueData()
@@ -49,13 +49,13 @@ public partial class CommonIndexTests
     }
 
     [DataTestMethod]
-    [DynamicData(nameof(GetRangeIndexTestMethods), DynamicDataSourceType.Method)]
-    public void RangeIndex(string method)
+    [DynamicData(nameof(GetMultiRangeIndexTestMethods), DynamicDataSourceType.Method)]
+    public void MultiRangeIndex(string method)
     {
-        BaseIndexTest.RunTest<RangeIndexTest>(method);
+        BaseIndexTest.RunTest<MultiRangeIndexTest>(method);
     }
 
-    public static IEnumerable<object[]> GetRangeIndexTestMethods()
+    public static IEnumerable<object[]> GetMultiRangeIndexTestMethods()
     {
         return BaseIndexTest.GetTestMethods<RangeIndexTest>();
     }

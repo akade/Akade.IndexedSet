@@ -22,7 +22,7 @@ public class ConcurrentSetTests
     [TestMethod]
     public async Task ParallelWrites()
     {
-        ConcurrentIndexedSet<Person> sut = CreateSet();
+        using ConcurrentIndexedSet<Person> sut = CreateSet();
 
         Task[] tasks = _testData.Select(p => Task.Run(() => sut.Add(p))).ToArray();
         await Task.WhenAll(tasks);
@@ -33,7 +33,7 @@ public class ConcurrentSetTests
     [TestMethod]
     public async Task ParallelReads()
     {
-        ConcurrentIndexedSet<Person> sut = CreateSet();
+        using ConcurrentIndexedSet<Person> sut = CreateSet();
         _ = sut.AddRange(_testData);
 
         Task<bool>[] tasks = _testData.Select(p => Task.Run(() => sut.TryGetSingle(x => x.Phone, p.Phone, out _))).ToArray();
@@ -44,7 +44,7 @@ public class ConcurrentSetTests
     [TestMethod]
     public async Task ParallelReadsAndWrites()
     {
-        ConcurrentIndexedSet<Person> sut = CreateSet();
+        using ConcurrentIndexedSet<Person> sut = CreateSet();
         _ = sut.AddRange(_testData);
 
         Task<bool>[] tasks = _testData.Select((p, i) => Task.Run(() =>
@@ -59,7 +59,7 @@ public class ConcurrentSetTests
     [TestMethod]
     public async Task Update_method_allows_to_execute_code_in_isolation()
     {
-        ConcurrentIndexedSet<int, TestData> sut = IndexedSetBuilder<TestData>.Create(x => x.PrimaryKey)
+        using ConcurrentIndexedSet<int, TestData> sut = IndexedSetBuilder<TestData>.Create(x => x.PrimaryKey)
                                                                              .WithIndex(x => x.IntProperty)
                                                                              .BuildConcurrent();
         var element = new TestData(1, 0, GuidGen.Get(1), "Test");
@@ -77,7 +77,7 @@ public class ConcurrentSetTests
     [TestMethod]
     public async Task Parallel_reads_and_writes_with_read_method()
     {
-        ConcurrentIndexedSet<int, TestData> sut = IndexedSetBuilder<TestData>.Create(x => x.PrimaryKey)
+        using ConcurrentIndexedSet<int, TestData> sut = IndexedSetBuilder<TestData>.Create(x => x.PrimaryKey)
                                                                              .WithIndex(x => x.IntProperty)
                                                                              .WithIndex(x => x.GuidProperty)
                                                                              .BuildConcurrent();

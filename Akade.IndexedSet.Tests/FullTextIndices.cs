@@ -1,5 +1,6 @@
 using Akade.IndexedSet.Tests.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Akade.IndexedSet.Tests;
 
@@ -99,5 +100,42 @@ public class FullTextIndices
 
         Assert.IsFalse(_indexedSet.TryGetSingle(x => x.Name, "Elephant", out Animal? animal2));
         Assert.IsNull(animal2);
+    }
+
+    [TestMethod]
+    [Experimental(Experiments.TextSearchImprovements)]
+    public void Retrieval_via_multi_key_retrieves_correct_items()
+    {
+        static IEnumerable<string> Multikeys(Animal d) => new[] { d.Name, d.Category };
+
+        var data = new Animal[] {
+         _bonobo,
+         _booby,
+         _boomslang,
+         _borador,
+         _tiger,
+         _tarantula,
+         _tapir,
+         _penguin,
+         _panther,
+         _pangolin,
+         _parrot,
+     };
+
+        _indexedSet = data.ToIndexedSet()
+                          .WithFullTextIndex(Multikeys)
+                          .Build();
+
+        // only reptile & spider
+        _indexedSet.AssertSingleItem(Multikeys, _boomslang);
+        _indexedSet.AssertSingleItem(Multikeys, _tarantula);
+
+        CollectionAssert.AreEquivalent(_indexedSet.Where(Multikeys, "Bird").ToArray(), new[] { _booby, _penguin, _parrot });
+
+        CollectionAssert.AreEquivalent(_indexedSet.Contains(Multikeys, "ird").ToArray(), new[] { _booby, _penguin, _parrot });
+        CollectionAssert.AreEquivalent(_indexedSet.FuzzyContains(Multikeys, "ard", 1).ToArray(), new[] { _borador, _booby, _penguin, _parrot, _tarantula });
+
+        CollectionAssert.AreEquivalent(_indexedSet.StartsWith(Multikeys, "Bir").ToArray(), new[] { _booby, _penguin, _parrot });
+        CollectionAssert.AreEquivalent(_indexedSet.FuzzyStartsWith(Multikeys, "Lir", 1).ToArray(), new[] { _booby, _penguin, _parrot });
     }
 }

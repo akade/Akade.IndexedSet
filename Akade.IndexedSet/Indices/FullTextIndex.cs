@@ -3,26 +3,57 @@ using Akade.IndexedSet.Extensions;
 using Akade.IndexedSet.Utils;
 
 namespace Akade.IndexedSet.Indices;
-internal class FullTextIndex<TElement> : TypedIndex<TElement, string>
+
+internal sealed class FullTextIndex<TElement> : TypedIndex<TElement, string>
 {
     private readonly SuffixTrie<TElement> _suffixTrie;
-    private readonly Func<TElement, string> _keyAccessor;
+
+    private delegate bool CandidateMatchCheck(TElement element, ReadOnlySpan<char> startsWith);
+    private delegate bool FuzzyCandidateMatchCheck(TElement element, ReadOnlySpan<char> startsWith, int maxDistance);
+
+    private readonly CandidateMatchCheck _checkCandidateMatch;
+    private readonly FuzzyCandidateMatchCheck _checkFuzzyCandidateMatch;
 
     public FullTextIndex(Func<TElement, string> keyAccessor, string name) : base(name)
     {
-        _keyAccessor = keyAccessor;
+        _checkCandidateMatch = (elem, startsWith) => MemoryExtensions.StartsWith(keyAccessor(elem), startsWith, StringComparison.Ordinal);
+        _checkFuzzyCandidateMatch = (elem, startsWith, maxDistance) => VerifyFuzzyStartsWith(keyAccessor(elem), startsWith, maxDistance);
         _suffixTrie = new();
     }
 
-    public override void Add(TElement value)
+    public FullTextIndex(Func<TElement, IEnumerable<string>> keyAccessor, string name) : base(name)
     {
-        string key = _keyAccessor(value);
+        _checkCandidateMatch = (elem, startsWith) =>
+        {
+            foreach (string key in keyAccessor(elem))
+            {
+                if (MemoryExtensions.StartsWith(key, startsWith, StringComparison.Ordinal))
+                    return true;
+            }
+
+            return false;
+        };
+
+        _checkFuzzyCandidateMatch = (elem, startsWith, maxDistance) =>
+        {
+            foreach(string key in keyAccessor(elem))
+            {
+                if (VerifyFuzzyStartsWith(key, startsWith, maxDistance))
+                    return true;
+            }
+
+            return false;
+        };
+        _suffixTrie = new();
+    }
+
+    internal override void Add(string key, TElement value)
+    {
         _ = _suffixTrie.Add(key, value);
     }
 
-    public override void Remove(TElement value)
+    internal override void Remove(string key, TElement value)
     {
-        string key = _keyAccessor(value);
         _ = _suffixTrie.Remove(key, value);
     }
 
@@ -59,7 +90,7 @@ internal class FullTextIndex<TElement> : TypedIndex<TElement, string>
 
         foreach (TElement candidate in _suffixTrie.GetAll(indexKey))
         {
-            if (MemoryExtensions.StartsWith(_keyAccessor(candidate), indexKey, StringComparison.Ordinal))
+            if (_checkCandidateMatch(candidate, indexKey))
             {
                 _ = matches.Add(candidate);
             }
@@ -68,13 +99,18 @@ internal class FullTextIndex<TElement> : TypedIndex<TElement, string>
         return matches;
     }
 
+    private static bool VerifyFuzzyStartsWith(ReadOnlySpan<char> found,  ReadOnlySpan<char> startsWith, int maxDistance)
+    {
+        return LevenshteinDistance.FuzzyMatch(found[..startsWith.Length], startsWith, maxDistance);
+    }
+
     internal override IEnumerable<TElement> FuzzyStartsWith(ReadOnlySpan<char> indexKey, int maxDistance)
     {
         HashSet<TElement> matches = new();
 
         foreach (TElement candidate in _suffixTrie.FuzzySearch(indexKey, maxDistance, false))
         {
-            if (LevenshteinDistance.FuzzyMatch(_keyAccessor(candidate).AsSpan()[..indexKey.Length], indexKey, maxDistance))
+            if (_checkFuzzyCandidateMatch(candidate, indexKey, maxDistance))
             {
                 _ = matches.Add(candidate);
             }

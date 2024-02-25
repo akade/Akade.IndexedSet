@@ -5,7 +5,7 @@ namespace Akade.IndexedSet.Tests.CommonIndexTests;
 
 public partial class CommonIndexTests
 {
-    internal class PrefixIndexTest : BaseIndexTest<string, string, Container<string>, PrefixIndex<Container<string>>>
+    internal class PrefixIndexTest : BaseIndexTest<string, Container<string>, PrefixIndex<Container<string>>>
     {
         public PrefixIndexTest() : base(x => x.Value)
         {
@@ -19,7 +19,7 @@ public partial class CommonIndexTests
 
         protected override PrefixIndex<Container<string>> CreateIndex()
         {
-            return new PrefixIndex<Container<string>>(x => x.Value, "Test");
+            return new PrefixIndex<Container<string>>("Test");
         }
 
         protected override string GetNotExistingKey()

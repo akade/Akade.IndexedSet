@@ -5,23 +5,19 @@ namespace Akade.IndexedSet.Indices;
 internal class PrefixIndex<TElement> : TypedIndex<TElement, string>
 {
     private readonly Trie<TElement> _trie;
-    private readonly Func<TElement, string> _keyAccessor;
 
-    public PrefixIndex(Func<TElement, string> keyAccessor, string name) : base(name)
+    public PrefixIndex(string name) : base(name)
     {
-        _keyAccessor = keyAccessor;
         _trie = new();
     }
 
-    public override void Add(TElement value)
+    internal override void Add(string key, TElement value)
     {
-        string key = _keyAccessor(value);
         _ = _trie.Add(key, value);
     }
 
-    public override void Remove(TElement value)
+    internal override void Remove(string key, TElement value)
     {
-        string key = _keyAccessor(value);
         _ = _trie.Remove(key, value);
     }
 

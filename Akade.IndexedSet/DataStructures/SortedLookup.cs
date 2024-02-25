@@ -11,22 +11,14 @@ internal class SortedLookup<TKey, TValue>
 {
     private readonly List<TValue> _sortedValues = new();
     private readonly BinaryHeap<TKey> _sortedKeys = new();
-    private readonly Func<TValue, TKey> _keyFunction;
 
-    public SortedLookup(Func<TValue, TKey> keyFunction)
+    public void Add(TKey key, TValue value)
     {
-        _keyFunction = keyFunction;
-    }
-
-    public void Add(TValue value)
-    {
-        TKey key = _keyFunction(value);
-
         int targetIndex = _sortedKeys.Add(key);
         _sortedValues.Insert(targetIndex, value);
     }
 
-    public void AddRange(IEnumerable<TValue> elementsToAdd)
+    public void AddRange(IEnumerable<KeyValuePair<TKey, TValue>> elementsToAdd)
     {
         if (elementsToAdd.TryGetNonEnumeratedCount(out int count))
         {
@@ -34,15 +26,14 @@ internal class SortedLookup<TKey, TValue>
             _ = _sortedKeys.EnsureCapacity(_sortedKeys.Count + count);
         }
 
-        foreach (TValue element in elementsToAdd.OrderBy(_keyFunction))
+        foreach (KeyValuePair<TKey, TValue> element in elementsToAdd.OrderBy(kvp => kvp.Key))
         {
-            Add(element);
+            Add(element.Key, element.Value);
         }
     }
 
-    public bool Remove(TValue value)
+    public bool Remove(TKey key, TValue value)
     {
-        TKey key = _keyFunction(value);
         Range removalCandidates = _sortedKeys.GetRange(key);
 
         (int offset, int length) = removalCandidates.GetOffsetAndLength(_sortedKeys.Count);

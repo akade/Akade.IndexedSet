@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
-internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, TIndex>
+internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
 {
 
     [TestMethod]
@@ -9,7 +9,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
     {
         TElement[] data = GetUniqueData();
         TIndex index = CreateIndexWithData(data);
-        Assert.AreEqual(data[0], index.Single(_searchExpression(data[0])));
+        Assert.AreEqual(data[0], index.Single(_keyAccessor(data[0])));
     }
 
     [TestMethod]
@@ -33,7 +33,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
         {
             TElement[] data = GetNonUniqueData();
             TIndex index = CreateIndexWithData(data);
-            TSearchKey nonUniqueKey = data.GroupBy(_searchExpression).Where(x => x.Count() > 1).First().Key;
+            TIndexKey nonUniqueKey = data.GroupBy(_keyAccessor).Where(x => x.Count() > 1).First().Key;
             _ = Assert.ThrowsException<InvalidOperationException>(() => index.Single(nonUniqueKey));
         }
     }
@@ -57,7 +57,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
     {
         TElement[] data = GetUniqueData();
         TIndex index = CreateIndexWithData(data);
-        Assert.IsTrue(index.TryGetSingle(_searchExpression(data[0]), out TElement? element));
+        Assert.IsTrue(index.TryGetSingle(_keyAccessor(data[0]), out TElement? element));
         Assert.AreEqual(data[0], element);
     }
 
@@ -68,7 +68,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TSearchKey, TElement, T
         {
             TElement[] data = GetNonUniqueData();
             TIndex index = CreateIndexWithData(data);
-            TSearchKey nonUniqueKey = data.GroupBy(_searchExpression).Where(x => x.Count() > 1).First().Key;
+            TIndexKey nonUniqueKey = data.GroupBy(_keyAccessor).Where(x => x.Count() > 1).First().Key;
             Assert.IsFalse(index.TryGetSingle(nonUniqueKey, out _));
         }
     }

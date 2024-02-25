@@ -23,6 +23,21 @@ internal static class IndexAssert
         Assert.AreEqual(testData, accessViaWhere);
     }
 
+    public static void AssertSingleItem<TElement, TIndexKey>(this IndexedSet<TElement> indexedSet, Func<TElement, IEnumerable<TIndexKey>> indexAccessor, TElement testData, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        Assert.IsNotNull(indexName);
+
+        foreach (TIndexKey indexKey in indexAccessor(testData))
+        {
+            TElement accessViaSingle = indexedSet.Single(indexAccessor, indexKey, indexName);
+            TElement accessViaWhere = indexedSet.Where(indexAccessor, indexKey, indexName).Single();
+
+            Assert.AreEqual(testData, accessViaSingle);
+            Assert.AreEqual(testData, accessViaWhere);
+        }
+    }
+
     public static void AssertMultipleItems<TElement, TIndexKey>(this IndexedSet<TElement> indexedSet, Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null, bool requireOrder = false, params TElement[] expectedElements)
         where TIndexKey : notnull
     {
