@@ -1,7 +1,7 @@
 # Experimental Features
 
 The new (.NET 8.0) [Experimental Attribute](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.codeanalysis.experimentalattribute) is used to mark features that are more likely to change in the future.
-**They are usually production-ready**, but we want to gather feedback from the community before we finalize them.
+**They are usually production-ready**, but changes in future releases will not be considered breaking changes.
 
 > :warning: In .NET 6 & 7, the `ExperimentalAttribute` is not available and we polyfill it but there is no compiler warning / error that will guide you!
 

@@ -8,7 +8,7 @@
 
 
 A convenient data structure supporting efficient in-memory indexing and querying, including range queries and fuzzy string matching.
-In a nutshell, it allows you to write LINQ-like queries *without* enumerating through the entire list. If you are currently completly enumerating
+In a nutshell, it allows you to write LINQ-like queries *without* enumerating through the entire list. If you are currently completely enumerating
 through your data, expect huge [speedups](docs/Benchmarks.md) and much better scalability!
 
 <!--TOC-->
@@ -29,7 +29,7 @@ through your data, expect huge [speedups](docs/Benchmarks.md) and much better sc
   - [FAQs](#faqs)
     - [How do I use multiple index types for the same property?](#how-do-i-use-multiple-index-types-for-the-same-property)
     - [How do I update key values if the elements are already in the set?](#how-do-i-update-key-values-if-the-elements-are-already-in-the-set)
-    - [How do I do case-insensitve (fuzzy) string matching (Prefix, FullTextIndex)?](#how-do-i-do-case-insensitve-fuzzy-string-matching-prefix-fulltextindex)
+    - [How do I do case-insensitive (fuzzy) string matching (Prefix, FullTextIndex)?](#how-do-i-do-case-insensitve-fuzzy-string-matching-prefix-fulltextindex)
   - [Roadmap](#roadmap)
 <!--/TOC-->
 
@@ -265,7 +265,7 @@ ConcurrentIndexedSet<RangeData> set = data.ToIndexedSet()
                                           .BuildConcurrent();
 ```
 
-> ⚠ The concurrent implmentation needs to materialize all query results.<br />
+> ⚠ The concurrent implementation needs to materialize all query results.<br />
 > `OrderBy` and `OrderByDescending` take an additional `count` parameter to avoid unnecessary materialization.
 > You can judge the overhead [here](docs/Benchmarks.md#ConcurrentSet)
 ### No reflection and no expressions - convention-based index naming
@@ -347,13 +347,13 @@ Potential features (not ordered):
 - [x] Easier updating of keys
 - [x] More index types (Trie)
 - [x] Range insertion and corresponding `.ToIndexedSet().WithIndex(x => ...).[...].Build()`
-- [x] Refactoring to allow a primarykey-less set: this was an artifical restriction that is not necessary
+- [x] Refactoring to allow a primarykey-less set: this was an artificial restriction that is not necessary
 - [x] Benchmarks
 - [x] Simplification of string indices, i.e. Span/String based overloads to avoid `AsMemory()`...
 - [x] Analyzers to help with best practices
 - [x] Multi-key everything: All index types can be used with multiple keys per element.
 - [ ] Tree-based range index for better insertion performance
 - [ ] Aggregates (i.e. sum or average: interface based on state & add/removal state update functions)
-- [ ] Custom (equality) comparators for indices
+- [ ] Custom (equality) comparer for indices
 
 If you have any suggestion or found a bug / unexpected behavior, open an issue! I will also review PRs and integrate them if they fit the project.
