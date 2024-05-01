@@ -4,7 +4,7 @@
   <Suppression>
     <DiagnosticId>CP0001</DiagnosticId>
     <Target>T:Akade.IndexedSet.ExperimentalAttribute</Target>
-    <Left>lib/net7.0/Akade.IndexedSet.dll</Left>
+    <Left>lib/net6.0/Akade.IndexedSet.dll</Left>
     <Right>lib/net8.0/Akade.IndexedSet.dll</Right>
   </Suppression>
 </Suppressions>
