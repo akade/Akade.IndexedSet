@@ -7,17 +7,21 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<Version>1.1.0</Version>
+		<Version>1.2.0-beta</Version>
 		<Description>Provides an In-Memory data structure, the IndexedSet, that allows to easily add indices to allow efficient querying. Currently supports unique and non-unique indices, range indices as well as fuzzy string matching for single attributes, compound or computed keys.</Description>
-		<Copyright>Copyright © Akade 2023</Copyright>
+		<Copyright>Copyright © Akade 2024</Copyright>
 		<Authors>Akade</Authors>
-		<EnablePackageValidation>true</EnablePackageValidation>
-		<RepositoryUrl>https://github.com/akade/Akade.IndexedSet</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryUrl>https://github.com/akade/Akade.IndexedSet</RepositoryUrl>
 		<PackageTags>data structure;indices;range query;unique index;range index;non-unique index;multi-value;dictionary;collections;computed keys;fuzzy;fuzzy search;approximate string matching;search;concurrency;multiple keys; fast lookup;performance</PackageTags>
 		<PackageReadmeFile>/README.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<EnablePackageValidation>true</EnablePackageValidation>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 	</PropertyGroup>
 	
 	<ItemGroup>
