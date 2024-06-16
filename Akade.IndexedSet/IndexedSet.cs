@@ -749,10 +749,7 @@ public class IndexedSet<TElement>
     private TypedIndex<TElement, TIndexKey> GetIndex<TIndexKey>(string? indexName)
         where TIndexKey : notnull
     {
-        if (indexName is null)
-        {
-            throw new ArgumentNullException(nameof(indexName));
-        }
+        ArgumentNullException.ThrowIfNull(indexName);
 
         if (!_indices.TryGetValue(indexName, out Index<TElement>? index))
         {

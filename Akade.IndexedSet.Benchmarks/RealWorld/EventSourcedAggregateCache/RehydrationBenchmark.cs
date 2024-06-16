@@ -11,7 +11,7 @@ public class RehydrationBenchmark
 {
     private readonly ConcurrentIndexedSet<AggregateId, Aggregate> _set = IndexedSetBuilder<Aggregate>.Create(x => x.Id)
                                                                                                      .WithIndex(x => x.Owner)
-                                                                                                     .WithIndex(x => x.SharedWith.Any())
+                                                                                                     .WithIndex(x => x.SharedWith.IsEmpty)
                                                                                                      .WithIndex(AggregateIndices.TenantsWithAccess)
                                                                                                      .WithFullTextIndex(AggregateIndices.FullName)
                                                                                                      .BuildConcurrent();
