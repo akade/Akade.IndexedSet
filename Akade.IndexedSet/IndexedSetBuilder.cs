@@ -109,10 +109,7 @@ public class IndexedSetBuilder<TElement>
     public virtual IndexedSetBuilder<TElement> WithUniqueIndex<TIndexKey>(Func<TElement, TIndexKey> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        if (indexName is null)
-        {
-            throw new ArgumentNullException(nameof(indexName));
-        }
+        ArgumentNullException.ThrowIfNull(indexName);
 
         _result.AddIndex(keyAccessor, new UniqueIndex<TElement, TIndexKey>(indexName));
 
@@ -134,10 +131,7 @@ public class IndexedSetBuilder<TElement>
     public virtual IndexedSetBuilder<TElement> WithUniqueIndex<TIndexKey>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        if (indexName is null)
-        {
-            throw new ArgumentNullException(nameof(indexName));
-        }
+        ArgumentNullException.ThrowIfNull(indexName);
 
         _result.AddIndex(keyAccessor, new UniqueIndex<TElement, TIndexKey>(indexName));
 
@@ -159,10 +153,7 @@ public class IndexedSetBuilder<TElement>
     public virtual IndexedSetBuilder<TElement> WithIndex<TIndexKey>(Func<TElement, TIndexKey> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        if (indexName is null)
-        {
-            throw new ArgumentNullException(nameof(indexName));
-        }
+        ArgumentNullException.ThrowIfNull(indexName);
 
         _result.AddIndex(keyAccessor, new NonUniqueIndex<TElement, TIndexKey>(indexName));
 
@@ -184,10 +175,7 @@ public class IndexedSetBuilder<TElement>
     public virtual IndexedSetBuilder<TElement> WithIndex<TIndexKey>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        if (indexName is null)
-        {
-            throw new ArgumentNullException(nameof(indexName));
-        }
+        ArgumentNullException.ThrowIfNull(indexName);
 
         _result.AddIndex(keyAccessor, new NonUniqueIndex<TElement, TIndexKey>(indexName));
 
@@ -209,10 +197,7 @@ public class IndexedSetBuilder<TElement>
     public virtual IndexedSetBuilder<TElement> WithRangeIndex<TIndexKey>(Func<TElement, TIndexKey> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        if (indexName is null)
-        {
-            throw new ArgumentNullException(nameof(indexName));
-        }
+        ArgumentNullException.ThrowIfNull(indexName);
 
         _result.AddIndex(keyAccessor, new RangeIndex<TElement, TIndexKey>(indexName));
 
@@ -234,10 +219,7 @@ public class IndexedSetBuilder<TElement>
     public virtual IndexedSetBuilder<TElement> WithRangeIndex<TIndexKey>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
         where TIndexKey : notnull
     {
-        if (indexName is null)
-        {
-            throw new ArgumentNullException(nameof(indexName));
-        }
+        ArgumentNullException.ThrowIfNull(indexName);
 
         _result.AddIndex(keyAccessor, new MultiRangeIndex<TElement, TIndexKey>(indexName));
 
@@ -257,10 +239,7 @@ public class IndexedSetBuilder<TElement>
     /// <returns>The instance on which this method is called is returned to support the fluent syntax.</returns>
     public virtual IndexedSetBuilder<TElement> WithFullTextIndex(Func<TElement, string> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
     {
-        if (indexName is null)
-        {
-            throw new ArgumentNullException(nameof(indexName));
-        }
+        ArgumentNullException.ThrowIfNull(indexName);
 
         _result.AddIndex(keyAccessor, new FullTextIndex<TElement>(keyAccessor, indexName));
 
@@ -281,10 +260,7 @@ public class IndexedSetBuilder<TElement>
     [Experimental(Experiments.TextSearchImprovements, UrlFormat = Experiments.UrlTemplate)]
     public virtual IndexedSetBuilder<TElement> WithFullTextIndex(Func<TElement, IEnumerable<string>> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
     {
-        if (indexName is null)
-        {
-            throw new ArgumentNullException(nameof(indexName));
-        }
+        ArgumentNullException.ThrowIfNull(indexName);
 
         _result.AddIndex(keyAccessor, new FullTextIndex<TElement>(keyAccessor, indexName));
 
@@ -304,10 +280,7 @@ public class IndexedSetBuilder<TElement>
     /// <returns>The instance on which this method is called is returned to support the fluent syntax.</returns>
     public virtual IndexedSetBuilder<TElement> WithPrefixIndex(Func<TElement, string> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
     {
-        if (indexName is null)
-        {
-            throw new ArgumentNullException(nameof(indexName));
-        }
+        ArgumentNullException.ThrowIfNull(indexName);
 
         _result.AddIndex(keyAccessor, new PrefixIndex<TElement>(indexName));
 
@@ -328,10 +301,7 @@ public class IndexedSetBuilder<TElement>
     [Experimental(Experiments.TextSearchImprovements, UrlFormat = Experiments.UrlTemplate)]
     public virtual IndexedSetBuilder<TElement> WithPrefixIndex(Func<TElement, IEnumerable<string>> keyAccessor, [CallerArgumentExpression("keyAccessor")] string? indexName = null)
     {
-        if (indexName is null)
-        {
-            throw new ArgumentNullException(nameof(indexName));
-        }
+        ArgumentNullException.ThrowIfNull(indexName);
 
         _result.AddIndex(keyAccessor, new PrefixIndex<TElement>(indexName));
 

@@ -21,7 +21,7 @@ public class TypeaheadSample
         // Travers the prefix trie to efficiently find all matches
         Type[] types = _types.StartsWith(x => x.Name.ToLowerInvariant(), "int").ToArray();
 
-        Assert.IsTrue(types.Any());
+        Assert.IsTrue(types.Length > 0);
         Assert.IsTrue(types.All(t => t.Name.StartsWith("int", StringComparison.InvariantCultureIgnoreCase)));
     }
 }
