@@ -7,15 +7,10 @@ namespace Akade.IndexedSet.Indices;
 /// O(log(n)) range queries based on <see cref="SortedLookup{TKey, TValue}"/>. Filters for distinct values as it is used
 /// for indices where elements can have multiple keys.
 /// </summary>
-internal class MultiRangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
+internal class MultiRangeIndex<TElement, TIndexKey>(string name) : TypedIndex<TElement, TIndexKey>(name)
     where TIndexKey : notnull
 {
-    private readonly SortedLookup<TIndexKey, TElement> _lookup;
-
-    public MultiRangeIndex(string name) : base(name)
-    {
-        _lookup = new();
-    }
+    private readonly SortedLookup<TIndexKey, TElement> _lookup = new();
 
     internal override void Add(TIndexKey key, TElement value)
     {
@@ -76,13 +71,13 @@ internal class MultiRangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TInde
     {
         if (_lookup.Count == 0)
         {
-            return Enumerable.Empty<TElement>();
+            return [];
         }
 
         TIndexKey maxKey = _lookup.GetMaximumKey();
 
         return Comparer<TIndexKey>.Default.Compare(value, maxKey) >= 0
-            ? Enumerable.Empty<TElement>()
+            ? []
             : _lookup.GetValuesInRange(value, maxKey, false, true).Distinct();
     }
 
@@ -90,13 +85,13 @@ internal class MultiRangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TInde
     {
         if (_lookup.Count == 0)
         {
-            return Enumerable.Empty<TElement>();
+            return [];
         }
 
         TIndexKey maxKey = _lookup.GetMaximumKey();
 
         return Comparer<TIndexKey>.Default.Compare(value, maxKey) > 0
-            ? Enumerable.Empty<TElement>()
+            ? []
             : _lookup.GetValuesInRange(value, maxKey, true, true).Distinct();
     }
 
@@ -104,13 +99,13 @@ internal class MultiRangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TInde
     {
         if (_lookup.Count == 0)
         {
-            return Enumerable.Empty<TElement>();
+            return [];
         }
 
         TIndexKey minKey = _lookup.GetMinimumKey();
 
         return Comparer<TIndexKey>.Default.Compare(value, minKey) <= 0
-            ? Enumerable.Empty<TElement>()
+            ? []
             : _lookup.GetValuesInRange(minKey, value, true, false).Distinct();
     }
 
@@ -118,13 +113,13 @@ internal class MultiRangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TInde
     {
         if (_lookup.Count == 0)
         {
-            return Enumerable.Empty<TElement>();
+            return [];
         }
 
         TIndexKey? minKey = _lookup.GetMinimumKey();
 
         return Comparer<TIndexKey>.Default.Compare(value, minKey) < 0
-            ? Enumerable.Empty<TElement>()
+            ? []
             : _lookup.GetValuesInRange(minKey, value, true, true).Distinct();
     }
 

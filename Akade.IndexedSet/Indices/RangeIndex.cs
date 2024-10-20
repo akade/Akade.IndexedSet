@@ -5,15 +5,10 @@ namespace Akade.IndexedSet.Indices;
 /// <summary>
 /// O(log(n)) range queries based on <see cref="SortedLookup{TKey, TValue}"/>.
 /// </summary>
-internal class RangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
+internal class RangeIndex<TElement, TIndexKey>(string name) : TypedIndex<TElement, TIndexKey>(name)
     where TIndexKey : notnull
 {
-    private readonly SortedLookup<TIndexKey, TElement> _lookup;
-
-    public RangeIndex(string name) : base(name)
-    {
-        _lookup = new();
-    }
+    private readonly SortedLookup<TIndexKey, TElement> _lookup = new();
 
     internal override void Add(TIndexKey key, TElement value)
     {
@@ -62,13 +57,13 @@ internal class RangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
     {
         if (_lookup.Count == 0)
         {
-            return Enumerable.Empty<TElement>();
+            return [];
         }
 
         TIndexKey maxKey = _lookup.GetMaximumKey();
 
         return Comparer<TIndexKey>.Default.Compare(value, maxKey) >= 0
-            ? Enumerable.Empty<TElement>()
+            ? []
             : _lookup.GetValuesInRange(value, maxKey, false, true);
     }
 
@@ -76,13 +71,13 @@ internal class RangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
     {
         if (_lookup.Count == 0)
         {
-            return Enumerable.Empty<TElement>();
+            return [];
         }
 
         TIndexKey maxKey = _lookup.GetMaximumKey();
 
         return Comparer<TIndexKey>.Default.Compare(value, maxKey) > 0
-            ? Enumerable.Empty<TElement>()
+            ? []
             : _lookup.GetValuesInRange(value, maxKey, true, true);
     }
 
@@ -90,13 +85,13 @@ internal class RangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
     {
         if (_lookup.Count == 0)
         {
-            return Enumerable.Empty<TElement>();
+            return [];
         }
 
         TIndexKey minKey = _lookup.GetMinimumKey();
 
         return Comparer<TIndexKey>.Default.Compare(value, minKey) <= 0
-            ? Enumerable.Empty<TElement>()
+            ? []
             : _lookup.GetValuesInRange(minKey, value, true, false);
     }
 
@@ -104,13 +99,13 @@ internal class RangeIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
     {
         if (_lookup.Count == 0)
         {
-            return Enumerable.Empty<TElement>();
+            return [];
         }
 
         TIndexKey? minKey = _lookup.GetMinimumKey();
 
         return Comparer<TIndexKey>.Default.Compare(value, minKey) < 0
-            ? Enumerable.Empty<TElement>()
+            ? []
             : _lookup.GetValuesInRange(minKey, value, true, true);
     }
 

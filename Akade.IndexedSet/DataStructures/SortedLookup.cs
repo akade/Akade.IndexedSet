@@ -9,8 +9,8 @@
 internal class SortedLookup<TKey, TValue>
     where TKey : notnull
 {
-    private readonly List<TValue> _sortedValues = new();
-    private readonly BinaryHeap<TKey> _sortedKeys = new();
+    private readonly List<TValue> _sortedValues = [];
+    private readonly BinaryHeap<TKey> _sortedKeys = [];
 
     public void Add(TKey key, TValue value)
     {
@@ -96,7 +96,7 @@ internal class SortedLookup<TKey, TValue>
     {
         if (_sortedKeys.Count == 0)
         {
-            return Enumerable.Empty<TValue>();
+            return [];
         }
 
         Range maximumRange = _sortedKeys.GetRange(GetMaximumKey());
@@ -107,7 +107,7 @@ internal class SortedLookup<TKey, TValue>
     {
         if (_sortedKeys.Count == 0)
         {
-            return Enumerable.Empty<TValue>();
+            return [];
         }
 
         Range maximumRange = _sortedKeys.GetRange(GetMinimumKey());

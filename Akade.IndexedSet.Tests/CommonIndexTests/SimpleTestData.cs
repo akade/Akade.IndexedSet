@@ -3,13 +3,7 @@
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
 
 [DebuggerDisplay($"{{{nameof(Value)}}}")]
-internal class Container<T>
+internal class Container<T>(T value)
 {
-    public Container(T value)
-    {
-
-        Value = value;
-    }
-
-    public T Value { get; }
+    public T Value { get; } = value;
 }

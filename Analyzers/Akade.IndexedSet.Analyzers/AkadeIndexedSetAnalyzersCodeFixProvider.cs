@@ -19,9 +19,12 @@ namespace Akade.IndexedSet.Analyzers;
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AkadeIndexedSetAnalyzersCodeFixProvider)), Shared]
 public class AkadeIndexedSetAnalyzersCodeFixProvider : CodeFixProvider
 {
-    public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(IndexNamingRulesAnalyzer.UseXAsIdentifierInLambdaRuleId,
-                                                                                                IndexNamingRulesAnalyzer.DoNotUseParenthesesInLambdaRuleId,
-                                                                                                IndexNamingRulesAnalyzer.DoNotUseBlockBodiedLambdaRuleId);
+    public sealed override ImmutableArray<string> FixableDiagnosticIds =>
+    [
+        IndexNamingRulesAnalyzer.UseXAsIdentifierInLambdaRuleId,
+        IndexNamingRulesAnalyzer.DoNotUseParenthesesInLambdaRuleId,
+        IndexNamingRulesAnalyzer.DoNotUseBlockBodiedLambdaRuleId,
+    ];
 
     public sealed override FixAllProvider GetFixAllProvider()
     {

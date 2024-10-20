@@ -4,8 +4,8 @@ namespace Akade.IndexedSet.Benchmarks;
 
 [MemoryDiagnoser]
 [DisassemblyDiagnoser]
-[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net60)]
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net80)]
+[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net90)]
 [JsonExporter]
 public class UniqueIndexBenchmarks
 {

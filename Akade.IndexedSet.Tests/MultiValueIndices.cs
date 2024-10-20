@@ -7,10 +7,10 @@ namespace Akade.IndexedSet.Tests;
 public class MultiValueIndices
 {
     private IndexedSet<int, DenormalizedTestData> _indexedSet = null!;
-    private readonly DenormalizedTestData _a = new(0, new[] { 1, 2, 3, 4 });
-    private readonly DenormalizedTestData _b = new(1, new[] { 2, 3 });
-    private readonly DenormalizedTestData _c = new(2, new[] { 3 });
-    private readonly DenormalizedTestData _d = new(3, new[] { 1, 2, 3 });
+    private readonly DenormalizedTestData _a = new(0, [1, 2, 3, 4]);
+    private readonly DenormalizedTestData _b = new(1, [2, 3]);
+    private readonly DenormalizedTestData _c = new(2, [3]);
+    private readonly DenormalizedTestData _d = new(3, [1, 2, 3]);
 
     [TestInitialize]
     public void Init()

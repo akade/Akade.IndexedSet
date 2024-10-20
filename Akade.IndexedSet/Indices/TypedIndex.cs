@@ -3,25 +3,19 @@
 /// <summary>
 /// Fully-generic index including on the index key
 /// </summary>
-internal abstract class TypedIndex<TElement, TIndexKey> : Index<TElement>
+internal abstract class TypedIndex<TElement, TIndexKey>(string name) : Index<TElement>(name)
     where TIndexKey : notnull
 {
-    protected TypedIndex(string name) : base(name)
-    {
-
-    }
-
     internal abstract void Add(TIndexKey key, TElement value);
     internal abstract void Remove(TIndexKey key, TElement value);
-    
+
     internal virtual void AddRange(IEnumerable<KeyValuePair<TIndexKey, TElement>> enumerable)
     {
-        foreach(KeyValuePair<TIndexKey, TElement> kvp in enumerable)
+        foreach (KeyValuePair<TIndexKey, TElement> kvp in enumerable)
         {
             Add(kvp.Key, kvp.Value);
         }
     }
-
 
     internal abstract TElement Single(TIndexKey indexKey);
     internal abstract bool TryGetSingle(TIndexKey indexKey, out TElement? element);

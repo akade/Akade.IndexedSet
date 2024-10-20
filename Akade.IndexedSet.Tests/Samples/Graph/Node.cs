@@ -2,14 +2,8 @@
 
 namespace Akade.IndexedSet.Tests.Samples.Graph;
 
-public class Node
+public class Node(int id, ImmutableArray<int> connectedTo)
 {
-    public Node(int id, ImmutableArray<int> connectedTo)
-    {
-        Id = id;
-        ConnectedTo = connectedTo;
-    }
-
-    public int Id { get; }
-    public ImmutableArray<int> ConnectedTo { get; }
+    public int Id { get; } = id;
+    public ImmutableArray<int> ConnectedTo { get; } = connectedTo;
 }

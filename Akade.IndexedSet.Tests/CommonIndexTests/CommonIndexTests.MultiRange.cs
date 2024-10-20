@@ -23,28 +23,28 @@ public partial class CommonIndexTests
 
         protected override Container<int>[] GetNonUniqueData()
         {
-            return new Container<int>[]
-            {
+            return
+            [
                 new(11),
                 new(11),
                 new(12),
                 new(12),
                 new(13),
                 new(13),
-            };
+            ];
         }
 
         protected override Container<int>[] GetUniqueData()
         {
-            return new Container<int>[]
-            {
+            return
+            [
                 new(1),
                 new(2),
                 new(3),
                 new(4),
                 new(5),
                 new(6),
-            };
+            ];
         }
     }
 

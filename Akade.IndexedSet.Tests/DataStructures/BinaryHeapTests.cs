@@ -1,9 +1,11 @@
 ﻿using Akade.IndexedSet.DataStructures;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Akade.IndexedSet.Tests.DataStructures;
 
 [TestClass]
+[SuppressMessage("Performance", "CA1861:Avoid constant arrays as arguments", Justification = "In unit tests: readability > performance")]
 public class BinaryHeapTests
 {
     private BinaryHeap<int> _heap = null!;
@@ -11,7 +13,7 @@ public class BinaryHeapTests
     [TestInitialize]
     public void TestInitialize()
     {
-        _heap = new();
+        _heap = [];
     }
 
     [TestMethod]
@@ -30,7 +32,7 @@ public class BinaryHeapTests
     [TestMethod]
     public void removing_random_values_from_heap_preserves_sorted_list_and_reports_correct_removal_positions()
     {
-        _heap.AddRange(new[] { 1, 2, 4, 4, 6, 6, 8, 9 });
+        _heap.AddRange([1, 2, 4, 4, 6, 6, 8, 9]);
 
         Assert.AreEqual(5, _heap.RemoveValue(6)); // 1 2 4 4 6 8 9
         Assert.AreEqual(4, _heap.RemoveValue(6)); // 1 2 4 4 8 9
@@ -42,7 +44,7 @@ public class BinaryHeapTests
     [TestMethod]
     public void querying_by_single_values_returns_correct_ranges()
     {
-        _heap.AddRange(new[] { 1, 2, 4, 4, 4, 4, 6, 6, 8, 9 });
+        _heap.AddRange([1, 2, 4, 4, 4, 4, 6, 6, 8, 9]);
 
         Assert.AreEqual(0..1, _heap.GetRange(1));
         Assert.AreEqual(1..2, _heap.GetRange(2));
@@ -85,12 +87,12 @@ public class BinaryHeapTests
     [TestMethod]
     public void querying_by_range_returns_correct_ranges()
     {
-        //                     0  1  2  3  4  5  6  7  8  9
-        _heap.AddRange(new[] { 1, 2, 4, 4, 4, 4, 6, 6, 8, 9 });
-        // case 1:             0  1
-        // case 2:             0  -  -  -  -  -  -  -  -  9
-        // case 3:                1  -  -  -  5
-        // case 4:                   2  -  -  -  -  7
+        //                           0  1  2  3  4  5  6  7  8  9
+        _heap.AddRange([1, 2, 4, 4, 4, 4, 6, 6, 8, 9]);
+        // case 1:                   0  1
+        // case 2:                   0  -  -  -  -  -  -  -  -  9
+        // case 3:                      1  -  -  -  5
+        // case 4:                         2  -  -  -  -  7
 
         Assert.AreEqual(0..2, _heap.GetRange(0, 3));
         Assert.AreEqual(0..10, _heap.GetRange(0, 10));
@@ -102,12 +104,12 @@ public class BinaryHeapTests
     [TestMethod]
     public void querying_by_range_returns_correct_ranges_respecting_inclusive_or_exclusive_boundaries_when_boundaries_are_elements()
     {
-        //                     0  1  2  3  4  5  6  7  8  9  10
-        _heap.AddRange(new[] { 1, 2, 4, 4, 4, 4, 5, 6, 6, 8, 9 });
-        // case 1:                               6  -  8
-        // case 1:                   2  -  -  -  -  -  8
-        // case 1:                               6  -  -  9
-        // case 1:                   2  -  -  -  -  -  -  9
+        //                           0  1  2  3  4  5  6  7  8  9  10
+        _heap.AddRange([1, 2, 4, 4, 4, 4, 5, 6, 6, 8, 9]);
+        // case 1:                                     6  -  8
+        // case 1:                         2  -  -  -  -  -  8
+        // case 1:                                     6  -  -  9
+        // case 1:                         2  -  -  -  -  -  -  9
 
         Assert.AreEqual(6..9, _heap.GetRange(4, 8, inclusiveStart: false, inclusiveEnd: false));
         Assert.AreEqual(2..9, _heap.GetRange(4, 8, inclusiveStart: true, inclusiveEnd: false));
@@ -118,9 +120,9 @@ public class BinaryHeapTests
     [TestMethod]
     public void querying_by_range_returns_correct_ranges_respecting_inclusive_or_exclusive_boundaries_when_boundaries_are_not_elements()
     {
-        //                     0  1  2  3  4  5  6  7  8  9  10
-        _heap.AddRange(new[] { 1, 2, 4, 4, 4, 4, 5, 6, 6, 8, 9 });
-        // all cases:                2  -  -  -  -  -  8
+        //                           0  1  2  3  4  5  6  7  8  9  10
+        _heap.AddRange([1, 2, 4, 4, 4, 4, 5, 6, 6, 8, 9]);
+        // all cases:                      2  -  -  -  -  -  8
 
         Assert.AreEqual(2..9, _heap.GetRange(3, 7, inclusiveStart: false, inclusiveEnd: false));
         Assert.AreEqual(2..9, _heap.GetRange(3, 7, inclusiveStart: true, inclusiveEnd: false));

@@ -22,15 +22,10 @@ public static class TestHelper
         return new TestHelperWithVerify<TVerifyBase>(verifyBase);
     }
 
-    public sealed class TestHelperWithVerify<TVerifyBase>
+    public sealed class TestHelperWithVerify<TVerifyBase>(TVerifyBase verifyBase)
        where TVerifyBase : VerifyBase
     {
-        private readonly TVerifyBase _verifyBase;
-
-        public TestHelperWithVerify(TVerifyBase verifyBase)
-        {
-            _verifyBase = verifyBase;
-        }
+        private readonly TVerifyBase _verifyBase = verifyBase;
 
         public Task ForSource<TSourceGen>(string source) where TSourceGen : IIncrementalGenerator, new()
         {
@@ -52,7 +47,7 @@ public static class TestHelper
 
             var compilation = CSharpCompilation.Create(
                 assemblyName: "Tests",
-                syntaxTrees: new[] { attributeSyntaxTree, syntaxTree }
+                syntaxTrees: [attributeSyntaxTree, syntaxTree]
                 );
 
             TSourceGen generator = new();

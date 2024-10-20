@@ -86,7 +86,7 @@ internal sealed class FullTextIndex<TElement> : TypedIndex<TElement, string>
 
     internal override IEnumerable<TElement> StartsWith(ReadOnlySpan<char> indexKey)
     {
-        HashSet<TElement> matches = new();
+        HashSet<TElement> matches = [];
 
         foreach (TElement candidate in _suffixTrie.GetAll(indexKey))
         {
@@ -106,7 +106,7 @@ internal sealed class FullTextIndex<TElement> : TypedIndex<TElement, string>
 
     internal override IEnumerable<TElement> FuzzyStartsWith(ReadOnlySpan<char> indexKey, int maxDistance)
     {
-        HashSet<TElement> matches = new();
+        HashSet<TElement> matches = [];
 
         foreach (TElement candidate in _suffixTrie.FuzzySearch(indexKey, maxDistance, false))
         {

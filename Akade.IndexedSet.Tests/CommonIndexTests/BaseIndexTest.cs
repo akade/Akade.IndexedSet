@@ -3,15 +3,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Reflection;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
-internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
+internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>(Func<TElement, TIndexKey> keyAccessor)
     where TIndex : TypedIndex<TElement, TIndexKey>
     where TIndexKey : notnull
 {
-    private readonly Func<TElement, TIndexKey> _keyAccessor;
-    public BaseIndexTest(Func<TElement, TIndexKey> keyAccessor)
-    {
-        _keyAccessor = keyAccessor;
-    }
+    private readonly Func<TElement, TIndexKey> _keyAccessor = keyAccessor;
 
     protected abstract TElement[] GetUniqueData();
 

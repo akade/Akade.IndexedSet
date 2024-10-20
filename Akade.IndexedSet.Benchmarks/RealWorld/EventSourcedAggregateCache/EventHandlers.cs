@@ -23,7 +23,7 @@ internal static class EventHandlers
 
     private static void HandleEvent(ConcurrentIndexedSet<AggregateId, Aggregate> state, AggregateAdded @event)
     {
-        _ = state.Add(new Aggregate(@event.Id, @event.Owner, ImmutableHashSet<TenantId>.Empty, @event.ExternalId, @event.FirstName, @event.LastName));
+        _ = state.Add(new Aggregate(@event.Id, @event.Owner, [], @event.ExternalId, @event.FirstName, @event.LastName));
     }
 
     internal static void HandleEvents(ConcurrentIndexedSet<AggregateId, Aggregate> state, IEnumerable<AggregateEvent> events)

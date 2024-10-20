@@ -29,14 +29,9 @@ internal sealed class ReaderWriterLockEx : IDisposable
         return _writerDisposable;
     }
 
-    private sealed class ReaderDisposable : IDisposable
+    private sealed class ReaderDisposable(ReaderWriterLockEx parent) : IDisposable
     {
-        private readonly ReaderWriterLockEx _parent;
-
-        public ReaderDisposable(ReaderWriterLockEx parent)
-        {
-            _parent = parent;
-        }
+        private readonly ReaderWriterLockEx _parent = parent;
 
         public void Dispose()
         {
@@ -44,14 +39,9 @@ internal sealed class ReaderWriterLockEx : IDisposable
         }
     }
 
-    private sealed class WriterDisposable : IDisposable
+    private sealed class WriterDisposable(ReaderWriterLockEx parent) : IDisposable
     {
-        private readonly ReaderWriterLockEx _parent;
-
-        public WriterDisposable(ReaderWriterLockEx parent)
-        {
-            _parent = parent;
-        }
+        private readonly ReaderWriterLockEx _parent = parent;
 
         public void Dispose()
         {

@@ -11,7 +11,7 @@ namespace Akade.IndexedSet.DataStructures;
 /// </summary>
 internal class BinaryHeap<TValue> : ICollection<TValue>
 {
-    private readonly List<TValue> _data = new();
+    private readonly List<TValue> _data = [];
     private readonly Comparer<TValue> _comparer = Comparer<TValue>.Default;
 
     public int Count => _data.Count;

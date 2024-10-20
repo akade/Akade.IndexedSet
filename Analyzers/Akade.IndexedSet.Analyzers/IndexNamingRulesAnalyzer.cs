@@ -48,7 +48,7 @@ public sealed class IndexNamingRulesAnalyzer : DiagnosticAnalyzer
         description: "Use the convention of expression bodied lambdas for simple indices or static methods for more complex indices to consistently name indices.",
         helpLinkUri: HelpLinkBase + DoNotUseBlockBodiedLambdaRuleId);
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(_useXInLambdaDescriptor, _doNotUseParenthesesDescriptor, _doNotUseBlockBodiedLambdaDescriptor);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = [_useXInLambdaDescriptor, _doNotUseParenthesesDescriptor, _doNotUseBlockBodiedLambdaDescriptor];
 
     public override void Initialize(AnalysisContext context)
     {

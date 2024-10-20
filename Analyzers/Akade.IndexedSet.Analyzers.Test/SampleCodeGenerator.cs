@@ -8,53 +8,53 @@ namespace Akade.IndexedSet.Analyzers.Test;
 internal static class SampleCodeGenerator
 {
     private static readonly string[] _setTypes =
-    {
+    [
         "IndexedSet<int>",
         "IndexedSet<int, int>",
         "ConcurrentIndexedSet<int>",
         "ConcurrentIndexedSet<int, int>"
-    };
+    ];
 
     private static readonly string[] _setIncorrectMethods =
-    {
+    [
         "Single({|#0:a => a|}, 1)",
         "Where({|#0:(x) => x|}, 2)",
         "StartsWith({|#0:x => { return x.ToString().ToLowerInvariant(); }|}, \"Test\")",
-    };
+    ];
 
     private static readonly string[] _setFixedMethods =
-    {
+    [
         "Single(x => x, 1)",
         "Where(x => x, 2)",
         "StartsWith(x => x.ToString().ToLowerInvariant(), \"Test\")",
-    };
+    ];
 
     private static readonly string[] _builderIncorrectMethods =
-    {
+    [
        "WithIndex({|#0:a => a|})",
        "WithRangeIndex({|#0:(x) => x|})",
        "WithFullTextIndex({|#0:x => { return x.ToString().ToLowerInvariant(); }|})",
-    };
+    ];
 
     private static readonly string[] _builderFixedMethods =
-    {
+    [
        "WithIndex(x => x)",
        "WithRangeIndex(x => x)",
        "WithFullTextIndex(x => x.ToString().ToLowerInvariant())",
-    };
+    ];
 
     private static readonly string[] _builderTypes =
-    {
+    [
          "ToIndexedSet()",
          "ToIndexedSet(x => x)"
-    };
+    ];
 
     private static readonly DiagnosticResult[] _diagnosticIds =
-    {
+    [
         VerifyCS.Diagnostic(IndexNamingRulesAnalyzer.UseXAsIdentifierInLambdaRuleId).WithLocation(0).WithArguments("a"),
         VerifyCS.Diagnostic(IndexNamingRulesAnalyzer.DoNotUseParenthesesInLambdaRuleId).WithLocation(0),
         VerifyCS.Diagnostic(IndexNamingRulesAnalyzer.DoNotUseBlockBodiedLambdaRuleId).WithLocation(0),
-    };
+    ];
 
     public static IEnumerable<(string incorrectCode, DiagnosticResult diagnostic, string fixedCode)> GetAllSamples()
     {

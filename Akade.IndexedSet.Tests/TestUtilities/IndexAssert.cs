@@ -1,16 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Runtime.CompilerServices;
-#if NET7_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
 
 namespace Akade.IndexedSet.Tests.TestUtilities;
-#if NET7_0_OR_GREATER
-[SuppressMessage("Style", "IDE0280:Use 'nameof'", Justification = ".NET 6 is still supported")]
-#endif
 internal static class IndexAssert
 {
-    public static void AssertSingleItem<TElement, TIndexKey>(this IndexedSet<TElement> indexedSet, Func<TElement, TIndexKey> indexAccessor, TElement testData, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+    public static void AssertSingleItem<TElement, TIndexKey>(this IndexedSet<TElement> indexedSet, Func<TElement, TIndexKey> indexAccessor, TElement testData, [CallerArgumentExpression(nameof(indexAccessor))] string? indexName = null)
         where TIndexKey : notnull
     {
         Assert.IsNotNull(indexName);
@@ -23,7 +17,7 @@ internal static class IndexAssert
         Assert.AreEqual(testData, accessViaWhere);
     }
 
-    public static void AssertSingleItem<TElement, TIndexKey>(this IndexedSet<TElement> indexedSet, Func<TElement, IEnumerable<TIndexKey>> indexAccessor, TElement testData, [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+    public static void AssertSingleItem<TElement, TIndexKey>(this IndexedSet<TElement> indexedSet, Func<TElement, IEnumerable<TIndexKey>> indexAccessor, TElement testData, [CallerArgumentExpression(nameof(indexAccessor))] string? indexName = null)
         where TIndexKey : notnull
     {
         Assert.IsNotNull(indexName);
@@ -38,7 +32,7 @@ internal static class IndexAssert
         }
     }
 
-    public static void AssertMultipleItems<TElement, TIndexKey>(this IndexedSet<TElement> indexedSet, Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression("indexAccessor")] string? indexName = null, bool requireOrder = false, params TElement[] expectedElements)
+    public static void AssertMultipleItems<TElement, TIndexKey>(this IndexedSet<TElement> indexedSet, Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression(nameof(indexAccessor))] string? indexName = null, bool requireOrder = false, params TElement[] expectedElements)
         where TIndexKey : notnull
     {
         if (expectedElements.Length < 2)
@@ -78,7 +72,7 @@ internal static class IndexAssert
         TIndexKey end,
         bool inclusiveStart,
         bool inclusiveEnd,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null,
+        [CallerArgumentExpression(nameof(indexAccessor))] string? indexName = null,
         params TElement[] expectedElements)
         where TIndexKey : notnull
     {
