@@ -4,9 +4,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
-using System;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 
@@ -15,14 +12,14 @@ namespace Akade.IndexedSet.Analyzers.Test;
 public static partial class CSharpAnalyzerVerifier<TAnalyzer>
     where TAnalyzer : DiagnosticAnalyzer, new()
 {
-    public class Test : CSharpAnalyzerTest<TAnalyzer, MSTestVerifier>
+    public class Test : CSharpAnalyzerTest<TAnalyzer, DefaultVerifier>
     {
         public Test()
         {
             string config = "Release";
             SetVersion(ref config);
 
-            ReferenceAssemblies = new ReferenceAssemblies("net8.0", new PackageIdentity("Microsoft.NETCore.App.Ref", "8.0.0"), Path.Combine("ref", "net8.0"));
+            ReferenceAssemblies = ReferenceAssemblies.Net.Net90;
 
             TestState.AdditionalReferences.Add(typeof(IndexedSet<>).Assembly);
 

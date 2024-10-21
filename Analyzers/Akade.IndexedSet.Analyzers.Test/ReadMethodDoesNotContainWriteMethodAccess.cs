@@ -1,7 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using VerifyCS = Akade.IndexedSet.Analyzers.Test.CSharpAnalyzerVerifier<Akade.IndexedSet.Analyzers.ConcurrentSetUsageAnalyzers>;
 
 namespace Akade.IndexedSet.Analyzers.Test;
