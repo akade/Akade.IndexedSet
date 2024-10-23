@@ -27,7 +27,7 @@ public sealed class ConcurrentSetUsageAnalyzers : DiagnosticAnalyzer
         description: "Do not perform writes within a read-lock as it may result in incorrect reads, or even corrupted state.",
         helpLinkUri: HelpLinkBase + DoNotPerformWritesWithinReadLockRuleId);
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(_doNotPerformWritesWithinReadLock);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = [_doNotPerformWritesWithinReadLock];
 
     public override void Initialize(AnalysisContext context)
     {

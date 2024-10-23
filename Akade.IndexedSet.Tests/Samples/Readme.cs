@@ -54,10 +54,10 @@ public class Readme
         //    \|
         //     4
 
-        _ = set.Add(new(Id: 1, ConnectsTo: new[] { 3, 4 }));
-        _ = set.Add(new(Id: 2, ConnectsTo: new[] { 3 }));
-        _ = set.Add(new(Id: 3, ConnectsTo: new[] { 1, 2, 3 }));
-        _ = set.Add(new(Id: 4, ConnectsTo: new[] { 1, 3 }));
+        _ = set.Add(new(Id: 1, ConnectsTo: [3, 4]));
+        _ = set.Add(new(Id: 2, ConnectsTo: [3]));
+        _ = set.Add(new(Id: 3, ConnectsTo: [1, 2, 3]));
+        _ = set.Add(new(Id: 4, ConnectsTo: [1, 3]));
 
         // For readability, it is recommended to write the name for the parameter contains
         IEnumerable<GraphNode> nodesThatConnectTo1 = set.Where(x => x.ConnectsTo, contains: 1); // returns nodes 3 & 4

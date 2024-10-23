@@ -3,14 +3,10 @@
 /// <summary>
 /// Unique index providing O(1) retrieval and insertion as well as enforcing unqueness
 /// </summary>
-internal class UniqueIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey>
+internal class UniqueIndex<TElement, TIndexKey>(string name) : TypedIndex<TElement, TIndexKey>(name)
     where TIndexKey : notnull
 {
-    private readonly Dictionary<TIndexKey, TElement> _data = new();
-
-    public UniqueIndex(string name) : base(name)
-    {
-    }
+    private readonly Dictionary<TIndexKey, TElement> _data = [];
 
     internal override void Add(TIndexKey key, TElement value)
     {
@@ -56,6 +52,6 @@ internal class UniqueIndex<TElement, TIndexKey> : TypedIndex<TElement, TIndexKey
 
     internal override IEnumerable<TElement> Where(TIndexKey indexKey)
     {
-        return _data.TryGetValue(indexKey, out TElement? result) ? new[] { result } : Enumerable.Empty<TElement>();
+        return _data.TryGetValue(indexKey, out TElement? result) ? [result] : [];
     }
 }

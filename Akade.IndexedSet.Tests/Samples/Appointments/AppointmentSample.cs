@@ -1,9 +1,11 @@
 ﻿using Akade.IndexedSet.Tests.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Akade.IndexedSet.Tests.Samples.Appointments;
 
 [TestClass]
+[SuppressMessage("Performance", "CA1861:Avoid constant arrays as arguments", Justification = "In unit tests: readability > performance")]
 public class AppointmentSample
 {
     private readonly DateTime _todayDateTime;

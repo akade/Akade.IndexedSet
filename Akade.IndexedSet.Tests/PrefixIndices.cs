@@ -61,8 +61,8 @@ public class PrefixIndices
     [TestMethod]
     public void multi_item_retrieval_works()
     {
-        _indexedSet.AssertMultipleItems(x => x.Category, expectedElements: new[] { _bonobo, _borador, _tiger, _tapir, _panther, _pangolin });
-        _indexedSet.AssertMultipleItems(x => x.Category, expectedElements: new[] { _booby, _penguin, _parrot });
+        _indexedSet.AssertMultipleItems(x => x.Category, expectedElements: [_bonobo, _borador, _tiger, _tapir, _panther, _pangolin]);
+        _indexedSet.AssertMultipleItems(x => x.Category, expectedElements: [_booby, _penguin, _parrot]);
     }
 
     [TestMethod]
@@ -93,7 +93,7 @@ public class PrefixIndices
     [Experimental(Experiments.TextSearchImprovements)]
     public void Retrieval_via_multi_key_retrieves_correct_items()
     {
-        static IEnumerable<string> Multikeys(Animal d) => new[] { d.Name, d.Category };
+        static IEnumerable<string> Multikeys(Animal d) => [d.Name, d.Category];
 
         var data = new Animal[] {
             _bonobo,

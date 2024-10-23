@@ -42,7 +42,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
             TElement[] data = GetUniqueData();
             AddElements(data, index);
 
-            TElement[] orderedElements = data.OrderBy(_keyAccessor).ToArray();
+            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor)];
 
             TIndexKey rangeStart = _keyAccessor(orderedElements[1]);
             TIndexKey rangeEnd = _keyAccessor(orderedElements[^2]);
@@ -74,7 +74,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
             AddElements(data, index);
-            TElement[] orderedElements = data.OrderBy(_keyAccessor).ToArray();
+            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor)];
 
             TIndexKey boundary = _keyAccessor(orderedElements[3]);
             CollectionAssert.AreEqual(orderedElements[0..3], index.LessThan(boundary).ToArray());
@@ -115,7 +115,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
             TElement[] data = GetUniqueData();
             AddElements(data, index);
 
-            TElement[] orderedElements = data.OrderBy(_keyAccessor).ToArray();
+            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor)];
 
             Assert.AreEqual(_keyAccessor(orderedElements[0]), index.Min());
             Assert.AreEqual(orderedElements[0], index.MinBy().Single());
@@ -155,7 +155,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
             AddElements(data, index);
-            TElement[] orderedElements = data.OrderBy(_keyAccessor).ToArray();
+            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor)];
 
             for (int i = 0; i < orderedElements.Length; i++)
             {
@@ -194,7 +194,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
             AddElements(data, index);
-            TElement[] orderedElements = data.OrderByDescending(_keyAccessor).ToArray();
+            TElement[] orderedElements = [.. data.OrderByDescending(_keyAccessor)];
 
             for (int i = 0; i < orderedElements.Length; i++)
             {

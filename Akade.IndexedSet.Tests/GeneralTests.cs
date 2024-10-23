@@ -17,7 +17,7 @@ public class GeneralTests
     [TestInitialize]
     public void Init()
     {
-        TestData[] data = new[] { _a, _b, _c, _d, _e };
+        TestData[] data = [_a, _b, _c, _d, _e];
         _indexedSet = data.ToIndexedSet(x => x.PrimaryKey)
                           .WithIndex(x => x.IntProperty)
                           .WithIndex(x => x.WritableProperty)
@@ -84,7 +84,7 @@ public class GeneralTests
                                                     .WithIndex(x => x.GuidProperty)
                                                     .WithUniqueIndex(x => x.IntProperty)
                                                     .Build();
-        TestData[] dataToAdd = new[] { _d, _b, _e };
+        TestData[] dataToAdd = [_d, _b, _e];
 
         _ = Assert.ThrowsException<ArgumentException>(() => set.AddRange(dataToAdd));
         Assert.AreEqual(2, set.Count);

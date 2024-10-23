@@ -9,9 +9,6 @@ namespace Akade.IndexedSet.Concurrency;
 /// Adds thread-safety, the trade off is, that all reading operations materialize the results into a collection.
 /// 
 /// </summary>
-#if NET7_0_OR_GREATER
-[SuppressMessage("Style", "IDE0280:Use 'nameof'", Justification = ".NET 6 is still supported")]
-#endif
 public partial class ConcurrentIndexedSet<TElement> : IDisposable
 {
     private readonly ReaderWriterLockEx _lock = new();
@@ -49,7 +46,7 @@ public partial class ConcurrentIndexedSet<TElement> : IDisposable
         Func<TElement, TIndexKey> indexAccessor,
         int skip = 0,
         int count = -1,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        [CallerArgumentExpression(nameof(indexAccessor))] string? indexName = null)
         where TIndexKey : notnull
     {
         using (AcquireReaderLock())
@@ -79,7 +76,7 @@ public partial class ConcurrentIndexedSet<TElement> : IDisposable
         Func<TElement, IEnumerable<TIndexKey>> indexAccessor,
         int skip = 0,
         int count = -1,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        [CallerArgumentExpression(nameof(indexAccessor))] string? indexName = null)
         where TIndexKey : notnull
     {
         using (AcquireReaderLock())
@@ -109,7 +106,7 @@ public partial class ConcurrentIndexedSet<TElement> : IDisposable
         Func<TElement, TIndexKey> indexAccessor,
         int skip = 0,
         int count = -1,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        [CallerArgumentExpression(nameof(indexAccessor))] string? indexName = null)
         where TIndexKey : notnull
     {
         using (AcquireReaderLock())
@@ -138,7 +135,7 @@ public partial class ConcurrentIndexedSet<TElement> : IDisposable
         Func<TElement, IEnumerable<TIndexKey>> indexAccessor,
         int skip = 0,
         int count = -1,
-        [CallerArgumentExpression("indexAccessor")] string? indexName = null)
+        [CallerArgumentExpression(nameof(indexAccessor))] string? indexName = null)
         where TIndexKey : notnull
     {
         using (AcquireReaderLock())

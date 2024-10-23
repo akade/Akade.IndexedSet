@@ -7,13 +7,13 @@
 internal class Lookup<TKey, TValue>
     where TKey : notnull
 {
-    private readonly Dictionary<TKey, HashSet<TValue>> _values = new();
+    private readonly Dictionary<TKey, HashSet<TValue>> _values = [];
 
     public bool Add(TKey key, TValue value)
     {
         if (!_values.TryGetValue(key, out HashSet<TValue>? keySet))
         {
-            keySet = _values[key] = new();
+            keySet = _values[key] = [];
         }
 
         if (keySet.Add(value))

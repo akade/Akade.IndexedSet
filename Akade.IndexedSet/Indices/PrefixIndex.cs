@@ -2,14 +2,9 @@
 using Akade.IndexedSet.Extensions;
 
 namespace Akade.IndexedSet.Indices;
-internal class PrefixIndex<TElement> : TypedIndex<TElement, string>
+internal class PrefixIndex<TElement>(string name) : TypedIndex<TElement, string>(name)
 {
-    private readonly Trie<TElement> _trie;
-
-    public PrefixIndex(string name) : base(name)
-    {
-        _trie = new();
-    }
+    private readonly Trie<TElement> _trie = new();
 
     internal override void Add(string key, TElement value)
     {

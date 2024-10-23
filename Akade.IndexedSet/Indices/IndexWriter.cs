@@ -17,18 +17,12 @@ internal abstract class TypedIndexWriter<TElement, TIndexKey, TIndex> : IndexWri
 
 }
 
-internal sealed class SingleKeyIndexWriter<TElement, TIndexKey, TIndex> : TypedIndexWriter<TElement, TIndexKey, TIndex>
+internal sealed class SingleKeyIndexWriter<TElement, TIndexKey, TIndex>(Func<TElement, TIndexKey> keyAccessor, TIndex index) : TypedIndexWriter<TElement, TIndexKey, TIndex>
     where TIndexKey : notnull
     where TIndex : TypedIndex<TElement, TIndexKey>
 {
-    private readonly Func<TElement, TIndexKey> _keyAccessor;
-    private readonly TIndex _index;
-
-    public SingleKeyIndexWriter(Func<TElement, TIndexKey> keyAccessor, TIndex index)
-    {
-        _keyAccessor = keyAccessor;
-        _index = index;
-    }
+    private readonly Func<TElement, TIndexKey> _keyAccessor = keyAccessor;
+    private readonly TIndex _index = index;
 
     internal override void Add(TElement element)
     {
@@ -46,18 +40,12 @@ internal sealed class SingleKeyIndexWriter<TElement, TIndexKey, TIndex> : TypedI
     }
 }
 
-internal sealed class MultiKeyIndexWriter<TElement, TIndexKey, TIndex> : TypedIndexWriter<TElement, TIndexKey, TIndex>
+internal sealed class MultiKeyIndexWriter<TElement, TIndexKey, TIndex>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, TIndex index) : TypedIndexWriter<TElement, TIndexKey, TIndex>
     where TIndexKey : notnull
     where TIndex : TypedIndex<TElement, TIndexKey>
 {
-    private readonly Func<TElement, IEnumerable<TIndexKey>> _keyAccessor;
-    private readonly TIndex _index;
-
-    public MultiKeyIndexWriter(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, TIndex index)
-    {
-        _keyAccessor = keyAccessor;
-        _index = index;
-    }
+    private readonly Func<TElement, IEnumerable<TIndexKey>> _keyAccessor = keyAccessor;
+    private readonly TIndex _index = index;
 
     internal override void Add(TElement element)
     {

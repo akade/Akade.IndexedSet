@@ -1,9 +1,11 @@
 ﻿using Akade.IndexedSet.DataStructures;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Akade.IndexedSet.Tests.DataStructures;
 
 [TestClass]
+[SuppressMessage("Performance", "CA1861:Avoid constant arrays as arguments", Justification = "In unit tests: readability > performance")]
 public class TrieTests
 {
     private readonly Trie<string> _trie = GetAnimalTrie();

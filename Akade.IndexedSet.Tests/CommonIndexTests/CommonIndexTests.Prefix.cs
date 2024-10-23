@@ -29,21 +29,21 @@ public partial class CommonIndexTests
 
         protected override Container<string>[] GetNonUniqueData()
         {
-            return new Container<string>[]
-            {
+            return
+            [
                 new("Mice"),
                 new("Possum"),
                 new("Possum"),
                 new("Rat"),
                 new("Rat"),
                 new("Rabbit"),
-            };
+            ];
         }
 
         protected override Container<string>[] GetUniqueData()
         {
-            return new Container<string>[]
-            {
+            return
+            [
                 new("Common snapping turtle"),
                 new("Common mallard"),
                 new("Domestic dog"),
@@ -51,7 +51,7 @@ public partial class CommonIndexTests
                 new("Mice"),
                 new("Rabbit"),
                 new("Possum"),
-            };
+            ];
         }
     }
 

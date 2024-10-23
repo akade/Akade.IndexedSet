@@ -35,10 +35,10 @@ internal class Trie<TElement>
 
         if (matchingNode is null)
         {
-            return Enumerable.Empty<TElement>();
+            return [];
         }
 
-        List<TElement> result = new();
+        List<TElement> result = [];
         AddRecursivlyToResult(matchingNode, result);
         return result;
     }
@@ -171,12 +171,12 @@ internal class Trie<TElement>
         {
             if (key.IsEmpty)
             {
-                _elements ??= new HashSet<TElement>();
+                _elements ??= [];
                 return _elements.Add(element);
             }
             else
             {
-                _children ??= new();
+                _children ??= [];
                 if (!_children.TryGetValue(key[0], out TrieNode? trieNode))
                 {
                     _children[key[0]] = trieNode = new();

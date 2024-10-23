@@ -15,7 +15,7 @@ public class UniqueIndices
     [TestInitialize]
     public void Init()
     {
-        TestData[] data = new[] { _a, _b, _c };
+        TestData[] data = [_a, _b, _c];
         _indexedSet = data.ToIndexedSet(x => x.PrimaryKey)
                           .WithUniqueIndex(x => x.IntProperty)
                           .WithUniqueIndex(x => x.GuidProperty)
@@ -50,7 +50,7 @@ public class UniqueIndices
     [TestMethod]
     public void retrieval_via_compound_key_returns_correct_items()
     {
-        TestData[] data = new[] { _a, _b, _c };
+        TestData[] data = [_a, _b, _c];
         _indexedSet = data.ToIndexedSet(x => x.PrimaryKey)
                           .WithUniqueIndex(x => (x.IntProperty, x.StringProperty))
                           .Build();
@@ -95,9 +95,9 @@ public class UniqueIndices
     [TestMethod]
     public void Retrieval_via_multi_key_retrieves_correct_items()
     {
-        static IEnumerable<int> Multikeys(TestData d) => new[] { d.PrimaryKey, d.IntProperty };
+        static IEnumerable<int> Multikeys(TestData d) => [d.PrimaryKey, d.IntProperty];
 
-        TestData[] data = new[] { _a, _b, _c };
+        TestData[] data = [_a, _b, _c];
         _indexedSet = data.ToIndexedSet(x => x.PrimaryKey)
                           .WithUniqueIndex(Multikeys)
                           .Build();

@@ -37,7 +37,7 @@ public class SearchSamples
     public void Search_for_person()
     {
         // Combine search results for each token
-        string[] tokens = Tokenize("John Doe").ToArray();
+        string[] tokens = [.. Tokenize("John Doe")];
         Person[] searchResult = tokens.SelectMany(x => _set.Contains(SearchIndex, x))
                                       .Distinct()
                                       .ToArray();
