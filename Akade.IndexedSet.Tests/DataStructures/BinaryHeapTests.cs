@@ -87,12 +87,12 @@ public class BinaryHeapTests
     [TestMethod]
     public void querying_by_range_returns_correct_ranges()
     {
-        //                           0  1  2  3  4  5  6  7  8  9
+        //              0  1  2  3  4  5  6  7  8  9
         _heap.AddRange([1, 2, 4, 4, 4, 4, 6, 6, 8, 9]);
-        // case 1:                   0  1
-        // case 2:                   0  -  -  -  -  -  -  -  -  9
-        // case 3:                      1  -  -  -  5
-        // case 4:                         2  -  -  -  -  7
+        // case 1:      0  1
+        // case 2:      0  -  -  -  -  -  -  -  -  9
+        // case 3:         1  -  -  -  5
+        // case 4:            2  -  -  -  -  7
 
         Assert.AreEqual(0..2, _heap.GetRange(0, 3));
         Assert.AreEqual(0..10, _heap.GetRange(0, 10));
@@ -104,12 +104,12 @@ public class BinaryHeapTests
     [TestMethod]
     public void querying_by_range_returns_correct_ranges_respecting_inclusive_or_exclusive_boundaries_when_boundaries_are_elements()
     {
-        //                           0  1  2  3  4  5  6  7  8  9  10
+        //              0  1  2  3  4  5  6  7  8  9  10
         _heap.AddRange([1, 2, 4, 4, 4, 4, 5, 6, 6, 8, 9]);
-        // case 1:                                     6  -  8
-        // case 1:                         2  -  -  -  -  -  8
-        // case 1:                                     6  -  -  9
-        // case 1:                         2  -  -  -  -  -  -  9
+        // case 1:                        6  -  8
+        // case 1:            2  -  -  -  -  -  8
+        // case 1:                        6  -  -  9
+        // case 1:            2  -  -  -  -  -  -  9
 
         Assert.AreEqual(6..9, _heap.GetRange(4, 8, inclusiveStart: false, inclusiveEnd: false));
         Assert.AreEqual(2..9, _heap.GetRange(4, 8, inclusiveStart: true, inclusiveEnd: false));
@@ -120,9 +120,9 @@ public class BinaryHeapTests
     [TestMethod]
     public void querying_by_range_returns_correct_ranges_respecting_inclusive_or_exclusive_boundaries_when_boundaries_are_not_elements()
     {
-        //                           0  1  2  3  4  5  6  7  8  9  10
+        //              0  1  2  3  4  5  6  7  8  9  10
         _heap.AddRange([1, 2, 4, 4, 4, 4, 5, 6, 6, 8, 9]);
-        // all cases:                      2  -  -  -  -  -  8
+        // all cases:         2  -  -  -  -  -  8
 
         Assert.AreEqual(2..9, _heap.GetRange(3, 7, inclusiveStart: false, inclusiveEnd: false));
         Assert.AreEqual(2..9, _heap.GetRange(3, 7, inclusiveStart: true, inclusiveEnd: false));
