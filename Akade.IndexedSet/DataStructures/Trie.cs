@@ -1,12 +1,13 @@
 ﻿using Akade.IndexedSet.Extensions;
 using Akade.IndexedSet.Utils;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 
 namespace Akade.IndexedSet.DataStructures;
 
 internal class Trie<TElement>
 {
-    private readonly TrieNode _root = new();
+    internal readonly TrieNode _root = new();
 
     public bool Add(ReadOnlySpan<char> key, TElement element)
     {
@@ -162,7 +163,7 @@ internal class Trie<TElement>
         _root.Clear();
     }
 
-    private class TrieNode
+    internal class TrieNode
     {
         internal Dictionary<char, TrieNode>? _children;
         internal HashSet<TElement>? _elements;
@@ -171,8 +172,7 @@ internal class Trie<TElement>
         {
             if (key.IsEmpty)
             {
-                _elements ??= [];
-                return _elements.Add(element);
+                return AddElement(element);
             }
             else
             {
@@ -184,6 +184,12 @@ internal class Trie<TElement>
 
                 return trieNode.Add(key[1..], element);
             }
+        }
+
+        internal bool AddElement(TElement element)
+        {
+            _elements ??= [];
+            return _elements.Add(element);
         }
 
         internal TrieNode? Find(ReadOnlySpan<char> key)
@@ -232,6 +238,14 @@ internal class Trie<TElement>
         {
             node = default;
             return _children?.TryGetValue(key, out node) ?? false;
+        }
+
+        internal TrieNode GetOrAddChildNode(char key)
+        {
+            _children ??= [];
+            ref TrieNode? node = ref CollectionsMarshal.GetValueRefOrAddDefault(_children, key, out bool _);
+            node ??= new();
+            return node;
         }
 
         internal bool HasElements()
