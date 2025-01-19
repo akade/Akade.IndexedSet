@@ -1,6 +1,7 @@
 ﻿using Akade.IndexedSet.Extensions;
 using Akade.IndexedSet.Utils;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 
 namespace Akade.IndexedSet.DataStructures;
 
@@ -177,11 +178,10 @@ internal class Trie<TElement>
             else
             {
                 _children ??= [];
-                if (!_children.TryGetValue(key[0], out TrieNode? trieNode))
-                {
-                    _children[key[0]] = trieNode = new();
-                }
 
+                ref TrieNode? trieNode = ref CollectionsMarshal.GetValueRefOrAddDefault(_children, key[0], out _);
+
+                trieNode ??= new();
                 return trieNode.Add(key[1..], element);
             }
         }

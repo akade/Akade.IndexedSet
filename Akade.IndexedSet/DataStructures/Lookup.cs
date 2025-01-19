@@ -1,4 +1,6 @@
-﻿namespace Akade.IndexedSet.DataStructures;
+﻿using System.Runtime.InteropServices;
+
+namespace Akade.IndexedSet.DataStructures;
 
 /// <summary>
 /// Modifiable lookup based on <see cref="Dictionary{TKey, TValue}"/> with <see cref="HashSet{T}"/> as value collection per key.
@@ -11,10 +13,8 @@ internal class Lookup<TKey, TValue>
 
     public bool Add(TKey key, TValue value)
     {
-        if (!_values.TryGetValue(key, out HashSet<TValue>? keySet))
-        {
-            keySet = _values[key] = [];
-        }
+        ref HashSet<TValue>? keySet = ref CollectionsMarshal.GetValueRefOrAddDefault(_values, key, out _);
+        keySet ??= [];
 
         if (keySet.Add(value))
         {
