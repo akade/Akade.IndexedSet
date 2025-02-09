@@ -16,7 +16,7 @@ public partial class CommonIndexTests
 
         protected override NonUniqueIndex<Container<int>, int> CreateIndex()
         {
-            return new NonUniqueIndex<Container<int>, int>("x => x.Value");
+            return new NonUniqueIndex<Container<int>, int>(EqualityComparer<int>.Default, "x => x.Value");
         }
 
         protected override Container<int>[] GetNonUniqueData()

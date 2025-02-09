@@ -1,4 +1,5 @@
 ﻿using Akade.IndexedSet.DataStructures;
+using Akade.IndexedSet.StringUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics.CodeAnalysis;
 
@@ -12,7 +13,7 @@ public class TrieTests
 
     private static Trie<string> GetAnimalTrie()
     {
-        Trie<string> trie = new();
+        Trie<string> trie = new(EqualityComparer<char>.Default);
 
         _ = AddToStringTrie(trie, "Tiger");
         _ = AddToStringTrie(trie, "Tarantula");
@@ -36,7 +37,7 @@ public class TrieTests
     [TestMethod]
     public void adding_the_same_element_returns_false()
     {
-        Trie<string> trie = new();
+        Trie<string> trie = new(EqualityComparer<char>.Default);
 
         Assert.IsTrue(AddToStringTrie(trie, "Cat"));
         Assert.IsFalse(AddToStringTrie(trie, "Cat"));
@@ -45,7 +46,7 @@ public class TrieTests
     [TestMethod]
     public void contains_returns_correct_value_when_adding_elements()
     {
-        Trie<string> trie = new();
+        Trie<string> trie = new(EqualityComparer<char>.Default);
 
         Assert.IsFalse(ContainsInStringTrie(trie, "Cat"));
         Assert.IsTrue(AddToStringTrie(trie, "Cat"));
@@ -55,7 +56,7 @@ public class TrieTests
     [TestMethod]
     public void contains_returns_correct_value_when_removing_elements()
     {
-        Trie<string> trie = new();
+        Trie<string> trie = new(EqualityComparer<char>.Default);
         _ = AddToStringTrie(trie, "Cat");
 
         Assert.IsTrue(ContainsInStringTrie(trie, "Cat"));
@@ -66,7 +67,7 @@ public class TrieTests
     [TestMethod]
     public void removing_returns_false_if_the_element_is_not_present()
     {
-        Trie<string> trie = new();
+        Trie<string> trie = new(EqualityComparer<char>.Default);
         Assert.IsFalse(RemoveFromStringTrie(trie, "Cat"));
     }
 
@@ -111,6 +112,19 @@ public class TrieTests
     {
         IEnumerable<string> result = _trie.FuzzySearch("Zan", 1, false);
         CollectionAssert.AreEquivalent(new[] { "Panther", "Pangolin" }, result.ToArray());
+    }
+
+    [TestMethod]
+    public void case_insensitive_exact_match()
+    {
+        // the keys are the same as the values, i.e. the different capitalizations are stored under the same key as different values
+        Trie<string> trie = new(CharEqualityComparer.OrdinalIgnoreCase);
+        _ = AddToStringTrie(trie, "cat");
+        _ = AddToStringTrie(trie, "Cat");
+        _ = AddToStringTrie(trie, "CAT");
+
+        IEnumerable<string> result = trie.Get("cat");
+        CollectionAssert.AreEquivalent(new[] { "cat", "Cat", "CAT" }, result.ToArray());
     }
 
     private static bool AddToStringTrie(Trie<string> stringTrie, string value)

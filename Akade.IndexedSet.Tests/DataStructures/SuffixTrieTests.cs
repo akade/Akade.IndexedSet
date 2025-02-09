@@ -13,7 +13,7 @@ public class SuffixTrieTests
     [TestInitialize]
     public void TestInitializer()
     {
-        _trie = new();
+        _trie = new(EqualityComparer<char>.Default);
         _ = AddToStringTrie(_trie, "Tiger");
         _ = AddToStringTrie(_trie, "Tarantula");
         _ = AddToStringTrie(_trie, "Penguin");
@@ -51,7 +51,7 @@ public class SuffixTrieTests
     [TestMethod]
     public void adding_the_same_element_return_false()
     {
-        SuffixTrie<string> trie = new();
+        SuffixTrie<string> trie = new(EqualityComparer<char>.Default);
 
         Assert.IsTrue(AddToStringTrie(trie, "Cat"));
         Assert.IsFalse(AddToStringTrie(trie, "Cat"));
@@ -60,7 +60,7 @@ public class SuffixTrieTests
     [TestMethod]
     public void contains_returns_correct_value_when_adding_elements()
     {
-        SuffixTrie<string> trie = new();
+        SuffixTrie<string> trie = new(EqualityComparer<char>.Default);
 
         Assert.IsFalse(ContainsInStringTrie(trie, "Cat"));
         Assert.IsTrue(AddToStringTrie(trie, "Cat"));
@@ -70,7 +70,7 @@ public class SuffixTrieTests
     [TestMethod]
     public void contains_returns_correct_value_when_removing_elements()
     {
-        SuffixTrie<string> trie = new();
+        SuffixTrie<string> trie = new(EqualityComparer<char>.Default);
 
         _ = AddToStringTrie(trie, "Cat");
         Assert.IsTrue(ContainsInStringTrie(trie, "Cat"));
@@ -81,7 +81,7 @@ public class SuffixTrieTests
     [TestMethod]
     public void removing_returns_false_if_the_element_is_not_present()
     {
-        SuffixTrie<string> trie = new();
+        SuffixTrie<string> trie = new(EqualityComparer<char>.Default);
         Assert.IsFalse(RemoveFromStringTrie(trie, "Cat"));
     }
 

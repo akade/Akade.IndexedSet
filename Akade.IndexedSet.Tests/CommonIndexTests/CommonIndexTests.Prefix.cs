@@ -19,7 +19,7 @@ public partial class CommonIndexTests
 
         protected override PrefixIndex<Container<string>> CreateIndex()
         {
-            return new PrefixIndex<Container<string>>("Test");
+            return new PrefixIndex<Container<string>>(EqualityComparer<char>.Default, "Test");
         }
 
         protected override string GetNotExistingKey()

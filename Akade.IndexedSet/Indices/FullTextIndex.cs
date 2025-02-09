@@ -14,14 +14,14 @@ internal sealed class FullTextIndex<TElement> : TypedIndex<TElement, string>
     private readonly CandidateMatchCheck _checkCandidateMatch;
     private readonly FuzzyCandidateMatchCheck _checkFuzzyCandidateMatch;
 
-    public FullTextIndex(Func<TElement, string> keyAccessor, string name) : base(name)
+    public FullTextIndex(Func<TElement, string> keyAccessor, IEqualityComparer<char> equalityComparer, string name) : base(name)
     {
         _checkCandidateMatch = (elem, startsWith) => MemoryExtensions.StartsWith(keyAccessor(elem), startsWith, StringComparison.Ordinal);
         _checkFuzzyCandidateMatch = (elem, startsWith, maxDistance) => VerifyFuzzyStartsWith(keyAccessor(elem), startsWith, maxDistance);
-        _suffixTrie = new();
+        _suffixTrie = new(equalityComparer);
     }
 
-    public FullTextIndex(Func<TElement, IEnumerable<string>> keyAccessor, string name) : base(name)
+    public FullTextIndex(Func<TElement, IEnumerable<string>> keyAccessor, IEqualityComparer<char> equalityComparer, string name) : base(name)
     {
         _checkCandidateMatch = (elem, startsWith) =>
         {
@@ -44,7 +44,7 @@ internal sealed class FullTextIndex<TElement> : TypedIndex<TElement, string>
 
             return false;
         };
-        _suffixTrie = new();
+        _suffixTrie = new(equalityComparer);
     }
 
     internal override void Add(string key, TElement value)

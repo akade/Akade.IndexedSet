@@ -98,14 +98,16 @@ public class IndexedSetBuilder<TElement>
     /// <typeparam name="TIndexKey">The type of the key within the index</typeparam>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
     /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
+    /// <param name="keyComparer">The comparer to use for the index. If not specified, the default comparer for <typeparamref name="TIndexKey"/> is used.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="keyAccessor"/> is automatically passed by the compiler.</param>
     /// <returns>The instance on which this method is called is returned to support the fluent syntax.</returns>
-    public virtual IndexedSetBuilder<TElement> WithUniqueIndex<TIndexKey>(Func<TElement, TIndexKey> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    public virtual IndexedSetBuilder<TElement> WithUniqueIndex<TIndexKey>(Func<TElement, TIndexKey> keyAccessor, IEqualityComparer<TIndexKey>? keyComparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
         where TIndexKey : notnull
     {
         ArgumentNullException.ThrowIfNull(indexName);
+        keyComparer ??= EqualityComparer<TIndexKey>.Default;
 
-        _result.AddIndex(keyAccessor, new UniqueIndex<TElement, TIndexKey>(indexName));
+        _result.AddIndex(keyAccessor, new UniqueIndex<TElement, TIndexKey>(keyComparer, indexName));
 
         return this;
     }
@@ -120,14 +122,16 @@ public class IndexedSetBuilder<TElement>
     /// <typeparam name="TIndexKey">The type of the key within the index</typeparam>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
     /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
+    /// <param name="keyComparer">The comparer to use for the index. If not specified, the default comparer for <typeparamref name="TIndexKey"/> is used.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="keyAccessor"/> is automatically passed by the compiler.</param>
     /// <returns>The instance on which this method is called is returned to support the fluent syntax.</returns>
-    public virtual IndexedSetBuilder<TElement> WithUniqueIndex<TIndexKey>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    public virtual IndexedSetBuilder<TElement> WithUniqueIndex<TIndexKey>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, IEqualityComparer<TIndexKey>? keyComparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
         where TIndexKey : notnull
     {
         ArgumentNullException.ThrowIfNull(indexName);
+        keyComparer ??= EqualityComparer<TIndexKey>.Default;
 
-        _result.AddIndex(keyAccessor, new UniqueIndex<TElement, TIndexKey>(indexName));
+        _result.AddIndex(keyAccessor, new UniqueIndex<TElement, TIndexKey>(keyComparer, indexName));
 
         return this;
     }
@@ -142,14 +146,16 @@ public class IndexedSetBuilder<TElement>
     /// <typeparam name="TIndexKey">The type of the key within the index</typeparam>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
     /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
+    /// <param name="keyComparer">The comparer to use for the index. If not specified, the default comparer for <typeparamref name="TIndexKey"/> is used.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="keyAccessor"/> is automatically passed by the compiler.</param>
     /// <returns>The instance on which this method is called is returned to support the fluent syntax.</returns>
-    public virtual IndexedSetBuilder<TElement> WithIndex<TIndexKey>(Func<TElement, TIndexKey> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    public virtual IndexedSetBuilder<TElement> WithIndex<TIndexKey>(Func<TElement, TIndexKey> keyAccessor, IEqualityComparer<TIndexKey>? keyComparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
         where TIndexKey : notnull
     {
         ArgumentNullException.ThrowIfNull(indexName);
+        keyComparer ??= EqualityComparer<TIndexKey>.Default;
 
-        _result.AddIndex(keyAccessor, new NonUniqueIndex<TElement, TIndexKey>(indexName));
+        _result.AddIndex(keyAccessor, new NonUniqueIndex<TElement, TIndexKey>(keyComparer, indexName));
 
         return this;
     }
@@ -164,14 +170,16 @@ public class IndexedSetBuilder<TElement>
     /// <typeparam name="TIndexKey">The type of the key within the index</typeparam>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
     /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
+    /// <param name="keyComparer">The comparer to use for the index. If not specified, the default comparer for <typeparamref name="TIndexKey"/> is used.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="keyAccessor"/> is automatically passed by the compiler.</param>
     /// <returns>The instance on which this method is called is returned to support the fluent syntax.</returns>
-    public virtual IndexedSetBuilder<TElement> WithIndex<TIndexKey>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    public virtual IndexedSetBuilder<TElement> WithIndex<TIndexKey>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, IEqualityComparer<TIndexKey>? keyComparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
         where TIndexKey : notnull
     {
         ArgumentNullException.ThrowIfNull(indexName);
+        keyComparer ??= EqualityComparer<TIndexKey>.Default;
 
-        _result.AddIndex(keyAccessor, new NonUniqueIndex<TElement, TIndexKey>(indexName));
+        _result.AddIndex(keyAccessor, new NonUniqueIndex<TElement, TIndexKey>(keyComparer, indexName));
 
         return this;
     }
@@ -186,14 +194,16 @@ public class IndexedSetBuilder<TElement>
     /// <typeparam name="TIndexKey">The type of the key within the index</typeparam>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
     /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
+    /// <param name="keyComparer">The comparer to use for the index. If not specified, the default comparer for <typeparamref name="TIndexKey"/> is used.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="keyAccessor"/> is automatically passed by the compiler.</param>
     /// <returns>The instance on which this method is called is returned to support the fluent syntax.</returns>
-    public virtual IndexedSetBuilder<TElement> WithRangeIndex<TIndexKey>(Func<TElement, TIndexKey> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    public virtual IndexedSetBuilder<TElement> WithRangeIndex<TIndexKey>(Func<TElement, TIndexKey> keyAccessor, IComparer<TIndexKey>? keyComparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
         where TIndexKey : notnull
     {
         ArgumentNullException.ThrowIfNull(indexName);
+        keyComparer ??= Comparer<TIndexKey>.Default;
 
-        _result.AddIndex(keyAccessor, new RangeIndex<TElement, TIndexKey>(indexName));
+        _result.AddIndex(keyAccessor, new RangeIndex<TElement, TIndexKey>(keyComparer, indexName));
 
         return this;
     }
@@ -208,34 +218,16 @@ public class IndexedSetBuilder<TElement>
     /// <typeparam name="TIndexKey">The type of the key within the index</typeparam>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
     /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
+    /// <param name="keyComparer">The comparer to use for the index. If not specified, the default comparer for <typeparamref name="TIndexKey"/> is used.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="keyAccessor"/> is automatically passed by the compiler.</param>
     /// <returns>The instance on which this method is called is returned to support the fluent syntax.</returns>
-    public virtual IndexedSetBuilder<TElement> WithRangeIndex<TIndexKey>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    public virtual IndexedSetBuilder<TElement> WithRangeIndex<TIndexKey>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, IComparer<TIndexKey>? keyComparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
         where TIndexKey : notnull
     {
         ArgumentNullException.ThrowIfNull(indexName);
+        keyComparer ??= Comparer<TIndexKey>.Default;
 
-        _result.AddIndex(keyAccessor, new MultiRangeIndex<TElement, TIndexKey>(indexName));
-
-        return this;
-    }
-
-    /// <summary>
-    /// Configures the <see cref="IndexedSet{TPrimaryKey, TElement}"/> to have a full text index based on a secondary key that 
-    /// supports fuzzy search on string startswith/contains queries. The secondary key can be any expression that does not change while 
-    /// the element is within the indexed set. The name of the index is based on the 
-    /// string representation of the expression and passed by the compiler to <paramref name="indexName"/>. 
-    /// The convention is to always use x as a lambda parameter: x => x.StringProp1. Alternativly, you can also always use the same method from a static class.
-    /// </summary>
-    /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
-    /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
-    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="keyAccessor"/> is automatically passed by the compiler.</param>
-    /// <returns>The instance on which this method is called is returned to support the fluent syntax.</returns>
-    public virtual IndexedSetBuilder<TElement> WithFullTextIndex(Func<TElement, string> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
-    {
-        ArgumentNullException.ThrowIfNull(indexName);
-
-        _result.AddIndex(keyAccessor, new FullTextIndex<TElement>(keyAccessor, indexName));
+        _result.AddIndex(keyAccessor, new MultiRangeIndex<TElement, TIndexKey>(keyComparer, indexName));
 
         return this;
     }
@@ -249,14 +241,38 @@ public class IndexedSetBuilder<TElement>
     /// </summary>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
     /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
+    /// <param name="comparer">The comparer to use for the index. If not specified, the default comparer is used.</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="keyAccessor"/> is automatically passed by the compiler.</param>
+    /// <returns>The instance on which this method is called is returned to support the fluent syntax.</returns>
+    public virtual IndexedSetBuilder<TElement> WithFullTextIndex(Func<TElement, string> keyAccessor, IEqualityComparer<char>? comparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    {
+        ArgumentNullException.ThrowIfNull(indexName);
+        comparer ??= EqualityComparer<char>.Default;
+
+        _result.AddIndex(keyAccessor, new FullTextIndex<TElement>(keyAccessor, comparer, indexName));
+
+        return this;
+    }
+
+    /// <summary>
+    /// Configures the <see cref="IndexedSet{TPrimaryKey, TElement}"/> to have a full text index based on a secondary key that 
+    /// supports fuzzy search on string startswith/contains queries. The secondary key can be any expression that does not change while 
+    /// the element is within the indexed set. The name of the index is based on the 
+    /// string representation of the expression and passed by the compiler to <paramref name="indexName"/>. 
+    /// The convention is to always use x as a lambda parameter: x => x.StringProp1. Alternativly, you can also always use the same method from a static class.
+    /// </summary>
+    /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
+    /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
+    /// <param name="comparer">The comparer to use for the index. If not specified, the default comparer is used.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="keyAccessor"/> is automatically passed by the compiler.</param>
     /// <returns>The instance on which this method is called is returned to support the fluent syntax.</returns>
     [Experimental(Experiments.TextSearchImprovements, UrlFormat = Experiments.UrlTemplate)]
-    public virtual IndexedSetBuilder<TElement> WithFullTextIndex(Func<TElement, IEnumerable<string>> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    public virtual IndexedSetBuilder<TElement> WithFullTextIndex(Func<TElement, IEnumerable<string>> keyAccessor, IEqualityComparer<char>? comparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
     {
         ArgumentNullException.ThrowIfNull(indexName);
+        comparer ??= EqualityComparer<char>.Default;
 
-        _result.AddIndex(keyAccessor, new FullTextIndex<TElement>(keyAccessor, indexName));
+        _result.AddIndex(keyAccessor, new FullTextIndex<TElement>(keyAccessor, comparer, indexName));
 
         return this;
     }
@@ -270,13 +286,15 @@ public class IndexedSetBuilder<TElement>
     /// </summary>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
     /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
+    /// <param name="comparer">The comparer to use for the index. If not specified, the default comparer is used.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="keyAccessor"/> is automatically passed by the compiler.</param>
     /// <returns>The instance on which this method is called is returned to support the fluent syntax.</returns>
-    public virtual IndexedSetBuilder<TElement> WithPrefixIndex(Func<TElement, string> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    public virtual IndexedSetBuilder<TElement> WithPrefixIndex(Func<TElement, string> keyAccessor, IEqualityComparer<char>? comparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
     {
         ArgumentNullException.ThrowIfNull(indexName);
+        comparer ??= EqualityComparer<char>.Default;
 
-        _result.AddIndex(keyAccessor, new PrefixIndex<TElement>(indexName));
+        _result.AddIndex(keyAccessor, new PrefixIndex<TElement>(comparer, indexName));
 
         return this;
     }
@@ -290,14 +308,16 @@ public class IndexedSetBuilder<TElement>
     /// </summary>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
     /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
+    /// <param name="comparer">The comparer to use for the index. If not specified, the default comparer is used.</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="keyAccessor"/> is automatically passed by the compiler.</param>
     /// <returns>The instance on which this method is called is returned to support the fluent syntax.</returns>
     [Experimental(Experiments.TextSearchImprovements, UrlFormat = Experiments.UrlTemplate)]
-    public virtual IndexedSetBuilder<TElement> WithPrefixIndex(Func<TElement, IEnumerable<string>> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    public virtual IndexedSetBuilder<TElement> WithPrefixIndex(Func<TElement, IEnumerable<string>> keyAccessor, IEqualityComparer<char>? comparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
     {
         ArgumentNullException.ThrowIfNull(indexName);
+        comparer ??= EqualityComparer<char>.Default;
 
-        _result.AddIndex(keyAccessor, new PrefixIndex<TElement>(indexName));
+        _result.AddIndex(keyAccessor, new PrefixIndex<TElement>(comparer, indexName));
 
         return this;
     }
@@ -332,64 +352,64 @@ public class IndexedSetBuilder<TPrimaryKey, TElement> : IndexedSetBuilder<TEleme
     where TPrimaryKey : notnull
 {
 
-    internal IndexedSetBuilder(Func<TElement, TPrimaryKey> primaryKeyAccessor, IEnumerable<TElement>? initialContent, string primaryKeyIndexName) : base(new IndexedSet<TPrimaryKey, TElement>(primaryKeyAccessor, primaryKeyIndexName), initialContent)
+    internal IndexedSetBuilder(Func<TElement, TPrimaryKey> primaryKeyAccessor, IEnumerable<TElement>? initialContent, string primaryKeyIndexName, IEqualityComparer<TPrimaryKey>? keyComparer = null)
+        : base(new IndexedSet<TPrimaryKey, TElement>(primaryKeyAccessor, keyComparer, primaryKeyIndexName), initialContent)
     {
     }
 
     /// <inheritdoc />
-    public override IndexedSetBuilder<TPrimaryKey, TElement> WithIndex<TIndexKey>(Func<TElement, TIndexKey> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    public override IndexedSetBuilder<TPrimaryKey, TElement> WithIndex<TIndexKey>(Func<TElement, TIndexKey> keyAccessor, IEqualityComparer<TIndexKey>? keyComparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
     {
-        _ = base.WithIndex(keyAccessor, indexName);
+        _ = base.WithIndex(keyAccessor, keyComparer, indexName);
         return this;
     }
 
     /// <inheritdoc />
-    public override IndexedSetBuilder<TPrimaryKey, TElement> WithIndex<TIndexKey>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    public override IndexedSetBuilder<TPrimaryKey, TElement> WithIndex<TIndexKey>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, IEqualityComparer<TIndexKey>? keyComparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
     {
-        _ = base.WithIndex(keyAccessor, indexName);
+        _ = base.WithIndex(keyAccessor, keyComparer, indexName);
         return this;
     }
 
     /// <inheritdoc />
-    public override IndexedSetBuilder<TPrimaryKey, TElement> WithRangeIndex<TIndexKey>(Func<TElement, TIndexKey> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    public override IndexedSetBuilder<TPrimaryKey, TElement> WithRangeIndex<TIndexKey>(Func<TElement, TIndexKey> keyAccessor, IComparer<TIndexKey>? keyComparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
     {
-        _ = base.WithRangeIndex(keyAccessor, indexName);
+        _ = base.WithRangeIndex(keyAccessor, keyComparer, indexName);
         return this;
     }
 
     /// <inheritdoc />
-    public override IndexedSetBuilder<TPrimaryKey, TElement> WithRangeIndex<TIndexKey>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    public override IndexedSetBuilder<TPrimaryKey, TElement> WithRangeIndex<TIndexKey>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, IComparer<TIndexKey>? keyComparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
     {
-        _ = base.WithRangeIndex(keyAccessor, indexName);
+        _ = base.WithRangeIndex(keyAccessor, keyComparer, indexName);
         return this;
     }
 
     /// <inheritdoc />
-    public override IndexedSetBuilder<TPrimaryKey, TElement> WithUniqueIndex<TIndexKey>(Func<TElement, TIndexKey> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    public override IndexedSetBuilder<TPrimaryKey, TElement> WithUniqueIndex<TIndexKey>(Func<TElement, TIndexKey> keyAccessor, IEqualityComparer<TIndexKey>? keyComparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
     {
-        _ = base.WithUniqueIndex(keyAccessor, indexName);
+        _ = base.WithUniqueIndex(keyAccessor, keyComparer, indexName);
         return this;
     }
 
     /// <inheritdoc />
-    public override IndexedSetBuilder<TPrimaryKey, TElement> WithUniqueIndex<TIndexKey>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    public override IndexedSetBuilder<TPrimaryKey, TElement> WithUniqueIndex<TIndexKey>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, IEqualityComparer<TIndexKey>? keyComparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
     {
-        _ = base.WithUniqueIndex(keyAccessor, indexName);
-        return this;
-    }
-
-
-    /// <inheritdoc />
-    public override IndexedSetBuilder<TPrimaryKey, TElement> WithFullTextIndex(Func<TElement, string> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
-    {
-        _ = base.WithFullTextIndex(keyAccessor, indexName);
+        _ = base.WithUniqueIndex(keyAccessor, keyComparer, indexName);
         return this;
     }
 
     /// <inheritdoc />
-    public override IndexedSetBuilder<TPrimaryKey, TElement> WithPrefixIndex(Func<TElement, string> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    public override IndexedSetBuilder<TPrimaryKey, TElement> WithFullTextIndex(Func<TElement, string> keyAccessor, IEqualityComparer<char>? comparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
     {
-        _ = base.WithPrefixIndex(keyAccessor, indexName);
+        _ = base.WithFullTextIndex(keyAccessor, comparer, indexName);
+        return this;
+    }
+
+    /// <inheritdoc />
+    public override IndexedSetBuilder<TPrimaryKey, TElement> WithPrefixIndex(Func<TElement, string> keyAccessor, IEqualityComparer<char>? comparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    {
+        _ = base.WithPrefixIndex(keyAccessor, comparer, indexName);
         return this;
     }
 

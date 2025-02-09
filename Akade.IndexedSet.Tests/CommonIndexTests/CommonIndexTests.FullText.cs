@@ -20,7 +20,7 @@ public partial class CommonIndexTests
 
         protected override FullTextIndex<Container<string>> CreateIndex()
         {
-            return new FullTextIndex<Container<string>>(x => x.Value, "Test");
+            return new FullTextIndex<Container<string>>(x => x.Value, EqualityComparer<char>.Default, "Test");
         }
 
         protected override string GetNotExistingKey()

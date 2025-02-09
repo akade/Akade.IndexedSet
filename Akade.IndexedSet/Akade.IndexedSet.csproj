@@ -49,4 +49,8 @@
 		<AdditionalFiles Include="PublicAPI/PublicAPI.Shipped.txt" />
 		<AdditionalFiles Include="PublicAPI/PublicAPI.Unshipped.txt" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="StringUtilities\" />
+	</ItemGroup>
 </Project>

@@ -3,10 +3,10 @@
 /// <summary>
 /// Unique index providing O(1) retrieval and insertion as well as enforcing unqueness
 /// </summary>
-internal class UniqueIndex<TElement, TIndexKey>(string name) : TypedIndex<TElement, TIndexKey>(name)
+internal class UniqueIndex<TElement, TIndexKey>(IEqualityComparer<TIndexKey> equalityComparer, string name) : TypedIndex<TElement, TIndexKey>(name)
     where TIndexKey : notnull
 {
-    private readonly Dictionary<TIndexKey, TElement> _data = [];
+    private readonly Dictionary<TIndexKey, TElement> _data = new(equalityComparer);
 
     internal override void Add(TIndexKey key, TElement value)
     {

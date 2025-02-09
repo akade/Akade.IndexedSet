@@ -13,7 +13,7 @@ public class BinaryHeapTests
     [TestInitialize]
     public void TestInitialize()
     {
-        _heap = [];
+        _heap = new(Comparer<int>.Default);
     }
 
     [TestMethod]

@@ -18,7 +18,7 @@ public partial class CommonIndexTests
 
         protected override RangeIndex<Container<int>, int> CreateIndex()
         {
-            return new RangeIndex<Container<int>, int>("Test");
+            return new RangeIndex<Container<int>, int>(Comparer<int>.Default, "Test");
         }
 
         protected override Container<int>[] GetNonUniqueData()
