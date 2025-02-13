@@ -81,12 +81,12 @@ public class MultiValueIndices
     public void custom_comparer_trygetsingle()
     {
         Assert.IsTrue(_indexedSet.TryGetSingle(IntListWithComparer, 4, out DenormalizedTestData? test1));
-        Assert.Equals(_a, test1);
+        Assert.AreEqual(_a, test1);
 
         Assert.IsFalse(_indexedSet.TryGetSingle(IntListWithComparer, 1, out DenormalizedTestData? test2));
         Assert.IsNull(test2);
 
-        Assert.IsFalse(_indexedSet.TryGetSingle(IntListWithComparer, 5, out DenormalizedTestData? test3));
+        Assert.IsFalse(_indexedSet.TryGetSingle(IntListWithComparer, 6, out DenormalizedTestData? test3));
         Assert.IsNull(test3);
     }
 
