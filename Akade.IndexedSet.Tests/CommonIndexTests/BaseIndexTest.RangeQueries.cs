@@ -3,7 +3,7 @@
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
 internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
 {
-    [TestMethod]
+    [BaseTestMethod]
     public void Range_based_methods_should_throw_if_not_supported()
     {
         if (!SupportsRangeBasedQueries)
@@ -23,7 +23,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void Range_returns_empty_result_if_not_present()
     {
         if (SupportsRangeBasedQueries)
@@ -33,7 +33,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void Range_returns_sorted_elements_respecting_boundary_parameters_for_unique_data()
     {
         if (SupportsRangeBasedQueries)
@@ -53,7 +53,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void Comparison_queries_return_empty_result_if_no_element_is_present()
     {
         if (SupportsRangeBasedQueries)
@@ -66,7 +66,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void Comparison_queries_return_sorted_elements_respecting_boundary()
     {
         if (SupportsRangeBasedQueries)
@@ -84,7 +84,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void MaxMin_throw_if_the_set_is_empty()
     {
         if (SupportsRangeBasedQueries)
@@ -95,7 +95,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void MaxMin_return_empty_enumerable_if_the_set_is_empty()
     {
         if (SupportsRangeBasedQueries)
@@ -106,7 +106,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void MaxMin_return_correct_key_and_values()
     {
         if (SupportsRangeBasedQueries)
@@ -125,7 +125,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void OrderBy_returns_empty_values_with_no_data()
     {
         if (SupportsRangeBasedQueries)
@@ -135,7 +135,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void OrderBy_throws_if_skip_value_is_too_large()
     {
         if (SupportsRangeBasedQueries)
@@ -147,7 +147,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void OrderBy_returns_sorted_values()
     {
         if (SupportsRangeBasedQueries)
@@ -164,7 +164,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void OrderByDescending_returns_empty_values_with_no_data()
     {
         if (SupportsRangeBasedQueries)
@@ -174,7 +174,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void OrderByDescending_throws_if_skip_value_is_too_large()
     {
         if (SupportsRangeBasedQueries)
@@ -186,7 +186,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void OrderByDescending_returns_sorted_values()
     {
         if (SupportsRangeBasedQueries)

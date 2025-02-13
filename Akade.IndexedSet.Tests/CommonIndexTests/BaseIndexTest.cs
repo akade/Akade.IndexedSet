@@ -38,7 +38,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>(Func<
         index.AddRange(elements.Select(element => KeyValuePair.Create(_keyAccessor(element), element)));
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void Adding_unique_data_should_throw_if_nonunique_keys_are_not_supported()
     {
         if (!SupportsNonUniqueKeys)
@@ -48,13 +48,16 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>(Func<
     }
 }
 
+[AttributeUsage(AttributeTargets.Method)]
+internal class BaseTestMethodAttribute : Attribute { }
+
 public static class BaseIndexTest
 {
     public static IEnumerable<object[]> GetTestMethods<T>()
     {
         return typeof(T).GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
                         .Where(m => m.Name != "Test")
-                        .Where(m => m.GetCustomAttribute(typeof(TestMethodAttribute)) is not null)
+                        .Where(m => m.GetCustomAttribute<BaseTestMethodAttribute>() is not null)
                         .Select(m => new object[] { m.Name })
                         .ToArray();
     }

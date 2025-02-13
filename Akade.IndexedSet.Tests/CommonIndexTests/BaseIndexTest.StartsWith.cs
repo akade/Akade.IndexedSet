@@ -3,7 +3,7 @@
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
 internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
 {
-    [TestMethod]
+    [BaseTestMethod]
     public void StartsWith_based_methods_should_throw_if_not_supported()
     {
         if (!SupportsStartsWithQueries)
@@ -13,7 +13,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void StartsWith_returns_empty_set_if_set_is_empty()
     {
         if (SupportsStartsWithQueries)
@@ -23,7 +23,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void StartsWith_returns_empty_set_if_no_matching_key_is_available()
     {
         if (SupportsStartsWithQueries)
@@ -34,7 +34,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void StartsWith_returns_matching_item()
     {
         if (SupportsStartsWithQueries)
@@ -46,7 +46,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void StartsWith_returns_multiple_matching_item()
     {
         if (SupportsStartsWithQueries)
@@ -62,7 +62,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void FuzzyStartsWith_based_methods_should_throw_if_not_supported()
     {
         if (!SupportsStartsWithQueries)
@@ -72,7 +72,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void FuzzyStartsWith_returns_empty_set_if_set_is_empty()
     {
         if (SupportsStartsWithQueries)
@@ -82,7 +82,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void FuzzyStartsWith_returns_empty_set_if_no_matching_key_is_available()
     {
         if (SupportsStartsWithQueries)
@@ -93,7 +93,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void FuzzyStartsWith_returns_matching_item()
     {
         if (SupportsStartsWithQueries)
@@ -110,7 +110,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void FuzzyStartsWith_returns_multiple_matching_item()
     {
         if (SupportsStartsWithQueries)

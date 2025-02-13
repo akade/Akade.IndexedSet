@@ -18,7 +18,10 @@ public static class CharEqualityComparer
     /// Gets a <see cref="IEqualityComparer{T}"/> that performs an ordinal equality comparison of <see cref="char"/> values using <see cref="char.ToUpper(char, CultureInfo)"/>.
     /// </summary>
     /// <param name="cultureInfo">The culture used for the case transformation</param>
-    public static IEqualityComparer<char> IgnoreCase(CultureInfo cultureInfo) => new IgnoreCaseCharEqualityComparer(cultureInfo);
+    public static IEqualityComparer<char> IgnoreCase(CultureInfo cultureInfo)
+    {
+        return new IgnoreCaseCharEqualityComparer(cultureInfo);
+    }
 }
 
 internal class IgnoreCaseCharEqualityComparer(CultureInfo cultureInfo) : IEqualityComparer<char>

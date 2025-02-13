@@ -52,10 +52,9 @@ public class FullTextIndices
     }
 
     [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
     public void single_item_retrieval_throws_exception_if_there_is_more_than_one_result()
     {
-        _indexedSet.AssertSingleItem(x => x.Category, _bonobo);
+        _ = Assert.ThrowsException<InvalidOperationException>(() => _indexedSet.AssertSingleItem(x => x.Category, _bonobo));
     }
 
     [TestMethod]
