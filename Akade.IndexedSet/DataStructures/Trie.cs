@@ -79,7 +79,7 @@ internal class Trie<TElement>(IEqualityComparer<char> equalityComparer)
         for (int i = 1; i < currentRow.Length; i++)
         {
             int insertOrDeletion = Math.Min(currentRow[i - 1] + 1, lastRow[i] + 1);
-            int replacement = word[i - 1] == ch ? lastRow[i - 1] : lastRow[i - 1] + 1;
+            int replacement = equalityComparer.Equals(word[i - 1], ch) ? lastRow[i - 1] : lastRow[i - 1] + 1;
             currentRow[i] = Math.Min(insertOrDeletion, replacement);
             minDistance = Math.Min(minDistance, currentRow[i]);
         }

@@ -1,3 +1,4 @@
+using Akade.IndexedSet.StringUtilities;
 using Akade.IndexedSet.Tests.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics.CodeAnalysis;
@@ -10,6 +11,7 @@ public class FullTextIndices
     private record class Animal(string Name, string Category);
 
     private IndexedSet<Animal> _indexedSet = null!;
+    private Animal[] _allAnimals = null!;
     private readonly Animal _bonobo = new("Bonobo", "Mammal");
     private readonly Animal _booby = new("Booby", "Bird");
     private readonly Animal _boomslang = new("Boomslang", "Reptile");
@@ -25,7 +27,7 @@ public class FullTextIndices
     [TestInitialize]
     public void Init()
     {
-        var data = new Animal[] {
+        _allAnimals = [
             _bonobo,
             _booby,
             _boomslang,
@@ -37,11 +39,11 @@ public class FullTextIndices
             _panther,
             _pangolin,
             _parrot,
-        };
-        _indexedSet = data.ToIndexedSet()
-                          .WithFullTextIndex(x => x.Category)
-                          .WithFullTextIndex(x => x.Name)
-                          .Build();
+        ];
+        _indexedSet = _allAnimals.ToIndexedSet()
+                                 .WithFullTextIndex(x => x.Category)
+                                 .WithFullTextIndex(x => x.Name)
+                                 .Build();
     }
 
     [TestMethod]
@@ -136,5 +138,33 @@ public class FullTextIndices
 
         CollectionAssert.AreEquivalent(_indexedSet.StartsWith(Multikeys, "Bir").ToArray(), new[] { _booby, _penguin, _parrot });
         CollectionAssert.AreEquivalent(_indexedSet.FuzzyStartsWith(Multikeys, "Lir", 1).ToArray(), new[] { _booby, _penguin, _parrot });
+    }
+
+    [TestMethod]
+    public void Case_insensitive_matching()
+    {
+        static string CategoryCaseInsensitive(Animal a) => a.Category;
+
+        _indexedSet = _allAnimals.ToIndexedSet()
+                                 .WithFullTextIndex(CategoryCaseInsensitive, CharEqualityComparer.OrdinalIgnoreCase)
+                                 .Build();
+
+        Animal[] actual = _indexedSet.StartsWith(CategoryCaseInsensitive, "MAMM").ToArray();
+        CollectionAssert.AreEquivalent(_allAnimals.Where(x => x.Category == "Mammal").ToArray(), actual);
+
+
+    }
+
+    [TestMethod]
+    public void Case_insensitive_fuzzy_matching()
+    {
+        static string NameCaseInsensitive(Animal a) => a.Name;
+
+        _indexedSet = _allAnimals.ToIndexedSet()
+                                 .WithFullTextIndex(NameCaseInsensitive, CharEqualityComparer.OrdinalIgnoreCase)
+                                 .Build();
+
+        Animal[] actual = _indexedSet.FuzzyStartsWith(NameCaseInsensitive, "PAN", 1).ToArray();
+        CollectionAssert.AreEquivalent(new[] { _penguin, _parrot, _panther, _pangolin }, actual);
     }
 }

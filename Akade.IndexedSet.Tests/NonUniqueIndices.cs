@@ -22,6 +22,7 @@ public class NonUniqueIndices
                           .WithIndex(x => x.IntProperty)
                           .WithIndex(x => x.GuidProperty)
                           .WithIndex(x => x.StringProperty)
+                          .WithIndex(CaseInsensitiveStringProperty, StringComparer.OrdinalIgnoreCase)
                           .Build();
     }
 
@@ -97,5 +98,20 @@ public class NonUniqueIndices
 
         Assert.IsTrue(_indexedSet.TryGetSingle(x => x.IntProperty, 11, out TestData? data3));
         Assert.IsNotNull(data3);
+    }
+
+    private static string CaseInsensitiveStringProperty(TestData data)
+    {
+        return data.StringProperty;
+    }
+
+    [TestMethod]
+    public void Case_insensitive_string_property_matching()
+    {
+        TestData[] actual = _indexedSet.Where(CaseInsensitiveStringProperty, "aa").ToArray();
+        CollectionAssert.AreEquivalent(new[] { _a }, actual);
+
+        actual = _indexedSet.Where(CaseInsensitiveStringProperty, "cc").ToArray();
+        CollectionAssert.AreEquivalent(new[] { _c, _d, _e }, actual);
     }
 }
