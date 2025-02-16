@@ -8,7 +8,7 @@ internal static class LevenshteinDistance
     /// Returns true if the strings have a levenshein distance smaller than <paramref name="maxDistance"/>.
     /// Does not calculate the entire distance if the minimum distance is already bigger.
     /// </summary>
-    public static bool FuzzyMatch(ReadOnlySpan<char> a, ReadOnlySpan<char> b, int maxDistance)
+    public static bool FuzzyMatch(ReadOnlySpan<char> a, ReadOnlySpan<char> b, int maxDistance, IEqualityComparer<char> equalityComparer)
     {
         int rowLength = a.Length + 1;
 
@@ -42,7 +42,7 @@ internal static class LevenshteinDistance
             for (int i = 1; i < currentRow.Length; i++)
             {
                 int insertOrDeletion = Math.Min(currentRow[i - 1] + 1, lastRow[i] + 1);
-                int replacement = a[i - 1] == b[j] ? lastRow[i - 1] : lastRow[i - 1] + 1;
+                int replacement = equalityComparer.Equals(a[i - 1], b[j]) ? lastRow[i - 1] : lastRow[i - 1] + 1;
                 currentRow[i] = Math.Min(insertOrDeletion, replacement);
                 minDistance = Math.Min(minDistance, currentRow[i]);
             }

@@ -27,7 +27,7 @@ public class GeneralTests
     }
 
     [TestMethod]
-    public void clear_removes_all_elements()
+    public void Clear_removes_all_elements()
     {
         _indexedSet.Clear();
         Assert.AreEqual(0, _indexedSet.Count);

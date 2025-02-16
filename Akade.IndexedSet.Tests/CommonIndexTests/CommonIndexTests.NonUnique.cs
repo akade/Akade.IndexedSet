@@ -5,14 +5,16 @@ namespace Akade.IndexedSet.Tests.CommonIndexTests;
 
 public partial class CommonIndexTests
 {
-    internal class NonUniqueIndexTest : BaseIndexTest<int, Container<int>, NonUniqueIndex<Container<int>, int>>
+    internal class NonUniqueIndexTest(IEqualityComparer<int> comparer)
+        : BaseIndexTest<int, Container<int>, NonUniqueIndex<Container<int>, int>, IEqualityComparer<int>>(x => x.Value)
+        , IBaseIndexTest<IEqualityComparer<int>>
     {
-        public NonUniqueIndexTest() : base(x => x.Value)
-        {
-
-        }
-
         protected override bool SupportsNonUniqueKeys => true;
+
+        public static IEnumerable<IEqualityComparer<int>> GetComparers()
+        {
+            return [EqualityComparer<int>.Default];
+        }
 
         protected override NonUniqueIndex<Container<int>, int> CreateIndex()
         {
@@ -48,13 +50,13 @@ public partial class CommonIndexTests
 
     [DataTestMethod]
     [DynamicData(nameof(GetNonUniqueIndexTestMethods), DynamicDataSourceType.Method)]
-    public void NonUniqueIndex(string method)
+    public void NonUniqueIndex(string method, object comparer)
     {
-        BaseIndexTest.RunTest<NonUniqueIndexTest>(method);
+        BaseIndexTest.RunTest<NonUniqueIndexTest, IEqualityComparer<int>>(method, comparer);
     }
 
     public static IEnumerable<object[]> GetNonUniqueIndexTestMethods()
     {
-        return BaseIndexTest.GetTestMethods<NonUniqueIndexTest>();
+        return BaseIndexTest.GetTestMethods<NonUniqueIndexTest, IEqualityComparer<int>>();
     }
 }

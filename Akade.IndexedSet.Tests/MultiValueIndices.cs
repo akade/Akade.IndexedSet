@@ -27,7 +27,7 @@ public class MultiValueIndices
     }
 
     [TestMethod]
-    public void contains_queries_return_correct_results()
+    public void Contains_queries_return_correct_results()
     {
         CollectionAssert.AreEquivalent(new[] { _a, _d }, _indexedSet.Where(x => x.IntList, contains: 1).ToArray());
         CollectionAssert.AreEquivalent(new[] { _a, _b, _d }, _indexedSet.Where(x => x.IntList, contains: 2).ToArray());
@@ -36,7 +36,7 @@ public class MultiValueIndices
     }
 
     [TestMethod]
-    public void single_queries_return_correct_results()
+    public void Single_queries_return_correct_results()
     {
         Assert.AreEqual(_a, _indexedSet.Single(x => x.IntList, 4));
     }
@@ -63,7 +63,7 @@ public class MultiValueIndices
     }
 
     [TestMethod]
-    public void custom_comparer_where()
+    public void Custom_comparer_where()
     {
         // a: [1, 2, 3, 4] => [0, 1, 1, 2] 
         // b: [2, 3]       => [1, 1]
@@ -78,7 +78,7 @@ public class MultiValueIndices
     }
 
     [TestMethod]
-    public void custom_comparer_trygetsingle()
+    public void Custom_comparer_trygetsingle()
     {
         Assert.IsTrue(_indexedSet.TryGetSingle(IntListWithComparer, 4, out DenormalizedTestData? test1));
         Assert.AreEqual(_a, test1);

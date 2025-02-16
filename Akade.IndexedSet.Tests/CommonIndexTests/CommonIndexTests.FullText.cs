@@ -1,17 +1,15 @@
 ﻿using Akade.IndexedSet.Indices;
+using Akade.IndexedSet.StringUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
 
 public partial class CommonIndexTests
 {
-    internal class FullTextIndexTest : BaseIndexTest<string, Container<string>, FullTextIndex<Container<string>>>
+    internal class FullTextIndexTest(IEqualityComparer<char> comparer)
+        : BaseIndexTest<string, Container<string>, FullTextIndex<Container<string>>, IEqualityComparer<char>>(x => x.Value)
+        , IBaseIndexTest<IEqualityComparer<char>>
     {
-        public FullTextIndexTest() : base(x => x.Value)
-        {
-
-        }
-
         protected override bool SupportsNonUniqueKeys => true;
 
         protected override bool SupportsRangeBasedQueries => false;
@@ -20,7 +18,7 @@ public partial class CommonIndexTests
 
         protected override FullTextIndex<Container<string>> CreateIndex()
         {
-            return new FullTextIndex<Container<string>>(x => x.Value, EqualityComparer<char>.Default, "Test");
+            return new FullTextIndex<Container<string>>(x => x.Value, comparer, "Test");
         }
 
         protected override string GetNotExistingKey()
@@ -54,17 +52,22 @@ public partial class CommonIndexTests
                new("Possum"),
             ];
         }
+
+        public static IEnumerable<IEqualityComparer<char>> GetComparers()
+        {
+            return [EqualityComparer<char>.Default, CharEqualityComparer.OrdinalIgnoreCase];
+        }
     }
 
     [DataTestMethod]
     [DynamicData(nameof(GetFullTextIndexTestMethods), DynamicDataSourceType.Method)]
-    public void FullTextIndex(string method)
+    public void FullTextIndex(string method, object comparer)
     {
-        BaseIndexTest.RunTest<FullTextIndexTest>(method);
+        BaseIndexTest.RunTest<FullTextIndexTest, IEqualityComparer<char>>(method, comparer);
     }
 
     public static IEnumerable<object[]> GetFullTextIndexTestMethods()
     {
-        return BaseIndexTest.GetTestMethods<FullTextIndexTest>();
+        return BaseIndexTest.GetTestMethods<FullTextIndexTest, IEqualityComparer<char>>();
     }
 }

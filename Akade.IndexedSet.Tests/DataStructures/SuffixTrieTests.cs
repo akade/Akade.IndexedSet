@@ -24,7 +24,7 @@ public class SuffixTrieTests
     }
 
     [TestMethod]
-    public void querying_common_prefixes_return_correct_elements()
+    public void Querying_common_prefixes_return_correct_elements()
     {
         CollectionAssert.AreEquivalent(new string[] { "Tiger", "Tarantula" }, _trie.GetAll("T").ToArray());
         CollectionAssert.AreEquivalent(new string[] { "Penguin", "Panther", "Pangolin", "Parrot" }, _trie.GetAll("P").ToArray());
@@ -34,14 +34,14 @@ public class SuffixTrieTests
     }
 
     [TestMethod]
-    public void querying_common_infixes_return_correct_elements()
+    public void Querying_common_infixes_return_correct_elements()
     {
         CollectionAssert.AreEquivalent(new string[] { "Panther", "Pangolin", "Tarantula" }, _trie.GetAll("an").ToArray());
         CollectionAssert.AreEquivalent(new string[] { "Chihuahua" }, _trie.GetAll("hua").ToArray());
     }
 
     [TestMethod]
-    public void querying_common_suffixes_return_correct_elements()
+    public void Querying_common_suffixes_return_correct_elements()
     {
         CollectionAssert.AreEquivalent(new string[] { "Panther", "Tiger" }, _trie.GetAll("er").ToArray());
         CollectionAssert.AreEquivalent(new string[] { "Chihuahua" }, _trie.GetAll("hua").ToArray());
@@ -49,7 +49,7 @@ public class SuffixTrieTests
     }
 
     [TestMethod]
-    public void adding_the_same_element_return_false()
+    public void Adding_the_same_element_return_false()
     {
         SuffixTrie<string> trie = new(EqualityComparer<char>.Default);
 
@@ -58,7 +58,7 @@ public class SuffixTrieTests
     }
 
     [TestMethod]
-    public void contains_returns_correct_value_when_adding_elements()
+    public void Contains_returns_correct_value_when_adding_elements()
     {
         SuffixTrie<string> trie = new(EqualityComparer<char>.Default);
 
@@ -68,7 +68,7 @@ public class SuffixTrieTests
     }
 
     [TestMethod]
-    public void contains_returns_correct_value_when_removing_elements()
+    public void Contains_returns_correct_value_when_removing_elements()
     {
         SuffixTrie<string> trie = new(EqualityComparer<char>.Default);
 
@@ -79,21 +79,21 @@ public class SuffixTrieTests
     }
 
     [TestMethod]
-    public void removing_returns_false_if_the_element_is_not_present()
+    public void Removing_returns_false_if_the_element_is_not_present()
     {
         SuffixTrie<string> trie = new(EqualityComparer<char>.Default);
         Assert.IsFalse(RemoveFromStringTrie(trie, "Cat"));
     }
 
     [TestMethod]
-    public void exact_fuzzy_search_with_single_result()
+    public void Exact_fuzzy_search_with_single_result()
     {
         IEnumerable<string> result = _trie.FuzzySearch("rantul", 1, true);
         Assert.AreEqual("Tarantula", result.Single());
     }
 
     [TestMethod]
-    public void exact_fuzzy_search_without_results()
+    public void Exact_fuzzy_search_without_results()
     {
         IEnumerable<string> result = _trie.FuzzySearch("Panner", 1, true);
         Assert.IsFalse(result.Any());
@@ -101,7 +101,7 @@ public class SuffixTrieTests
 
     [TestMethod]
 
-    public void inexact_fuzzy_search_and_single_result()
+    public void Inexact_fuzzy_search_and_single_result()
     {
         IEnumerable<string> result = _trie.FuzzySearch("Pangolin", 2, false);
         CollectionAssert.AreEquivalent(new[] { "Pangolin" }, result.ToArray());
@@ -109,21 +109,21 @@ public class SuffixTrieTests
 
     [TestMethod]
 
-    public void inexact_fuzzy_search_and_multiple_result()
+    public void Inexact_fuzzy_search_and_multiple_result()
     {
         IEnumerable<string> result = _trie.FuzzySearch("Pan", 2, false);
         CollectionAssert.AreEquivalent(new[] { "Penguin", "Panther", "Pangolin", "Parrot", "Tarantula", "Chihuahua" }, result.ToArray());
     }
 
     [TestMethod]
-    public void inexact_fuzzy_search_without_result()
+    public void Inexact_fuzzy_search_without_result()
     {
         IEnumerable<string> result = _trie.FuzzySearch("Non", 1, false);
         Assert.IsFalse(result.Any());
     }
 
     [TestMethod]
-    public void inexact_fuzzy_search_and_multiple_result_with_first_character_changed()
+    public void Inexact_fuzzy_search_and_multiple_result_with_first_character_changed()
     {
         IEnumerable<string> result = _trie.FuzzySearch("Zan", 1, false);
         CollectionAssert.AreEquivalent(new[] { "Panther", "Pangolin", "Tarantula" }, result.ToArray());

@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Reflection;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
-internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>(Func<TElement, TIndexKey> keyAccessor)
+internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComparer>(Func<TElement, TIndexKey> keyAccessor)
     where TIndex : TypedIndex<TElement, TIndexKey>
     where TIndexKey : notnull
 {
@@ -48,23 +48,33 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>(Func<
     }
 }
 
+internal interface IBaseIndexTest<TComparer>
+    where TComparer : notnull
+{
+    static abstract IEnumerable<TComparer> GetComparers();
+}
+
 [AttributeUsage(AttributeTargets.Method)]
 internal class BaseTestMethodAttribute : Attribute { }
 
-public static class BaseIndexTest
+internal static class BaseIndexTest
 {
-    public static IEnumerable<object[]> GetTestMethods<T>()
+    public static IEnumerable<object[]> GetTestMethods<T, TComparer>()
+        where T : IBaseIndexTest<TComparer>
+        where TComparer : notnull
     {
         return typeof(T).GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
                         .Where(m => m.Name != "Test")
                         .Where(m => m.GetCustomAttribute<BaseTestMethodAttribute>() is not null)
-                        .Select(m => new object[] { m.Name })
+                        .SelectMany(method => T.GetComparers().Select(comparer => new object[] { method.Name, comparer }))
                         .ToArray();
     }
 
-    public static void RunTest<T>(string method)
+    public static void RunTest<T, TComparer>(string method, object comparer)
+        where T : IBaseIndexTest<TComparer>
+        where TComparer : notnull
     {
-        T testClass = Activator.CreateInstance<T>();
+        T testClass = (T)(Activator.CreateInstance(typeof(T), comparer) ?? throw new InvalidOperationException());
         MethodInfo methodInfo = typeof(T).GetMethod(method, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
             ?? throw new ArgumentOutOfRangeException(nameof(method));
 

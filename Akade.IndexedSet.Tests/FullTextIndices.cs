@@ -47,47 +47,47 @@ public class FullTextIndices
     }
 
     [TestMethod]
-    public void single_item_retrieval_works()
+    public void Single_item_retrieval_works()
     {
         _indexedSet.AssertSingleItem(x => x.Category, _boomslang);
         _indexedSet.AssertSingleItem(x => x.Category, _tarantula);
     }
 
     [TestMethod]
-    public void single_item_retrieval_throws_exception_if_there_is_more_than_one_result()
+    public void Single_item_retrieval_throws_exception_if_there_is_more_than_one_result()
     {
         _ = Assert.ThrowsException<InvalidOperationException>(() => _indexedSet.AssertSingleItem(x => x.Category, _bonobo));
     }
 
     [TestMethod]
-    public void multi_item_retrieval_works()
+    public void Multi_item_retrieval_works()
     {
         _indexedSet.AssertMultipleItems(x => x.Category, expectedElements: [_bonobo, _borador, _tiger, _tapir, _panther, _pangolin]);
         _indexedSet.AssertMultipleItems(x => x.Category, expectedElements: [_booby, _penguin, _parrot]);
     }
 
     [TestMethod]
-    public void search_via_starts_with()
+    public void Search_via_starts_with()
     {
         CollectionAssert.AreEquivalent(new[] { _booby, _boomslang }, _indexedSet.StartsWith(x => x.Name, "Boo").ToArray());
         CollectionAssert.AreEquivalent(new[] { _panther, _pangolin }, _indexedSet.StartsWith(x => x.Name, "Pan").ToArray());
     }
 
     [TestMethod]
-    public void search_via_fuzzy_starts_with()
+    public void Search_via_fuzzy_starts_with()
     {
         CollectionAssert.AreEquivalent(new[] { _bonobo, _booby, _boomslang, _borador }, _indexedSet.FuzzyStartsWith(x => x.Name, "Boo", 1).ToArray());
         CollectionAssert.AreEquivalent(new[] { _penguin, _parrot, _panther, _pangolin }, _indexedSet.FuzzyStartsWith(x => x.Name, "Pan", 1).ToArray());
     }
 
     [TestMethod]
-    public void search_via_contains()
+    public void Search_via_contains()
     {
         CollectionAssert.AreEquivalent(new[] { _boomslang, _tarantula, _panther, _pangolin }, _indexedSet.Contains(x => x.Name, "an").ToArray());
     }
 
     [TestMethod]
-    public void search_via_fuzzy_contains()
+    public void Search_via_fuzzy_contains()
     {
         Animal[] actual = _indexedSet.FuzzyContains(x => x.Name, "Pan", 1).ToArray();
         CollectionAssert.AreEquivalent(new[] { _boomslang, _tarantula, _penguin, _parrot, _panther, _pangolin }, actual);
@@ -151,8 +151,6 @@ public class FullTextIndices
 
         Animal[] actual = _indexedSet.StartsWith(CategoryCaseInsensitive, "MAMM").ToArray();
         CollectionAssert.AreEquivalent(_allAnimals.Where(x => x.Category == "Mammal").ToArray(), actual);
-
-
     }
 
     [TestMethod]

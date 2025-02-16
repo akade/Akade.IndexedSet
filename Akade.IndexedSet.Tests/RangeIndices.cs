@@ -27,7 +27,7 @@ public class RangeIndices
     }
 
     [TestMethod]
-    public void range_query_on_ints_returns_correct_items()
+    public void Range_query_on_ints_returns_correct_items()
     {
         _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 3, 25, inclusiveStart: true, inclusiveEnd: false, expectedElements: [_a, _b, _c, _d, _e]);
         _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 8, 12, inclusiveStart: true, inclusiveEnd: false, expectedElements: [_a, _b, _c]);
@@ -36,7 +36,7 @@ public class RangeIndices
     }
 
     [TestMethod]
-    public void range_query_on_ints_correctly_respects_inclusive_or_exclusive_boundaries()
+    public void Range_query_on_ints_correctly_respects_inclusive_or_exclusive_boundaries()
     {
         _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 10, 13, inclusiveStart: false, inclusiveEnd: false, expectedElements: [_c]);
         _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 10, 13, inclusiveStart: true, inclusiveEnd: false, expectedElements: [_a, _b, _c]);
@@ -45,7 +45,7 @@ public class RangeIndices
     }
 
     [TestMethod]
-    public void range_query_on_strings_returns_correct_items()
+    public void Range_query_on_strings_returns_correct_items()
     {
         _indexedSet.AssertMultipleItemsViaRange(x => x.StringProperty, "A", "F", inclusiveStart: true, inclusiveEnd: false, expectedElements: [_a, _b, _c, _d, _e]);
         _indexedSet.AssertMultipleItemsViaRange(x => x.StringProperty, "A", "D", inclusiveStart: true, inclusiveEnd: false, expectedElements: [_a, _b]);
@@ -54,7 +54,7 @@ public class RangeIndices
     }
 
     [TestMethod]
-    public void range_query_on_guids_returns_correct_items()
+    public void Range_query_on_guids_returns_correct_items()
     {
         _indexedSet.AssertMultipleItemsViaRange(x => x.GuidProperty, GuidGen.Get(0), GuidGen.Get(12), inclusiveStart: true, inclusiveEnd: false, expectedElements: [_a, _b, _c, _d, _e]);
         _indexedSet.AssertMultipleItemsViaRange(x => x.GuidProperty, GuidGen.Get(0), GuidGen.Get(4), inclusiveStart: true, inclusiveEnd: false, expectedElements: [_a, _b, _c]);
