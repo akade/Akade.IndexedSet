@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Akade.IndexedSet.Tests.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
 internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComparer>
@@ -33,7 +34,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
         {
             TElement[] data = GetNonUniqueData();
             TIndex index = CreateIndexWithData(data);
-            TIndexKey nonUniqueKey = data.GroupBy(_keyAccessor).Where(x => x.Count() > 1).First().Key;
+            TIndexKey nonUniqueKey = data.GroupByWithSortBasedFallback(_keyAccessor, _comparer).Where(x => x.Count() > 1).First().Key;
             _ = Assert.ThrowsException<InvalidOperationException>(() => index.Single(nonUniqueKey));
         }
     }
@@ -68,7 +69,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
         {
             TElement[] data = GetNonUniqueData();
             TIndex index = CreateIndexWithData(data);
-            TIndexKey nonUniqueKey = data.GroupBy(_keyAccessor).Where(x => x.Count() > 1).First().Key;
+            TIndexKey nonUniqueKey = data.GroupByWithSortBasedFallback(_keyAccessor, _comparer).Where(x => x.Count() > 1).First().Key;
             Assert.IsFalse(index.TryGetSingle(nonUniqueKey, out _));
         }
     }

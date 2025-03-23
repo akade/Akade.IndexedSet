@@ -7,7 +7,7 @@ namespace Akade.IndexedSet.Tests.CommonIndexTests;
 public partial class CommonIndexTests
 {
     internal class FullTextIndexTest(IEqualityComparer<char> comparer)
-        : BaseIndexTest<string, Container<string>, FullTextIndex<Container<string>>, IEqualityComparer<char>>(x => x.Value)
+        : BaseIndexTest<string, Container<string>, FullTextIndex<Container<string>>, IEqualityComparer<char>>(x => x.Value, comparer)
         , IBaseIndexTest<IEqualityComparer<char>>
     {
         protected override bool SupportsNonUniqueKeys => true;
@@ -18,7 +18,7 @@ public partial class CommonIndexTests
 
         protected override FullTextIndex<Container<string>> CreateIndex()
         {
-            return new FullTextIndex<Container<string>>(x => x.Value, comparer, "Test");
+            return new FullTextIndex<Container<string>>(x => x.Value, _comparer, "Test");
         }
 
         protected override string GetNotExistingKey()

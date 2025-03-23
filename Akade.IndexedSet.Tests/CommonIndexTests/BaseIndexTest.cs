@@ -3,11 +3,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Reflection;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
-internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComparer>(Func<TElement, TIndexKey> keyAccessor)
+internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComparer>(Func<TElement, TIndexKey> keyAccessor, TComparer comparer)
     where TIndex : TypedIndex<TElement, TIndexKey>
     where TIndexKey : notnull
+    where TComparer : notnull
 {
     private readonly Func<TElement, TIndexKey> _keyAccessor = keyAccessor;
+    protected readonly TComparer _comparer = comparer;
 
     protected abstract TElement[] GetUniqueData();
 
@@ -74,7 +76,7 @@ internal static class BaseIndexTest
         where T : IBaseIndexTest<TComparer>
         where TComparer : notnull
     {
-        T testClass = (T)(Activator.CreateInstance(typeof(T), comparer) ?? throw new InvalidOperationException());
+        var testClass = (T)(Activator.CreateInstance(typeof(T), comparer) ?? throw new InvalidOperationException());
         MethodInfo methodInfo = typeof(T).GetMethod(method, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
             ?? throw new ArgumentOutOfRangeException(nameof(method));
 

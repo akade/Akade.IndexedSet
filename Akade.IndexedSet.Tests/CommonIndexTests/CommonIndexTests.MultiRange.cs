@@ -6,7 +6,7 @@ namespace Akade.IndexedSet.Tests.CommonIndexTests;
 public partial class CommonIndexTests
 {
     internal class MultiRangeIndexTest(IComparer<int> comparer)
-        : BaseIndexTest<int, Container<int>, MultiRangeIndex<Container<int>, int>, IComparer<int>>(x => x.Value)
+        : BaseIndexTest<int, Container<int>, MultiRangeIndex<Container<int>, int>, IComparer<int>>(x => x.Value, comparer)
         , IBaseIndexTest<IComparer<int>>
     {
         protected override bool SupportsNonUniqueKeys => true;
@@ -20,7 +20,7 @@ public partial class CommonIndexTests
 
         protected override MultiRangeIndex<Container<int>, int> CreateIndex()
         {
-            return new MultiRangeIndex<Container<int>, int>(comparer, "Test");
+            return new MultiRangeIndex<Container<int>, int>(_comparer, "Test");
         }
 
         protected override Container<int>[] GetNonUniqueData()

@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Akade.IndexedSet.Tests.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
 internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComparer>
@@ -42,7 +43,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
             TElement[] data = GetUniqueData();
             AddElements(data, index);
 
-            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor)];
+            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor, ComparerUtils.GetComparer<TIndexKey>(_comparer))];
 
             TIndexKey rangeStart = _keyAccessor(orderedElements[1]);
             TIndexKey rangeEnd = _keyAccessor(orderedElements[^2]);
@@ -74,13 +75,13 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
             AddElements(data, index);
-            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor)];
+            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor, ComparerUtils.GetComparer<TIndexKey>(_comparer))];
 
-            TIndexKey boundary = _keyAccessor(orderedElements[3]);
-            CollectionAssert.AreEqual(orderedElements[0..3], index.LessThan(boundary).ToArray());
-            CollectionAssert.AreEqual(orderedElements[0..4], index.LessThanOrEqual(boundary).ToArray());
-            CollectionAssert.AreEqual(orderedElements[4..], index.GreaterThan(boundary).ToArray());
-            CollectionAssert.AreEqual(orderedElements[3..], index.GreaterThanOrEqual(boundary).ToArray());
+            TIndexKey boundary = _keyAccessor(orderedElements[2]);
+            CollectionAssert.AreEqual(orderedElements[0..2], index.LessThan(boundary).ToArray());
+            CollectionAssert.AreEqual(orderedElements[0..3], index.LessThanOrEqual(boundary).ToArray());
+            CollectionAssert.AreEqual(orderedElements[3..], index.GreaterThan(boundary).ToArray());
+            CollectionAssert.AreEqual(orderedElements[2..], index.GreaterThanOrEqual(boundary).ToArray());
         }
     }
 
@@ -115,7 +116,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
             TElement[] data = GetUniqueData();
             AddElements(data, index);
 
-            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor)];
+            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor, ComparerUtils.GetComparer<TIndexKey>(_comparer))];
 
             Assert.AreEqual(_keyAccessor(orderedElements[0]), index.Min());
             Assert.AreEqual(orderedElements[0], index.MinBy().Single());
@@ -155,7 +156,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
             AddElements(data, index);
-            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor)];
+            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor, ComparerUtils.GetComparer<TIndexKey>(_comparer))];
 
             for (int i = 0; i < orderedElements.Length; i++)
             {
@@ -194,7 +195,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
             AddElements(data, index);
-            TElement[] orderedElements = [.. data.OrderByDescending(_keyAccessor)];
+            TElement[] orderedElements = [.. data.OrderByDescending(_keyAccessor, ComparerUtils.GetComparer<TIndexKey>(_comparer))];
 
             for (int i = 0; i < orderedElements.Length; i++)
             {

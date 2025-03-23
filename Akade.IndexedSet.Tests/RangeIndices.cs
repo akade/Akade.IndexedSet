@@ -217,7 +217,6 @@ public class RangeIndices
                           .WithRangeIndex(Multikeys)
                           .Build();
 
-
         CollectionAssert.AreEqual(new[] { _a, _b, _c }, _indexedSet.Range(Multikeys, _a.PrimaryKey, _c.PrimaryKey, inclusiveEnd: true).ToArray());
 
         // matches _a
@@ -226,5 +225,22 @@ public class RangeIndices
 
         // matches _a & _b
         Assert.IsFalse(_indexedSet.TryGetSingle(Multikeys, _b.PrimaryKey, out _));
+    }
+
+    [TestMethod]
+    public void Custom_comparer_allows_to_control_order()
+    {
+        IComparer<string> byLength = Comparer<string>.Create((a, b) =>
+        {
+            int lengthComparison = a.Length.CompareTo(b.Length);
+            return lengthComparison == 0 ? Comparer<string>.Default.Compare(a, b) : lengthComparison;
+        });
+
+        IndexedSet<string> set = new[] { "aaa2", "ab", "a", "aaa1", "ba" }.ToIndexedSet()
+                                                                          .WithRangeIndex(x => x, byLength)
+                                                                          .Build();
+
+        CollectionAssert.AreEqual(new[] { "a", "ab", "ba", "aaa1", "aaa2" }, set.OrderBy(x => x).ToArray());
+        CollectionAssert.AreEqual(new[] { "aaa2", "aaa1", "ba", "ab", "a" }, set.OrderByDescending(x => x).ToArray());
     }
 }

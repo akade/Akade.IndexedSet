@@ -7,7 +7,7 @@ namespace Akade.IndexedSet.Tests.CommonIndexTests;
 public partial class CommonIndexTests
 {
     internal class PrefixIndexTest(IEqualityComparer<char> comparer)
-        : BaseIndexTest<string, Container<string>, PrefixIndex<Container<string>>, IEqualityComparer<char>>(x => x.Value)
+        : BaseIndexTest<string, Container<string>, PrefixIndex<Container<string>>, IEqualityComparer<char>>(x => x.Value, comparer)
         , IBaseIndexTest<IEqualityComparer<char>>
 
     {
@@ -24,7 +24,7 @@ public partial class CommonIndexTests
 
         protected override PrefixIndex<Container<string>> CreateIndex()
         {
-            return new PrefixIndex<Container<string>>(comparer, "Test");
+            return new PrefixIndex<Container<string>>(_comparer, "Test");
         }
 
         protected override string GetNotExistingKey()

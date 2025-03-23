@@ -7,7 +7,7 @@ namespace Akade.IndexedSet.Tests.CommonIndexTests;
 public partial class CommonIndexTests
 {
     internal class UniqueIndexTest(IEqualityComparer<int> comparer)
-        : BaseIndexTest<int, Container<int>, UniqueIndex<Container<int>, int>, IEqualityComparer<int>>(x => x.Value)
+        : BaseIndexTest<int, Container<int>, UniqueIndex<Container<int>, int>, IEqualityComparer<int>>(x => x.Value, comparer)
         , IBaseIndexTest<IEqualityComparer<int>>
     {
         protected override bool SupportsNonUniqueKeys => false;
@@ -19,7 +19,7 @@ public partial class CommonIndexTests
 
         protected override UniqueIndex<Container<int>, int> CreateIndex()
         {
-            return new UniqueIndex<Container<int>, int>(comparer, "x => x.Value");
+            return new UniqueIndex<Container<int>, int>(_comparer, "x => x.Value");
         }
 
         protected override Container<int>[] GetNonUniqueData()

@@ -104,4 +104,18 @@ public class UniqueIndices
         _indexedSet.AssertSingleItem(Multikeys, _b);
         _indexedSet.AssertSingleItem(Multikeys, _c);
     }
+
+    [TestMethod]
+    public void Custom_comparer_allows_modifying_comparison()
+    {
+        string[] data = ["a", "b", "c"];
+        IndexedSet<string> indexedSet = data.ToIndexedSet()
+                                            .WithUniqueIndex(x => x, StringComparer.OrdinalIgnoreCase)
+                                            .Build();
+
+        Assert.IsTrue(indexedSet.TryGetSingle(x => x, "A", out string? a));
+        Assert.AreEqual("a", a);
+
+        _ = Assert.ThrowsException<ArgumentException>(() => indexedSet.Add("C"));
+    }
 }
