@@ -5,10 +5,10 @@ namespace Akade.IndexedSet.Indices;
 /// <summary>
 /// O(log(n)) range queries based on <see cref="SortedLookup{TKey, TValue}"/>.
 /// </summary>
-internal class RangeIndex<TElement, TIndexKey>(string name) : TypedIndex<TElement, TIndexKey>(name)
+internal class RangeIndex<TElement, TIndexKey>(IComparer<TIndexKey> keyComparer, string name) : TypedIndex<TElement, TIndexKey>(name)
     where TIndexKey : notnull
 {
-    private readonly SortedLookup<TIndexKey, TElement> _lookup = new();
+    private readonly SortedLookup<TIndexKey, TElement> _lookup = new(keyComparer);
 
     internal override void Add(TIndexKey key, TElement value)
     {

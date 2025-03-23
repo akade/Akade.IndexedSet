@@ -192,7 +192,7 @@ public class IndexedSet<TElement>
     }
 
     /// <summary>
-    /// Searches for an element via an index  within "denormalized keys". See <see cref="IndexedSetBuilder{TPrimaryKey, TElement}.WithIndex{TIndexKey}(Func{TElement, IEnumerable{TIndexKey}}, string?)"/>.
+    /// Searches for an element via an index  within "denormalized keys". See <see cref="IndexedSetBuilder{TPrimaryKey, TElement}.WithIndex{TIndexKey}(Func{TElement, IEnumerable{TIndexKey}}, IEqualityComparer{TIndexKey}, string?)"/>.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
@@ -211,7 +211,7 @@ public class IndexedSet<TElement>
     }
 
     /// <summary>
-    /// Searches for multiple elements via an index. See <see cref="IndexedSetBuilder{TPrimaryKey, TElement}.WithIndex{TIndexKey}(Func{TElement, TIndexKey}, string?)"/>.
+    /// Searches for multiple elements via an index. See <see cref="IndexedSetBuilder{TPrimaryKey, TElement}.WithIndex{TIndexKey}(Func{TElement, TIndexKey}, IEqualityComparer{TIndexKey}, string?)"/>.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
@@ -230,7 +230,7 @@ public class IndexedSet<TElement>
     }
 
     /// <summary>
-    /// Searches for multiple elements via an index within "denormalized keys". See <see cref="IndexedSetBuilder{TPrimaryKey, TElement}.WithIndex{TIndexKey}(Func{TElement, IEnumerable{TIndexKey}}, string?)"/>.
+    /// Searches for multiple elements via an index within "denormalized keys". See <see cref="IndexedSetBuilder{TPrimaryKey, TElement}.WithIndex{TIndexKey}(Func{TElement, IEnumerable{TIndexKey}}, IEqualityComparer{TIndexKey}, string?)"/>.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
@@ -880,12 +880,13 @@ public class IndexedSet<TPrimaryKey, TElement> : IndexedSet<TElement>
     /// <param name="primaryKeyAccessor">Returns the primary key for a given item. The primary key should not be changed while the element is within the set. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="primaryKeyIndexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <param name="primaryKeyIndexName">The name for the primary index. Usually, you should not specify this as the expression in <paramref name="primaryKeyIndexName"/> is automatically passed by the compiler.</param>
-    protected internal IndexedSet(Func<TElement, TPrimaryKey> primaryKeyAccessor, [CallerArgumentExpression(nameof(primaryKeyAccessor))] string primaryKeyIndexName = "")
+    /// <param name="keyComparer">A key comparer used to compare primary keys. If null is passed, the default comparer is used.</param>
+    protected internal IndexedSet(Func<TElement, TPrimaryKey> primaryKeyAccessor, IEqualityComparer<TPrimaryKey>? keyComparer = null, [CallerArgumentExpression(nameof(primaryKeyAccessor))] string primaryKeyIndexName = "")
     {
         _primaryKeyAccessor = primaryKeyAccessor;
         _primaryKeyIndexName = primaryKeyIndexName;
 
-        AddIndex(_primaryKeyAccessor, new UniqueIndex<TElement, TPrimaryKey>(primaryKeyIndexName));
+        AddIndex(_primaryKeyAccessor, new UniqueIndex<TElement, TPrimaryKey>(keyComparer ?? EqualityComparer<TPrimaryKey>.Default, primaryKeyIndexName));
     }
 
     /// <summary>

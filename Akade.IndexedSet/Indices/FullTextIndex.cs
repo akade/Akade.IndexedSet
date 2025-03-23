@@ -1,5 +1,6 @@
 ﻿using Akade.IndexedSet.DataStructures;
 using Akade.IndexedSet.Extensions;
+using Akade.IndexedSet.StringUtilities;
 using Akade.IndexedSet.Utils;
 
 namespace Akade.IndexedSet.Indices;
@@ -8,26 +9,43 @@ internal sealed class FullTextIndex<TElement> : TypedIndex<TElement, string>
 {
     private readonly SuffixTrie<TElement> _suffixTrie;
 
+    private delegate bool StartsWithCheck(ReadOnlySpan<char> key, ReadOnlySpan<char> startsWith);
     private delegate bool CandidateMatchCheck(TElement element, ReadOnlySpan<char> startsWith);
     private delegate bool FuzzyCandidateMatchCheck(TElement element, ReadOnlySpan<char> startsWith, int maxDistance);
 
+    private readonly StartsWithCheck _startsWithCheck;
     private readonly CandidateMatchCheck _checkCandidateMatch;
     private readonly FuzzyCandidateMatchCheck _checkFuzzyCandidateMatch;
+    private readonly IEqualityComparer<char> _equalityComparer;
 
-    public FullTextIndex(Func<TElement, string> keyAccessor, string name) : base(name)
+    public FullTextIndex(Func<TElement, string> keyAccessor, IEqualityComparer<char> equalityComparer, string name) : base(name)
     {
-        _checkCandidateMatch = (elem, startsWith) => MemoryExtensions.StartsWith(keyAccessor(elem), startsWith, StringComparison.Ordinal);
+        _startsWithCheck = GetStartsWithForComparer(equalityComparer);
+        _checkCandidateMatch = (elem, startsWith) => _startsWithCheck(keyAccessor(elem), startsWith);
         _checkFuzzyCandidateMatch = (elem, startsWith, maxDistance) => VerifyFuzzyStartsWith(keyAccessor(elem), startsWith, maxDistance);
-        _suffixTrie = new();
+        _suffixTrie = new(equalityComparer);
+        _equalityComparer = equalityComparer;
     }
 
-    public FullTextIndex(Func<TElement, IEnumerable<string>> keyAccessor, string name) : base(name)
+    private static StartsWithCheck GetStartsWithForComparer(IEqualityComparer<char> equalityComparer)
     {
+        return equalityComparer switch
+        {
+            IgnoreCaseCharEqualityComparer => (elem, startsWith) => elem.StartsWith(startsWith, StringComparison.OrdinalIgnoreCase),
+            { } x when x == EqualityComparer<char>.Default => (elem, startsWith) => elem.StartsWith(startsWith, StringComparison.Ordinal),
+            _ => (elem, startsWith) => elem.StartsWith(startsWith, equalityComparer)
+        };
+    }
+
+    public FullTextIndex(Func<TElement, IEnumerable<string>> keyAccessor, IEqualityComparer<char> equalityComparer, string name) : base(name)
+    {
+        _startsWithCheck = GetStartsWithForComparer(equalityComparer);
+
         _checkCandidateMatch = (elem, startsWith) =>
         {
             foreach (string key in keyAccessor(elem))
             {
-                if (MemoryExtensions.StartsWith(key, startsWith, StringComparison.Ordinal))
+                if (_startsWithCheck(key, startsWith))
                     return true;
             }
 
@@ -44,7 +62,8 @@ internal sealed class FullTextIndex<TElement> : TypedIndex<TElement, string>
 
             return false;
         };
-        _suffixTrie = new();
+        _suffixTrie = new(equalityComparer);
+        _equalityComparer = equalityComparer;
     }
 
     internal override void Add(string key, TElement value)
@@ -99,9 +118,9 @@ internal sealed class FullTextIndex<TElement> : TypedIndex<TElement, string>
         return matches;
     }
 
-    private static bool VerifyFuzzyStartsWith(ReadOnlySpan<char> found,  ReadOnlySpan<char> startsWith, int maxDistance)
+    private bool VerifyFuzzyStartsWith(ReadOnlySpan<char> found,  ReadOnlySpan<char> startsWith, int maxDistance)
     {
-        return LevenshteinDistance.FuzzyMatch(found[..startsWith.Length], startsWith, maxDistance);
+        return LevenshteinDistance.FuzzyMatch(found[..startsWith.Length], startsWith, maxDistance, _equalityComparer);
     }
 
     internal override IEnumerable<TElement> FuzzyStartsWith(ReadOnlySpan<char> indexKey, int maxDistance)

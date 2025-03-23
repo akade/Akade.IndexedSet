@@ -3,11 +3,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Reflection;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
-internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>(Func<TElement, TIndexKey> keyAccessor)
+internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComparer>(Func<TElement, TIndexKey> keyAccessor, TComparer comparer)
     where TIndex : TypedIndex<TElement, TIndexKey>
     where TIndexKey : notnull
+    where TComparer : notnull
 {
     private readonly Func<TElement, TIndexKey> _keyAccessor = keyAccessor;
+    protected readonly TComparer _comparer = comparer;
 
     protected abstract TElement[] GetUniqueData();
 
@@ -38,7 +40,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>(Func<
         index.AddRange(elements.Select(element => KeyValuePair.Create(_keyAccessor(element), element)));
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void Adding_unique_data_should_throw_if_nonunique_keys_are_not_supported()
     {
         if (!SupportsNonUniqueKeys)
@@ -48,20 +50,33 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>(Func<
     }
 }
 
-public static class BaseIndexTest
+internal interface IBaseIndexTest<TComparer>
+    where TComparer : notnull
 {
-    public static IEnumerable<object[]> GetTestMethods<T>()
+    static abstract IEnumerable<TComparer> GetComparers();
+}
+
+[AttributeUsage(AttributeTargets.Method)]
+internal class BaseTestMethodAttribute : Attribute { }
+
+internal static class BaseIndexTest
+{
+    public static IEnumerable<object[]> GetTestMethods<T, TComparer>()
+        where T : IBaseIndexTest<TComparer>
+        where TComparer : notnull
     {
         return typeof(T).GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
                         .Where(m => m.Name != "Test")
-                        .Where(m => m.GetCustomAttribute(typeof(TestMethodAttribute)) is not null)
-                        .Select(m => new object[] { m.Name })
+                        .Where(m => m.GetCustomAttribute<BaseTestMethodAttribute>() is not null)
+                        .SelectMany(method => T.GetComparers().Select(comparer => new object[] { method.Name, comparer }))
                         .ToArray();
     }
 
-    public static void RunTest<T>(string method)
+    public static void RunTest<T, TComparer>(string method, object comparer)
+        where T : IBaseIndexTest<TComparer>
+        where TComparer : notnull
     {
-        T testClass = Activator.CreateInstance<T>();
+        var testClass = (T)(Activator.CreateInstance(typeof(T), comparer) ?? throw new InvalidOperationException());
         MethodInfo methodInfo = typeof(T).GetMethod(method, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
             ?? throw new ArgumentOutOfRangeException(nameof(method));
 

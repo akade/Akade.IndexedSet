@@ -26,13 +26,13 @@ public class LeaderboardSample
 
 
     [TestMethod]
-    public void get_overall_highscore()
+    public void Get_overall_highscore()
     {
         Assert.AreEqual(240 * 240, _leaderboard.Max(x => x.Score));
     }
 
     [TestMethod]
-    public void get_top_ten()
+    public void Get_top_ten()
     {
         var expected = Enumerable.Range(231, 10) // 231 to 240 (inclusive)
                                  .Select(i => i * i)
@@ -49,7 +49,7 @@ public class LeaderboardSample
     }
 
     [TestMethod]
-    public void get_second_page_of_leaderboard()
+    public void Get_second_page_of_leaderboard()
     {
         var expected = Enumerable.Range(221, 10) // 221 to 230 (inclusive)
                                  .Select(i => i * i)

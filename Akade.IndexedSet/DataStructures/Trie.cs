@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 
 namespace Akade.IndexedSet.DataStructures;
 
-internal class Trie<TElement>
+internal class Trie<TElement>(IEqualityComparer<char> equalityComparer)
 {
-    private readonly TrieNode _root = new();
+    private readonly TrieNode _root = new(equalityComparer);
 
     public bool Add(ReadOnlySpan<char> key, TElement element)
     {
@@ -79,7 +79,7 @@ internal class Trie<TElement>
         for (int i = 1; i < currentRow.Length; i++)
         {
             int insertOrDeletion = Math.Min(currentRow[i - 1] + 1, lastRow[i] + 1);
-            int replacement = word[i - 1] == ch ? lastRow[i - 1] : lastRow[i - 1] + 1;
+            int replacement = equalityComparer.Equals(word[i - 1], ch) ? lastRow[i - 1] : lastRow[i - 1] + 1;
             currentRow[i] = Math.Min(insertOrDeletion, replacement);
             minDistance = Math.Min(minDistance, currentRow[i]);
         }
@@ -124,7 +124,7 @@ internal class Trie<TElement>
         }
     }
 
-    private static void AddRecursivlyToResult(Trie<TElement>.TrieNode currentNode, PriorityQueue<TElement, int> results, int distance)
+    private static void AddRecursivlyToResult(TrieNode currentNode, PriorityQueue<TElement, int> results, int distance)
     {
         if (currentNode._elements is not null)
         {
@@ -135,14 +135,14 @@ internal class Trie<TElement>
         }
         if (currentNode._children is not null)
         {
-            foreach ((_, Trie<TElement>.TrieNode child) in currentNode._children)
+            foreach ((_, TrieNode child) in currentNode._children)
             {
                 AddRecursivlyToResult(child, results, distance);
             }
         }
     }
 
-    private static void AddRecursivlyToResult(Trie<TElement>.TrieNode currentNode, List<TElement> results)
+    private static void AddRecursivlyToResult(TrieNode currentNode, List<TElement> results)
     {
         if (currentNode._elements is not null)
         {
@@ -151,7 +151,7 @@ internal class Trie<TElement>
 
         if (currentNode._children is not null)
         {
-            foreach ((_, Trie<TElement>.TrieNode child) in currentNode._children)
+            foreach ((_, TrieNode child) in currentNode._children)
             {
                 AddRecursivlyToResult(child, results);
             }
@@ -163,7 +163,7 @@ internal class Trie<TElement>
         _root.Clear();
     }
 
-    private class TrieNode
+    private class TrieNode(IEqualityComparer<char> equalityComparer)
     {
         internal Dictionary<char, TrieNode>? _children;
         internal HashSet<TElement>? _elements;
@@ -177,11 +177,11 @@ internal class Trie<TElement>
             }
             else
             {
-                _children ??= [];
+                _children ??= new(equalityComparer);
 
                 ref TrieNode? trieNode = ref CollectionsMarshal.GetValueRefOrAddDefault(_children, key[0], out _);
 
-                trieNode ??= new();
+                trieNode ??= new(equalityComparer);
                 return trieNode.Add(key[1..], element);
             }
         }

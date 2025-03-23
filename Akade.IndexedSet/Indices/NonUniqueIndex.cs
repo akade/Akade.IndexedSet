@@ -3,10 +3,10 @@
 /// <summary>
 /// Nonunique index implementation based on <see cref="DataStructures.Lookup{TKey, TElement}"/>
 /// </summary>
-internal sealed class NonUniqueIndex<TElement, TIndexKey>(string name) : TypedIndex<TElement, TIndexKey>(name)
+internal sealed class NonUniqueIndex<TElement, TIndexKey>(IEqualityComparer<TIndexKey> equalityComparer, string name) : TypedIndex<TElement, TIndexKey>(name)
     where TIndexKey : notnull
 {
-    private readonly DataStructures.Lookup<TIndexKey, TElement> _data = new();
+    private readonly DataStructures.Lookup<TIndexKey, TElement> _data = new(equalityComparer);
 
     internal override void Add(TIndexKey key, TElement value)
     {

@@ -1,7 +1,7 @@
 ﻿namespace Akade.IndexedSet.DataStructures;
-internal class SuffixTrie<TElement>
+internal class SuffixTrie<TElement>(IEqualityComparer<char> equalityComparer)
 {
-    private readonly Trie<TElement> _trie = new();
+    private readonly Trie<TElement> _trie = new(equalityComparer);
 
     public bool Add(ReadOnlySpan<char> key, TElement element)
     {

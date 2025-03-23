@@ -332,13 +332,14 @@ concurrentSet.Update(set =>
 ```
 
 ### How do I do case-insensitve (fuzzy) string matching (Prefix, FullTextIndex)?
-Remember that you can index whatever you want, including computed properties. This also applies for fuzzy matching:
+While you can use whatever index expression that you want (i.e. `.ToLowerInvariant()`), 
+using a comparer is recommended:
 
 ```csharp
 IndexedSet<Data> set = IndexedSetBuilder<Data>.Create(x => x.PrimaryKey)
-                                              .WithFullTextIndex(x => x.Text.ToLowerInvariant())
+                                              .WithFullTextIndex(x => x.Text, CharEqualityComparer.OrdinalIgnoreCase)
                                               .Build();
-IEnumerable<Data> matches = set.FuzzyContains(x => x.Text.ToLowerInvariant(), "Search", maxDistance: 2);
+IEnumerable<Data> matches = set.FuzzyContains(x => x.Text, "Search", maxDistance: 2);
 ```
 
 ## Roadmap

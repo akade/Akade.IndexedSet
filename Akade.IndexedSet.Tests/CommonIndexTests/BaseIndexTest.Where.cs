@@ -1,23 +1,23 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
-internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
+internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComparer>
 {
-    [TestMethod]
+    [BaseTestMethod]
     public void Where_should_return_empty_result_when_no_data_is_present()
     {
         TIndex index = CreateIndex();
         Assert.IsFalse(index.Where(GetNotExistingKey()).Any());
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void Where_should_return_empty_result_when_key_is_not_present()
     {
         TIndex index = CreateIndexWithData(GetUniqueData());
         Assert.IsFalse(index.Where(GetNotExistingKey()).Any());
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void Where_should_return_single_element_for_unique_key()
     {
         TElement[] data = GetUniqueData();
@@ -25,7 +25,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         Assert.AreEqual(data[0], index.Where(_keyAccessor(data[0])).Single());
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void Where_should_return_multiple_element_for_unique_key()
     {
         if (SupportsNonUniqueKeys)

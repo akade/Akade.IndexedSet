@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Akade.IndexedSet.StringUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.Samples.TypeaheadSample;
 
@@ -11,7 +12,7 @@ public class TypeaheadSample
     {
         _types = typeof(string).Assembly.GetTypes()
                                         .ToIndexedSet()
-                                        .WithPrefixIndex(x => x.Name.ToLowerInvariant())
+                                        .WithPrefixIndex(x => x.Name, CharEqualityComparer.OrdinalIgnoreCase)
                                         .Build();
     }
 
@@ -19,7 +20,7 @@ public class TypeaheadSample
     public void Case_insensitve_lookahead_in_all_types_within_system_runtime()
     {
         // Travers the prefix trie to efficiently find all matches
-        Type[] types = _types.StartsWith(x => x.Name.ToLowerInvariant(), "int").ToArray();
+        Type[] types = _types.StartsWith(x => x.Name, "int").ToArray();
 
         Assert.IsTrue(types.Length > 0);
         Assert.IsTrue(types.All(t => t.Name.StartsWith("int", StringComparison.InvariantCultureIgnoreCase)));

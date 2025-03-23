@@ -22,11 +22,12 @@ public class NonUniqueIndices
                           .WithIndex(x => x.IntProperty)
                           .WithIndex(x => x.GuidProperty)
                           .WithIndex(x => x.StringProperty)
+                          .WithIndex(CaseInsensitiveStringProperty, StringComparer.OrdinalIgnoreCase)
                           .Build();
     }
 
     [TestMethod]
-    public void retrieval_via_secondary_int_key_returns_correct_items()
+    public void Retrieval_via_secondary_int_key_returns_correct_items()
     {
         _indexedSet.AssertMultipleItems(x => x.IntProperty, expectedElements: [_a, _b]);
         _indexedSet.AssertSingleItem(x => x.IntProperty, _c);
@@ -34,7 +35,7 @@ public class NonUniqueIndices
     }
 
     [TestMethod]
-    public void retrieval_via_secondary_guid_key_returns_correct_items()
+    public void Retrieval_via_secondary_guid_key_returns_correct_items()
     {
         _indexedSet.AssertSingleItem(x => x.GuidProperty, _a);
         _indexedSet.AssertSingleItem(x => x.GuidProperty, _b);
@@ -43,7 +44,7 @@ public class NonUniqueIndices
     }
 
     [TestMethod]
-    public void retrieval_via_secondary_string_key_returns_correct_items()
+    public void Retrieval_via_secondary_string_key_returns_correct_items()
     {
         _indexedSet.AssertSingleItem(x => x.StringProperty, _a);
         _indexedSet.AssertSingleItem(x => x.StringProperty, _b);
@@ -51,14 +52,13 @@ public class NonUniqueIndices
     }
 
     [TestMethod]
-    [ExpectedException(typeof(NotSupportedException))]
-    public void range_queries_throw_exception()
+    public void Range_queries_throw_exception()
     {
-        _ = _indexedSet.Range(x => x.IntProperty, 5, 10).ToList();
+        _ = Assert.ThrowsException<NotSupportedException>(() => _ = _indexedSet.Range(x => x.IntProperty, 5, 10).ToList());
     }
 
     [TestMethod]
-    public void retrieval_via_compound_key_returns_correct_items()
+    public void Retrieval_via_compound_key_returns_correct_items()
     {
         TestData[] data = [_a, _b, _c, _d, _e];
         _indexedSet = data.ToIndexedSet(x => x.PrimaryKey)
@@ -97,5 +97,20 @@ public class NonUniqueIndices
 
         Assert.IsTrue(_indexedSet.TryGetSingle(x => x.IntProperty, 11, out TestData? data3));
         Assert.IsNotNull(data3);
+    }
+
+    private static string CaseInsensitiveStringProperty(TestData data)
+    {
+        return data.StringProperty;
+    }
+
+    [TestMethod]
+    public void Case_insensitive_string_property_matching()
+    {
+        TestData[] actual = _indexedSet.Where(CaseInsensitiveStringProperty, "aa").ToArray();
+        CollectionAssert.AreEquivalent(new[] { _a }, actual);
+
+        actual = _indexedSet.Where(CaseInsensitiveStringProperty, "cc").ToArray();
+        CollectionAssert.AreEquivalent(new[] { _c, _d, _e }, actual);
     }
 }

@@ -9,10 +9,10 @@ namespace Akade.IndexedSet.DataStructures;
 /// values are inserted in reverse order: insertion at the beginning requires moving all the values
 /// within the list and its backing array.
 /// </summary>
-internal class BinaryHeap<TValue> : ICollection<TValue>
+internal class BinaryHeap<TValue>(IComparer<TValue> comparer) : ICollection<TValue>
 {
     private readonly List<TValue> _data = [];
-    private readonly Comparer<TValue> _comparer = Comparer<TValue>.Default;
+    private readonly IComparer<TValue> _comparer = comparer;
 
     public int Count => _data.Count;
 

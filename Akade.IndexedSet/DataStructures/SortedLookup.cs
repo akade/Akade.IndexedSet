@@ -6,11 +6,12 @@
 /// Provides O(log(n)) operations as well as range queries based on the key.
 /// Suffers from the same insertion order problematic as <see cref="BinaryHeap{TValue}"/>
 /// </summary>
-internal class SortedLookup<TKey, TValue>
+internal class SortedLookup<TKey, TValue>(IComparer<TKey> keyComparer)
     where TKey : notnull
 {
     private readonly List<TValue> _sortedValues = [];
-    private readonly BinaryHeap<TKey> _sortedKeys = [];
+    private readonly BinaryHeap<TKey> _sortedKeys = new(keyComparer);
+    private readonly IComparer<TKey> _keyComparer = keyComparer;
 
     public void Add(TKey key, TValue value)
     {
@@ -26,7 +27,7 @@ internal class SortedLookup<TKey, TValue>
             _ = _sortedKeys.EnsureCapacity(_sortedKeys.Count + count);
         }
 
-        foreach (KeyValuePair<TKey, TValue> element in elementsToAdd.OrderBy(kvp => kvp.Key))
+        foreach (KeyValuePair<TKey, TValue> element in elementsToAdd.OrderBy(kvp => kvp.Key, _keyComparer))
         {
             Add(element.Key, element.Value);
         }

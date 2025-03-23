@@ -9,7 +9,7 @@ namespace Akade.IndexedSet.Tests.Samples.Graph;
 public class GraphSample
 {
     [TestMethod]
-    public void efficiently_query_incoming_edges_on_nodes()
+    public void Efficiently_query_incoming_edges_on_nodes()
     {
         IndexedSet<int, Node> _graph = IndexedSetBuilder<Node>.Create(x => x.Id)
                                                               .WithIndex<int>(x => x.ConnectedTo) // for special collections such as immutable arrays: make sure the correct overload has been selected by providing generic arguments

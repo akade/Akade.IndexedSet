@@ -6,10 +6,10 @@ namespace Akade.IndexedSet.DataStructures;
 /// Modifiable lookup based on <see cref="Dictionary{TKey, TValue}"/> with <see cref="HashSet{T}"/> as value collection per key.
 /// O(1) retreival and insertion.
 /// </summary>
-internal class Lookup<TKey, TValue>
+internal class Lookup<TKey, TValue>(IEqualityComparer<TKey> keyComparer)
     where TKey : notnull
 {
-    private readonly Dictionary<TKey, HashSet<TValue>> _values = [];
+    private readonly Dictionary<TKey, HashSet<TValue>> _values = new(keyComparer);
 
     public bool Add(TKey key, TValue value)
     {

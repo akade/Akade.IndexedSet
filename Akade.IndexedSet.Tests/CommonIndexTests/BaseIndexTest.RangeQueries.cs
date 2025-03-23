@@ -1,9 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Akade.IndexedSet.Tests.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
-internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
+internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComparer>
 {
-    [TestMethod]
+    [BaseTestMethod]
     public void Range_based_methods_should_throw_if_not_supported()
     {
         if (!SupportsRangeBasedQueries)
@@ -23,7 +24,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void Range_returns_empty_result_if_not_present()
     {
         if (SupportsRangeBasedQueries)
@@ -33,7 +34,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void Range_returns_sorted_elements_respecting_boundary_parameters_for_unique_data()
     {
         if (SupportsRangeBasedQueries)
@@ -42,7 +43,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
             TElement[] data = GetUniqueData();
             AddElements(data, index);
 
-            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor)];
+            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor, ComparerUtils.GetComparer<TIndexKey>(_comparer))];
 
             TIndexKey rangeStart = _keyAccessor(orderedElements[1]);
             TIndexKey rangeEnd = _keyAccessor(orderedElements[^2]);
@@ -53,7 +54,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void Comparison_queries_return_empty_result_if_no_element_is_present()
     {
         if (SupportsRangeBasedQueries)
@@ -66,7 +67,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void Comparison_queries_return_sorted_elements_respecting_boundary()
     {
         if (SupportsRangeBasedQueries)
@@ -74,17 +75,17 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
             AddElements(data, index);
-            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor)];
+            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor, ComparerUtils.GetComparer<TIndexKey>(_comparer))];
 
-            TIndexKey boundary = _keyAccessor(orderedElements[3]);
-            CollectionAssert.AreEqual(orderedElements[0..3], index.LessThan(boundary).ToArray());
-            CollectionAssert.AreEqual(orderedElements[0..4], index.LessThanOrEqual(boundary).ToArray());
-            CollectionAssert.AreEqual(orderedElements[4..], index.GreaterThan(boundary).ToArray());
-            CollectionAssert.AreEqual(orderedElements[3..], index.GreaterThanOrEqual(boundary).ToArray());
+            TIndexKey boundary = _keyAccessor(orderedElements[2]);
+            CollectionAssert.AreEqual(orderedElements[0..2], index.LessThan(boundary).ToArray());
+            CollectionAssert.AreEqual(orderedElements[0..3], index.LessThanOrEqual(boundary).ToArray());
+            CollectionAssert.AreEqual(orderedElements[3..], index.GreaterThan(boundary).ToArray());
+            CollectionAssert.AreEqual(orderedElements[2..], index.GreaterThanOrEqual(boundary).ToArray());
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void MaxMin_throw_if_the_set_is_empty()
     {
         if (SupportsRangeBasedQueries)
@@ -95,7 +96,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void MaxMin_return_empty_enumerable_if_the_set_is_empty()
     {
         if (SupportsRangeBasedQueries)
@@ -106,7 +107,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void MaxMin_return_correct_key_and_values()
     {
         if (SupportsRangeBasedQueries)
@@ -115,7 +116,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
             TElement[] data = GetUniqueData();
             AddElements(data, index);
 
-            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor)];
+            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor, ComparerUtils.GetComparer<TIndexKey>(_comparer))];
 
             Assert.AreEqual(_keyAccessor(orderedElements[0]), index.Min());
             Assert.AreEqual(orderedElements[0], index.MinBy().Single());
@@ -125,7 +126,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void OrderBy_returns_empty_values_with_no_data()
     {
         if (SupportsRangeBasedQueries)
@@ -135,7 +136,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void OrderBy_throws_if_skip_value_is_too_large()
     {
         if (SupportsRangeBasedQueries)
@@ -147,7 +148,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void OrderBy_returns_sorted_values()
     {
         if (SupportsRangeBasedQueries)
@@ -155,7 +156,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
             AddElements(data, index);
-            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor)];
+            TElement[] orderedElements = [.. data.OrderBy(_keyAccessor, ComparerUtils.GetComparer<TIndexKey>(_comparer))];
 
             for (int i = 0; i < orderedElements.Length; i++)
             {
@@ -164,7 +165,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void OrderByDescending_returns_empty_values_with_no_data()
     {
         if (SupportsRangeBasedQueries)
@@ -174,7 +175,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void OrderByDescending_throws_if_skip_value_is_too_large()
     {
         if (SupportsRangeBasedQueries)
@@ -186,7 +187,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void OrderByDescending_returns_sorted_values()
     {
         if (SupportsRangeBasedQueries)
@@ -194,7 +195,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
             AddElements(data, index);
-            TElement[] orderedElements = [.. data.OrderByDescending(_keyAccessor)];
+            TElement[] orderedElements = [.. data.OrderByDescending(_keyAccessor, ComparerUtils.GetComparer<TIndexKey>(_comparer))];
 
             for (int i = 0; i < orderedElements.Length; i++)
             {
