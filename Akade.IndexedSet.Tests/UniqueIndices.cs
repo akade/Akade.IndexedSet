@@ -24,7 +24,7 @@ public class UniqueIndices
     }
 
     [TestMethod]
-    public void retrieval_via_secondary_int_key_returns_correct_items()
+    public void Retrieval_via_secondary_int_key_returns_correct_items()
     {
         _indexedSet.AssertSingleItem(x => x.IntProperty, _a);
         _indexedSet.AssertSingleItem(x => x.IntProperty, _b);
@@ -32,7 +32,7 @@ public class UniqueIndices
     }
 
     [TestMethod]
-    public void retrieval_via_secondary_guid_key_returns_correct_items()
+    public void Retrieval_via_secondary_guid_key_returns_correct_items()
     {
         _indexedSet.AssertSingleItem(x => x.GuidProperty, _a);
         _indexedSet.AssertSingleItem(x => x.GuidProperty, _b);
@@ -40,7 +40,7 @@ public class UniqueIndices
     }
 
     [TestMethod]
-    public void retrieval_via_secondary_string_key_returns_correct_items()
+    public void Retrieval_via_secondary_string_key_returns_correct_items()
     {
         _indexedSet.AssertSingleItem(x => x.StringProperty, _a);
         _indexedSet.AssertSingleItem(x => x.StringProperty, _b);
@@ -48,7 +48,7 @@ public class UniqueIndices
     }
 
     [TestMethod]
-    public void retrieval_via_compound_key_returns_correct_items()
+    public void Retrieval_via_compound_key_returns_correct_items()
     {
         TestData[] data = [_a, _b, _c];
         _indexedSet = data.ToIndexedSet(x => x.PrimaryKey)
@@ -61,17 +61,15 @@ public class UniqueIndices
     }
 
     [TestMethod]
-    [ExpectedException(typeof(NotSupportedException))]
-    public void range_queries_throw_exception()
+    public void Range_queries_throw_exception()
     {
-        _ = _indexedSet.Range(x => x.IntProperty, 5, 10).ToList();
+        _ = Assert.ThrowsException<NotSupportedException>(() => _ = _indexedSet.Range(x => x.IntProperty, 5, 10).ToList());
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
-    public void adding_duplicate_key_throws()
+    public void Adding_duplicate_key_throws()
     {
-        _ = _indexedSet.Add(new TestData(5, 10, Guid.NewGuid(), "ew"));
+        _ = Assert.ThrowsException<ArgumentException>(() => _ = _indexedSet.Add(new TestData(5, 10, Guid.NewGuid(), "ew")));
     }
 
     [TestMethod]
@@ -105,5 +103,19 @@ public class UniqueIndices
         _indexedSet.AssertSingleItem(Multikeys, _a);
         _indexedSet.AssertSingleItem(Multikeys, _b);
         _indexedSet.AssertSingleItem(Multikeys, _c);
+    }
+
+    [TestMethod]
+    public void Custom_comparer_allows_modifying_comparison()
+    {
+        string[] data = ["a", "b", "c"];
+        IndexedSet<string> indexedSet = data.ToIndexedSet()
+                                            .WithUniqueIndex(x => x, StringComparer.OrdinalIgnoreCase)
+                                            .Build();
+
+        Assert.IsTrue(indexedSet.TryGetSingle(x => x, "A", out string? a));
+        Assert.AreEqual("a", a);
+
+        _ = Assert.ThrowsException<ArgumentException>(() => indexedSet.Add("C"));
     }
 }

@@ -1,3 +1,4 @@
+using Akade.IndexedSet.StringUtilities;
 using Akade.IndexedSet.Tests.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics.CodeAnalysis;
@@ -10,6 +11,7 @@ public class PrefixIndices
     private record class Animal(string Name, string Category);
 
     private IndexedSet<Animal> _indexedSet = null!;
+    private Animal[] _allAnimals = null!;
     private readonly Animal _bonobo = new("Bonobo", "Mammal");
     private readonly Animal _booby = new("Booby", "Bird");
     private readonly Animal _boomslang = new("Boomslang", "Reptile");
@@ -25,7 +27,7 @@ public class PrefixIndices
     [TestInitialize]
     public void Init()
     {
-        var data = new Animal[] {
+        _allAnimals = [
             _bonobo,
             _booby,
             _boomslang,
@@ -37,43 +39,42 @@ public class PrefixIndices
             _panther,
             _pangolin,
             _parrot,
-        };
-        _indexedSet = data.ToIndexedSet()
-                          .WithPrefixIndex(x => x.Category)
-                          .WithPrefixIndex(x => x.Name)
-                          .Build();
+        ];
+        _indexedSet = _allAnimals.ToIndexedSet()
+                                 .WithPrefixIndex(x => x.Category)
+                                 .WithPrefixIndex(x => x.Name)
+                                 .Build();
     }
 
     [TestMethod]
-    public void single_item_retrieval_works()
+    public void Single_item_retrieval_works()
     {
         _indexedSet.AssertSingleItem(x => x.Category, _boomslang);
         _indexedSet.AssertSingleItem(x => x.Category, _tarantula);
     }
 
     [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
-    public void single_item_retrieval_throws_exception_if_there_is_more_than_one_result()
+    public void Single_item_retrieval_throws_exception_if_there_is_more_than_one_result()
     {
-        _indexedSet.AssertSingleItem(x => x.Category, _bonobo);
+        _ = Assert.ThrowsException<InvalidOperationException>(() => _indexedSet.AssertSingleItem(x => x.Category, _bonobo));
     }
 
     [TestMethod]
-    public void multi_item_retrieval_works()
+    public void Multi_item_retrieval_works()
     {
         _indexedSet.AssertMultipleItems(x => x.Category, expectedElements: [_bonobo, _borador, _tiger, _tapir, _panther, _pangolin]);
         _indexedSet.AssertMultipleItems(x => x.Category, expectedElements: [_booby, _penguin, _parrot]);
     }
 
     [TestMethod]
-    public void search_via_starts_with()
+    public void Search_via_starts_with()
     {
         CollectionAssert.AreEquivalent(new[] { _booby, _boomslang }, _indexedSet.StartsWith(x => x.Name, "Boo").ToArray());
         CollectionAssert.AreEquivalent(new[] { _panther, _pangolin }, _indexedSet.StartsWith(x => x.Name, "Pan").ToArray());
     }
 
     [TestMethod]
-    public void search_via_fuzzy_starts_with()
+    public void Search_via_fuzzy_starts_with()
     {
         CollectionAssert.AreEquivalent(new[] { _bonobo, _booby, _boomslang, _borador }, _indexedSet.FuzzyStartsWith(x => x.Name, "Boo", 1).ToArray());
         CollectionAssert.AreEquivalent(new[] { _penguin, _parrot, _panther, _pangolin }, _indexedSet.FuzzyStartsWith(x => x.Name, "Pan", 1).ToArray());
@@ -95,23 +96,9 @@ public class PrefixIndices
     {
         static IEnumerable<string> Multikeys(Animal d) => [d.Name, d.Category];
 
-        var data = new Animal[] {
-            _bonobo,
-            _booby,
-            _boomslang,
-            _borador,
-            _tiger,
-            _tarantula,
-            _tapir,
-            _penguin,
-            _panther,
-            _pangolin,
-            _parrot,
-        };
-
-        _indexedSet = data.ToIndexedSet()
-                          .WithPrefixIndex(Multikeys)
-                          .Build();
+        _indexedSet = _allAnimals.ToIndexedSet()
+                                 .WithPrefixIndex(Multikeys)
+                                 .Build();
 
         // only reptile & spider
         _indexedSet.AssertSingleItem(Multikeys, _boomslang);
@@ -120,5 +107,31 @@ public class PrefixIndices
         CollectionAssert.AreEquivalent(_indexedSet.Where(Multikeys, "Bird").ToArray(), new[] { _booby, _penguin, _parrot });
         CollectionAssert.AreEquivalent(_indexedSet.StartsWith(Multikeys, "Bir").ToArray(), new[] { _booby, _penguin, _parrot });
         CollectionAssert.AreEquivalent(_indexedSet.FuzzyStartsWith(Multikeys, "Lir", 1).ToArray(), new[] { _booby, _penguin, _parrot });
+    }
+
+    [TestMethod]
+    public void Case_insensitive_matching()
+    {
+        static string CategoryCaseInsensitive(Animal a) => a.Category;
+
+        _indexedSet = _allAnimals.ToIndexedSet()
+                                 .WithPrefixIndex(CategoryCaseInsensitive, CharEqualityComparer.OrdinalIgnoreCase)
+                                 .Build();
+
+        Animal[] actual = _indexedSet.StartsWith(CategoryCaseInsensitive, "MAMM").ToArray();
+        CollectionAssert.AreEquivalent(_allAnimals.Where(x => x.Category == "Mammal").ToArray(), actual);
+    }
+
+    [TestMethod]
+    public void Case_insensitive_fuzzy_matching()
+    {
+        static string NameCaseInsensitive(Animal a) => a.Name;
+
+        _indexedSet = _allAnimals.ToIndexedSet()
+                                 .WithPrefixIndex(NameCaseInsensitive, CharEqualityComparer.OrdinalIgnoreCase)
+                                 .Build();
+        
+        Animal[] actual = _indexedSet.FuzzyStartsWith(NameCaseInsensitive, "PAN", 1).ToArray();
+        CollectionAssert.AreEquivalent(new[] { _penguin, _parrot, _panther, _pangolin }, actual);
     }
 }

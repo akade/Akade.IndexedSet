@@ -1,25 +1,30 @@
 ﻿using Akade.IndexedSet.Indices;
+using Akade.IndexedSet.StringUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
 
 public partial class CommonIndexTests
 {
-    internal class PrefixIndexTest : BaseIndexTest<string, Container<string>, PrefixIndex<Container<string>>>
-    {
-        public PrefixIndexTest() : base(x => x.Value)
-        {
+    internal class PrefixIndexTest(IEqualityComparer<char> comparer)
+        : BaseIndexTest<string, Container<string>, PrefixIndex<Container<string>>, IEqualityComparer<char>>(x => x.Value, comparer)
+        , IBaseIndexTest<IEqualityComparer<char>>
 
-        }
+    {
 
         protected override bool SupportsNonUniqueKeys => true;
 
         protected override bool SupportsRangeBasedQueries => false;
         protected override bool SupportsStartsWithQueries => true;
 
+        public static IEnumerable<IEqualityComparer<char>> GetComparers()
+        {
+            return [EqualityComparer<char>.Default, CharEqualityComparer.OrdinalIgnoreCase];
+        }
+
         protected override PrefixIndex<Container<string>> CreateIndex()
         {
-            return new PrefixIndex<Container<string>>("Test");
+            return new PrefixIndex<Container<string>>(_comparer, "Test");
         }
 
         protected override string GetNotExistingKey()
@@ -57,13 +62,13 @@ public partial class CommonIndexTests
 
     [DataTestMethod]
     [DynamicData(nameof(GetPrefixIndexTestMethods), DynamicDataSourceType.Method)]
-    public void PrefixIndex(string method)
+    public void PrefixIndex(string method, object comparer)
     {
-        BaseIndexTest.RunTest<PrefixIndexTest>(method);
+        BaseIndexTest.RunTest<PrefixIndexTest, IEqualityComparer<char>>(method, comparer);
     }
 
     public static IEnumerable<object[]> GetPrefixIndexTestMethods()
     {
-        return BaseIndexTest.GetTestMethods<PrefixIndexTest>();
+        return BaseIndexTest.GetTestMethods<PrefixIndexTest, IEqualityComparer<char>>();
     }
 }

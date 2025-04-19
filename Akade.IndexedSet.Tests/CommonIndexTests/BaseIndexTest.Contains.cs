@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
-internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
+internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComparer>
 {
-    [TestMethod]
+    [BaseTestMethod]
     public void Contains_based_methods_should_throw_if_not_supported()
     {
         if (!SupportsContainsQueries)
@@ -13,7 +13,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void Contains_returns_empty_set_if_set_is_empty()
     {
         if (SupportsContainsQueries)
@@ -23,7 +23,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void Contains_returns_empty_set_if_no_matching_key_is_available()
     {
         if (SupportsContainsQueries)
@@ -33,7 +33,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void Contains_returns_matching_item()
     {
         if (SupportsContainsQueries)
@@ -45,7 +45,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void Contains_returns_multiple_matching_item()
     {
         if (SupportsContainsQueries)
@@ -61,7 +61,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void FuzzyContains_based_methods_should_throw_if_not_supported()
     {
         if (!SupportsContainsQueries)
@@ -71,7 +71,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void FuzzyContains_returns_empty_set_if_set_is_empty()
     {
         if (SupportsContainsQueries)
@@ -81,7 +81,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void FuzzyContains_returns_empty_set_if_no_matching_key_is_available()
     {
         if (SupportsContainsQueries)
@@ -91,7 +91,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void FuzzyContains_returns_matching_item()
     {
         if (SupportsContainsQueries)
@@ -108,7 +108,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex>
         }
     }
 
-    [TestMethod]
+    [BaseTestMethod]
     public void FuzzyContains_returns_multiple_matching_item()
     {
         if (SupportsContainsQueries)

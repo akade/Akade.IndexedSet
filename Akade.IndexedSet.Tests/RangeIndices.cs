@@ -1,3 +1,4 @@
+
 using Akade.IndexedSet.Tests.Data;
 using Akade.IndexedSet.Tests.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -26,7 +27,7 @@ public class RangeIndices
     }
 
     [TestMethod]
-    public void range_query_on_ints_returns_correct_items()
+    public void Range_query_on_ints_returns_correct_items()
     {
         _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 3, 25, inclusiveStart: true, inclusiveEnd: false, expectedElements: [_a, _b, _c, _d, _e]);
         _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 8, 12, inclusiveStart: true, inclusiveEnd: false, expectedElements: [_a, _b, _c]);
@@ -35,7 +36,7 @@ public class RangeIndices
     }
 
     [TestMethod]
-    public void range_query_on_ints_correctly_respects_inclusive_or_exclusive_boundaries()
+    public void Range_query_on_ints_correctly_respects_inclusive_or_exclusive_boundaries()
     {
         _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 10, 13, inclusiveStart: false, inclusiveEnd: false, expectedElements: [_c]);
         _indexedSet.AssertMultipleItemsViaRange(x => x.IntProperty, 10, 13, inclusiveStart: true, inclusiveEnd: false, expectedElements: [_a, _b, _c]);
@@ -44,7 +45,7 @@ public class RangeIndices
     }
 
     [TestMethod]
-    public void range_query_on_strings_returns_correct_items()
+    public void Range_query_on_strings_returns_correct_items()
     {
         _indexedSet.AssertMultipleItemsViaRange(x => x.StringProperty, "A", "F", inclusiveStart: true, inclusiveEnd: false, expectedElements: [_a, _b, _c, _d, _e]);
         _indexedSet.AssertMultipleItemsViaRange(x => x.StringProperty, "A", "D", inclusiveStart: true, inclusiveEnd: false, expectedElements: [_a, _b]);
@@ -53,7 +54,7 @@ public class RangeIndices
     }
 
     [TestMethod]
-    public void range_query_on_guids_returns_correct_items()
+    public void Range_query_on_guids_returns_correct_items()
     {
         _indexedSet.AssertMultipleItemsViaRange(x => x.GuidProperty, GuidGen.Get(0), GuidGen.Get(12), inclusiveStart: true, inclusiveEnd: false, expectedElements: [_a, _b, _c, _d, _e]);
         _indexedSet.AssertMultipleItemsViaRange(x => x.GuidProperty, GuidGen.Get(0), GuidGen.Get(4), inclusiveStart: true, inclusiveEnd: false, expectedElements: [_a, _b, _c]);
@@ -216,7 +217,6 @@ public class RangeIndices
                           .WithRangeIndex(Multikeys)
                           .Build();
 
-
         CollectionAssert.AreEqual(new[] { _a, _b, _c }, _indexedSet.Range(Multikeys, _a.PrimaryKey, _c.PrimaryKey, inclusiveEnd: true).ToArray());
 
         // matches _a
@@ -225,5 +225,22 @@ public class RangeIndices
 
         // matches _a & _b
         Assert.IsFalse(_indexedSet.TryGetSingle(Multikeys, _b.PrimaryKey, out _));
+    }
+
+    [TestMethod]
+    public void Custom_comparer_allows_to_control_order()
+    {
+        IComparer<string> byLength = Comparer<string>.Create((a, b) =>
+        {
+            int lengthComparison = a.Length.CompareTo(b.Length);
+            return lengthComparison == 0 ? Comparer<string>.Default.Compare(a, b) : lengthComparison;
+        });
+
+        IndexedSet<string> set = new[] { "aaa2", "ab", "a", "aaa1", "ba" }.ToIndexedSet()
+                                                                          .WithRangeIndex(x => x, byLength)
+                                                                          .Build();
+
+        CollectionAssert.AreEqual(new[] { "a", "ab", "ba", "aaa1", "aaa2" }, set.OrderBy(x => x).ToArray());
+        CollectionAssert.AreEqual(new[] { "aaa2", "aaa1", "ba", "ab", "a" }, set.OrderByDescending(x => x).ToArray());
     }
 }

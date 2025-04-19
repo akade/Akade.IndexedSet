@@ -47,7 +47,7 @@ public class AppointmentSample
     }
 
     [TestMethod]
-    public void get_all_meetings_for_owner()
+    public void Get_all_meetings_for_owner()
     {
         // Multivalue access. Note that we use the same expression that was used during setting the set up
         Assert.AreEqual(6, _appointments.Where(x => x.Owner, "Lancelot").Count());
@@ -56,7 +56,7 @@ public class AppointmentSample
     }
 
     [TestMethod]
-    public void get_all_meetings_today_or_tomorrow()
+    public void Get_all_meetings_today_or_tomorrow()
     {
         // Range query with exlusive end
         string[] meetings = _appointments.Range(x => x.Start, _todayDateTime, _todayDateTime.AddDays(2))
@@ -68,7 +68,7 @@ public class AppointmentSample
     }
 
     [TestMethod]
-    public void check_for_conflicting_meetings()
+    public void Check_for_conflicting_meetings()
     {
         DateTime plannedStart = _today.AddDays(2).WithDayTime(09, 00);
         DateTime plannedEnd = _today.AddDays(2).WithDayTime(09, 30);
@@ -87,16 +87,15 @@ public class AppointmentSample
     }
 
     [TestMethod]
-    [ExpectedException(typeof(IndexNotFoundException))]
-    public void key_expression_does_matter()
+    public void Key_expression_does_matter()
     {
         // the index was created with x => x.Owner
         // Hence, even though the indexed key is the same, the name for the index is not
-        _ = _appointments.Single(t => t.Owner, "Test");
+        _ = Assert.ThrowsException<IndexNotFoundException>(() => _ = _appointments.Single(t => t.Owner, "Test"));
     }
 
     [TestMethod]
-    public void using_a_calculated_index_property_to_find_all_longer_appointments()
+    public void Using_a_calculated_index_property_to_find_all_longer_appointments()
     {
         // Note that you can use complex key extractors, make sure 
         string[] longerAppointments = _appointments.Range(Duration, TimeSpan.FromMinutes(30), TimeSpan.MaxValue)
@@ -110,7 +109,7 @@ public class AppointmentSample
     }
 
     [TestMethod]
-    public void text_searching_within_subjects()
+    public void Text_searching_within_subjects()
     {
         // querying within the full-text-search index allows to perform a contains over a trie instead of comparing it on all elements
         Appointment meetingWith42InSubject = _appointments.Contains(x => x.Subject, "#42").Single();
@@ -118,7 +117,7 @@ public class AppointmentSample
     }
 
     [TestMethod]
-    public void fuzzy_searching_within_subjects()
+    public void Fuzzy_searching_within_subjects()
     {
         // Fulltext and prefix indices support fuzzy matching to allow a certain number of errors (Levenshtein/edit distance)
         Appointment technicalDebtMeeting = _appointments.FuzzyContains(x => x.Subject, "Technical Det", 1).Single();

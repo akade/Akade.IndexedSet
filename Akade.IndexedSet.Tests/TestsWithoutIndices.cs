@@ -19,7 +19,7 @@ public class TestsWithoutIndices
     }
 
     [TestMethod]
-    public void adding_multiple_items_alawys_returns_correct_count()
+    public void Adding_multiple_items_always_returns_correct_count()
     {
         Assert.AreEqual(0, _indexedSet.Count);
 
@@ -34,7 +34,7 @@ public class TestsWithoutIndices
     }
 
     [TestMethod]
-    public void retrieval_via_primary_key_returns_matching_items()
+    public void Retrieval_via_primary_key_returns_matching_items()
     {
         AddAll();
         Assert.AreEqual(_a, _indexedSet[0]);
@@ -43,7 +43,7 @@ public class TestsWithoutIndices
     }
 
     [TestMethod]
-    public void removing_multiple_items_alawys_returns_correct_count()
+    public void Removing_multiple_items_alawys_returns_correct_count()
     {
         AddAll();
         Assert.AreEqual(3, _indexedSet.Count);
@@ -59,7 +59,7 @@ public class TestsWithoutIndices
     }
 
     [TestMethod]
-    public void removing_multiple_items_removes_the_correct_items()
+    public void Removing_multiple_items_removes_the_correct_items()
     {
         AddAll();
         Assert.IsTrue(_indexedSet.Contains(_b));
@@ -72,34 +72,31 @@ public class TestsWithoutIndices
     }
 
     [TestMethod]
-    [ExpectedException(typeof(KeyNotFoundException))]
-    public void missing_primarykey_throws()
+    public void Missing_primarykey_throws()
     {
         AddAll();
-        _ = _indexedSet[42];
+        _ = Assert.ThrowsException<KeyNotFoundException>(() => _ = _indexedSet[42]);
     }
 
     [TestMethod]
-    [ExpectedException(typeof(IndexNotFoundException))]
-    public void missing_index_throws()
+    public void Missing_index_throws()
     {
         AddAll();
-        _ = _indexedSet.Single(x => x.IntProperty, _a.IntProperty);
+        _ = Assert.ThrowsException<IndexNotFoundException>(() => _ = _indexedSet.Single(x => x.IntProperty, _a.IntProperty));
     }
 
     [TestMethod]
-    public void adding_duplicate_item_returns_false()
+    public void Adding_duplicate_item_returns_false()
     {
         AddAll();
         Assert.IsFalse(_indexedSet.Add(_a));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
-    public void adding_duplicate_primary_key_throws()
+    public void Adding_duplicate_primary_key_throws()
     {
         AddAll();
-        _ = _indexedSet.Add(new TestData(0, 0, Guid.Empty, ""));
+        _ = Assert.ThrowsException<ArgumentException>(() => _ = _indexedSet.Add(new TestData(0, 0, Guid.Empty, "")));
     }
 
     private void AddAll()
