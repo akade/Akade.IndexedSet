@@ -2,7 +2,7 @@
 
 internal sealed class ReaderWriterLockEx : IDisposable
 {
-    private readonly ReaderWriterLockSlim _lock = new();
+    private readonly ReaderWriterLockSlim _lock = new(LockRecursionPolicy.SupportsRecursion);
     private readonly ReaderDisposable _readerDisposable;
     private readonly WriterDisposable _writerDisposable;
 
