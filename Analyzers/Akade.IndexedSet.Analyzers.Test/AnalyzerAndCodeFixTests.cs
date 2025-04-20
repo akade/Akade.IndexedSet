@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using VerifyCS = Akade.IndexedSet.Analyzers.Test.CSharpCodeFixVerifier<
     Akade.IndexedSet.Analyzers.IndexNamingRulesAnalyzer,
-    Akade.IndexedSet.Analyzers.AkadeIndexedSetAnalyzersCodeFixProvider>;
+    Akade.IndexedSet.Analyzers.Fixes.AkadeIndexedSetAnalyzersCodeFixProvider>;
 [assembly: TestDataSourceDiscovery(TestDataSourceDiscoveryOption.DuringExecution)]
 
 namespace Akade.IndexedSet.Analyzers.Test;
