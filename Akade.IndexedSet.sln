@@ -44,6 +44,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{A85AE3BF-0
 		docs\ExperimentalFeatures.md = docs\ExperimentalFeatures.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akade.IndexedSet.Analyzers.Fixes", "Analyzers\Akade.IndexedSet.Analyzers.Fixes\Akade.IndexedSet.Analyzers.Fixes.csproj", "{951D9B15-BA77-F3E4-348D-FB0600408FC6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -82,6 +84,10 @@ Global
 		{34BEB19B-028A-4CD1-90EB-1E1A62C04671}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34BEB19B-028A-4CD1-90EB-1E1A62C04671}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34BEB19B-028A-4CD1-90EB-1E1A62C04671}.Release|Any CPU.Build.0 = Release|Any CPU
+		{951D9B15-BA77-F3E4-348D-FB0600408FC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{951D9B15-BA77-F3E4-348D-FB0600408FC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{951D9B15-BA77-F3E4-348D-FB0600408FC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{951D9B15-BA77-F3E4-348D-FB0600408FC6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -93,6 +99,7 @@ Global
 		{CAAB99B7-218B-417A-B81A-84F30BAC1B4E} = {601B55BB-32DD-491A-816E-127FC48BCCEA}
 		{34BEB19B-028A-4CD1-90EB-1E1A62C04671} = {601B55BB-32DD-491A-816E-127FC48BCCEA}
 		{A85AE3BF-0E73-4032-9DE5-0EF9200AA43F} = {1D4D9594-0CD1-4103-AA2E-8589FBBD6EAC}
+		{951D9B15-BA77-F3E4-348D-FB0600408FC6} = {7F8BE28E-51E4-4818-B0C9-BDD357CCDAFA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C65ABA45-764F-4D07-A2A5-800115204611}

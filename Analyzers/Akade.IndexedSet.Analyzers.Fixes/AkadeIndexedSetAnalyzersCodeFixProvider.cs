@@ -1,5 +1,4 @@
-﻿
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -14,7 +13,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Akade.IndexedSet.Analyzers;
+namespace Akade.IndexedSet.Analyzers.Fixes;
 
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AkadeIndexedSetAnalyzersCodeFixProvider)), Shared]
 public class AkadeIndexedSetAnalyzersCodeFixProvider : CodeFixProvider

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using VerifyCS = Akade.IndexedSet.Analyzers.Test.CSharpCodeFixVerifier<
     Akade.IndexedSet.Analyzers.IndexNamingRulesAnalyzer,
-    Akade.IndexedSet.Analyzers.AkadeIndexedSetAnalyzersCodeFixProvider>;
+    Akade.IndexedSet.Analyzers.Fixes.AkadeIndexedSetAnalyzersCodeFixProvider>;
 
 namespace Akade.IndexedSet.Analyzers.Test;
 

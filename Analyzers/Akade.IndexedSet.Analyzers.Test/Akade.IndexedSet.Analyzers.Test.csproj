@@ -23,7 +23,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Akade.IndexedSet\Akade.IndexedSet.csproj" />
-    <ProjectReference Include="..\Akade.IndexedSet.Analyzers\Akade.IndexedSet.Analyzers.csproj" />
+	  <ProjectReference Include="..\Akade.IndexedSet.Analyzers\Akade.IndexedSet.Analyzers.csproj" />
+	  <ProjectReference Include="..\Akade.IndexedSet.Analyzers.Fixes\Akade.IndexedSet.Analyzers.Fixes.csproj" />
   </ItemGroup>
 
 </Project>

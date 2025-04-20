@@ -33,6 +33,7 @@
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="Exists('$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets')" />
 
   <ItemGroup>
+    <ProjectReference Include="..\Akade.IndexedSet.Analyzers.Fixes\Akade.IndexedSet.Analyzers.Fixes.csproj" />
     <ProjectReference Include="..\Akade.IndexedSet.Analyzers\Akade.IndexedSet.Analyzers.csproj" />
   </ItemGroup>
 
