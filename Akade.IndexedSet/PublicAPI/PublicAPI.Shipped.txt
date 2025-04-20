@@ -150,3 +150,7 @@ virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithRangeIndex<TIndexKey>(S
 virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithRangeIndex<TIndexKey>(System.Func<TElement, TIndexKey>! keyAccessor, System.Collections.Generic.IComparer<TIndexKey>? keyComparer = null, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!
 virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithUniqueIndex<TIndexKey>(System.Func<TElement, System.Collections.Generic.IEnumerable<TIndexKey>!>! keyAccessor, System.Collections.Generic.IEqualityComparer<TIndexKey>? keyComparer = null, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!
 virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithUniqueIndex<TIndexKey>(System.Func<TElement, TIndexKey>! keyAccessor, System.Collections.Generic.IEqualityComparer<TIndexKey>? keyComparer = null, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!
+
+Akade.IndexedSet.StringUtilities.CharEqualityComparer
+static Akade.IndexedSet.StringUtilities.CharEqualityComparer.IgnoreCase(System.Globalization.CultureInfo! cultureInfo) -> System.Collections.Generic.IEqualityComparer<char>!
+static Akade.IndexedSet.StringUtilities.CharEqualityComparer.OrdinalIgnoreCase.get -> System.Collections.Generic.IEqualityComparer<char>!

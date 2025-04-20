@@ -1,4 +1,1 @@
 ﻿#nullable enable
-Akade.IndexedSet.StringUtilities.CharEqualityComparer
-static Akade.IndexedSet.StringUtilities.CharEqualityComparer.IgnoreCase(System.Globalization.CultureInfo! cultureInfo) -> System.Collections.Generic.IEqualityComparer<char>!
-static Akade.IndexedSet.StringUtilities.CharEqualityComparer.OrdinalIgnoreCase.get -> System.Collections.Generic.IEqualityComparer<char>!
