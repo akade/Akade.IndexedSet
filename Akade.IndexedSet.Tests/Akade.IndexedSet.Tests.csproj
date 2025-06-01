@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
@@ -20,6 +20,14 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Akade.IndexedSet\Akade.IndexedSet.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EditorConfigFiles Remove="C:\Source\Repos\akade\Akade.IndexedSet\Akade.IndexedSet.Tests\.editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="C:\Source\Repos\akade\Akade.IndexedSet\Akade.IndexedSet.Tests\.editorconfig" />
 	</ItemGroup>
 
 </Project>

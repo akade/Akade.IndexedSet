@@ -10,17 +10,17 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
         if (!SupportsRangeBasedQueries)
         {
             TIndex index = CreateIndex();
-            _ = Assert.ThrowsException<NotSupportedException>(() => index.Range(GetNotExistingKey(), GetNotExistingKey(), false, false));
-            _ = Assert.ThrowsException<NotSupportedException>(() => index.LessThan(GetNotExistingKey()));
-            _ = Assert.ThrowsException<NotSupportedException>(() => index.LessThanOrEqual(GetNotExistingKey()));
-            _ = Assert.ThrowsException<NotSupportedException>(() => index.GreaterThan(GetNotExistingKey()));
-            _ = Assert.ThrowsException<NotSupportedException>(() => index.GreaterThanOrEqual(GetNotExistingKey()));
-            _ = Assert.ThrowsException<NotSupportedException>(() => index.Min());
-            _ = Assert.ThrowsException<NotSupportedException>(() => index.MinBy());
-            _ = Assert.ThrowsException<NotSupportedException>(() => index.Max());
-            _ = Assert.ThrowsException<NotSupportedException>(() => index.MaxBy());
-            _ = Assert.ThrowsException<NotSupportedException>(() => index.OrderBy(0));
-            _ = Assert.ThrowsException<NotSupportedException>(() => index.OrderByDescending(0));
+            _ = Assert.ThrowsExactly<NotSupportedException>(() => index.Range(GetNotExistingKey(), GetNotExistingKey(), false, false));
+            _ = Assert.ThrowsExactly<NotSupportedException>(() => index.LessThan(GetNotExistingKey()));
+            _ = Assert.ThrowsExactly<NotSupportedException>(() => index.LessThanOrEqual(GetNotExistingKey()));
+            _ = Assert.ThrowsExactly<NotSupportedException>(() => index.GreaterThan(GetNotExistingKey()));
+            _ = Assert.ThrowsExactly<NotSupportedException>(() => index.GreaterThanOrEqual(GetNotExistingKey()));
+            _ = Assert.ThrowsExactly<NotSupportedException>(() => index.Min());
+            _ = Assert.ThrowsExactly<NotSupportedException>(() => index.MinBy());
+            _ = Assert.ThrowsExactly<NotSupportedException>(() => index.Max());
+            _ = Assert.ThrowsExactly<NotSupportedException>(() => index.MaxBy());
+            _ = Assert.ThrowsExactly<NotSupportedException>(() => index.OrderBy(0));
+            _ = Assert.ThrowsExactly<NotSupportedException>(() => index.OrderByDescending(0));
         }
     }
 
@@ -91,8 +91,8 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
         if (SupportsRangeBasedQueries)
         {
             TIndex index = CreateIndex();
-            _ = Assert.ThrowsException<InvalidOperationException>(() => index.Min());
-            _ = Assert.ThrowsException<InvalidOperationException>(() => index.Max());
+            _ = Assert.ThrowsExactly<InvalidOperationException>(() => index.Min());
+            _ = Assert.ThrowsExactly<InvalidOperationException>(() => index.Max());
         }
     }
 
@@ -144,7 +144,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
             AddElements(data, index);
-            _ = Assert.ThrowsException<ArgumentOutOfRangeException>(() => index.OrderBy(data.Length + 1).Any());
+            _ = Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => _ = index.OrderBy(data.Length + 1).Any());
         }
     }
 
@@ -183,7 +183,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
             TIndex index = CreateIndex();
             TElement[] data = GetUniqueData();
             AddElements(data, index);
-            _ = Assert.ThrowsException<ArgumentOutOfRangeException>(() => index.OrderByDescending(data.Length + 1).Any());
+            _ = Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => _ = index.OrderByDescending(data.Length + 1).Any());
         }
     }
 

@@ -17,14 +17,14 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
     public void Single_should_throw_if_empty()
     {
         TIndex index = CreateIndex();
-        _ = Assert.ThrowsException<KeyNotFoundException>(() => index.Single(GetNotExistingKey()));
+        _ = Assert.ThrowsExactly<KeyNotFoundException>(() => index.Single(GetNotExistingKey()));
     }
 
     [BaseTestMethod]
     public void Single_should_throw_if_not_found()
     {
         TIndex index = CreateIndexWithData(GetUniqueData());
-        _ = Assert.ThrowsException<KeyNotFoundException>(() => index.Single(GetNotExistingKey()));
+        _ = Assert.ThrowsExactly<KeyNotFoundException>(() => index.Single(GetNotExistingKey()));
     }
 
     [BaseTestMethod]
@@ -35,7 +35,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
             TElement[] data = GetNonUniqueData();
             TIndex index = CreateIndexWithData(data);
             TIndexKey nonUniqueKey = data.GroupByWithSortBasedFallback(_keyAccessor, _comparer).Where(x => x.Count() > 1).First().Key;
-            _ = Assert.ThrowsException<InvalidOperationException>(() => index.Single(nonUniqueKey));
+            _ = Assert.ThrowsExactly<InvalidOperationException>(() => index.Single(nonUniqueKey));
         }
     }
 

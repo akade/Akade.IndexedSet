@@ -54,7 +54,7 @@ public class NonUniqueIndices
     [TestMethod]
     public void Range_queries_throw_exception()
     {
-        _ = Assert.ThrowsException<NotSupportedException>(() => _ = _indexedSet.Range(x => x.IntProperty, 5, 10).ToList());
+        _ = Assert.ThrowsExactly<NotSupportedException>(() => _ = _indexedSet.Range(x => x.IntProperty, 5, 10).ToList());
     }
 
     [TestMethod]

@@ -71,7 +71,7 @@ public class GeneralTests
                                                        .WithUniqueIndex(x => x.IntProperty)
                                                        .Build();
 
-        _ = Assert.ThrowsException<ArgumentException>(() => set.Add(_b));
+        _ = Assert.ThrowsExactly<ArgumentException>(() => set.Add(_b));
         Assert.IsFalse(set.TryGetSingle(x => x.GuidProperty, _b.GuidProperty, out _));
         Assert.AreEqual(3, set.Count);
         Assert.IsFalse(set.Contains(_b));
@@ -86,7 +86,7 @@ public class GeneralTests
                                                     .Build();
         TestData[] dataToAdd = [_d, _b, _e];
 
-        _ = Assert.ThrowsException<ArgumentException>(() => set.AddRange(dataToAdd));
+        _ = Assert.ThrowsExactly<ArgumentException>(() => set.AddRange(dataToAdd));
         Assert.AreEqual(2, set.Count);
 
         foreach (TestData item in dataToAdd)

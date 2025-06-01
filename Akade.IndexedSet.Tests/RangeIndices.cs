@@ -181,8 +181,8 @@ public class RangeIndices
                                                  .WithRangeIndex(x => x.IntProperty)
                                                  .Build();
 
-        _ = Assert.ThrowsException<InvalidOperationException>(() => _indexedSet.Min(x => x.IntProperty));
-        _ = Assert.ThrowsException<InvalidOperationException>(() => _indexedSet.Max(x => x.IntProperty));
+        _ = Assert.ThrowsExactly<InvalidOperationException>(() => _indexedSet.Min(x => x.IntProperty));
+        _ = Assert.ThrowsExactly<InvalidOperationException>(() => _indexedSet.Max(x => x.IntProperty));
     }
 
     [TestMethod]

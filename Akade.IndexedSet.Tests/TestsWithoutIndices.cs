@@ -75,14 +75,14 @@ public class TestsWithoutIndices
     public void Missing_primarykey_throws()
     {
         AddAll();
-        _ = Assert.ThrowsException<KeyNotFoundException>(() => _ = _indexedSet[42]);
+        _ = Assert.ThrowsExactly<KeyNotFoundException>(() => _ = _indexedSet[42]);
     }
 
     [TestMethod]
     public void Missing_index_throws()
     {
         AddAll();
-        _ = Assert.ThrowsException<IndexNotFoundException>(() => _ = _indexedSet.Single(x => x.IntProperty, _a.IntProperty));
+        _ = Assert.ThrowsExactly<IndexNotFoundException>(() => _ = _indexedSet.Single(x => x.IntProperty, _a.IntProperty));
     }
 
     [TestMethod]
@@ -96,7 +96,7 @@ public class TestsWithoutIndices
     public void Adding_duplicate_primary_key_throws()
     {
         AddAll();
-        _ = Assert.ThrowsException<ArgumentException>(() => _ = _indexedSet.Add(new TestData(0, 0, Guid.Empty, "")));
+        _ = Assert.ThrowsExactly<ArgumentException>(() => _ = _indexedSet.Add(new TestData(0, 0, Guid.Empty, "")));
     }
 
     private void AddAll()
