@@ -9,7 +9,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
         if (!SupportsStartsWithQueries)
         {
             TIndex index = CreateIndex();
-            _ = Assert.ThrowsException<NotSupportedException>(() => index.StartsWith(GetNotExistingKey().ToString()));
+            _ = Assert.ThrowsExactly<NotSupportedException>(() => index.StartsWith(GetNotExistingKey().ToString()));
         }
     }
 
@@ -68,7 +68,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
         if (!SupportsStartsWithQueries)
         {
             TIndex index = CreateIndex();
-            _ = Assert.ThrowsException<NotSupportedException>(() => index.FuzzyStartsWith(GetNotExistingKey().ToString(), 1));
+            _ = Assert.ThrowsExactly<NotSupportedException>(() => index.FuzzyStartsWith(GetNotExistingKey().ToString(), 1));
         }
     }
 

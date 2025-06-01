@@ -1,9 +1,7 @@
-﻿using Akade.IndexedSet.Benchmarks.RealWorld.EventSourcedAggregateCache;
-using Akade.IndexedSet.Concurrency;
+﻿using Akade.IndexedSet.Concurrency;
 using BenchmarkDotNet.Attributes;
-using System.Collections.Immutable;
 
-namespace Akade.IndexedSet.Benchmarks.RealWorld;
+namespace Akade.IndexedSet.Benchmarks.RealWorld.EventSourcedAggregateCache;
 
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net80)]
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net90)]
@@ -22,5 +20,5 @@ public class RehydrationBenchmark
         _set.Clear();
         EventHandlers.HandleEvents(_set, DataGenerator.GenerateEvents(30000));
     }
-    
+
 }

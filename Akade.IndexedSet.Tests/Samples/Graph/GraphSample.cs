@@ -5,7 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 namespace Akade.IndexedSet.Tests.Samples.Graph;
 
 [TestClass]
-[SuppressMessage("Performance", "CA1861:Avoid constant arrays as arguments", Justification = "In unit tests: readability > performance")]
 public class GraphSample
 {
     [TestMethod]

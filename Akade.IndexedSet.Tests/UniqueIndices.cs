@@ -63,13 +63,13 @@ public class UniqueIndices
     [TestMethod]
     public void Range_queries_throw_exception()
     {
-        _ = Assert.ThrowsException<NotSupportedException>(() => _ = _indexedSet.Range(x => x.IntProperty, 5, 10).ToList());
+        _ = Assert.ThrowsExactly<NotSupportedException>(() => _ = _indexedSet.Range(x => x.IntProperty, 5, 10).ToList());
     }
 
     [TestMethod]
     public void Adding_duplicate_key_throws()
     {
-        _ = Assert.ThrowsException<ArgumentException>(() => _ = _indexedSet.Add(new TestData(5, 10, Guid.NewGuid(), "ew")));
+        _ = Assert.ThrowsExactly<ArgumentException>(() => _ = _indexedSet.Add(new TestData(5, 10, Guid.NewGuid(), "ew")));
     }
 
     [TestMethod]
@@ -116,6 +116,6 @@ public class UniqueIndices
         Assert.IsTrue(indexedSet.TryGetSingle(x => x, "A", out string? a));
         Assert.AreEqual("a", a);
 
-        _ = Assert.ThrowsException<ArgumentException>(() => indexedSet.Add("C"));
+        _ = Assert.ThrowsExactly<ArgumentException>(() => indexedSet.Add("C"));
     }
 }

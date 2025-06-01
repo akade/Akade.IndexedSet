@@ -5,7 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 namespace Akade.IndexedSet.Tests.Samples.Appointments;
 
 [TestClass]
-[SuppressMessage("Performance", "CA1861:Avoid constant arrays as arguments", Justification = "In unit tests: readability > performance")]
 public class AppointmentSample
 {
     private readonly DateTime _todayDateTime;
@@ -91,7 +90,7 @@ public class AppointmentSample
     {
         // the index was created with x => x.Owner
         // Hence, even though the indexed key is the same, the name for the index is not
-        _ = Assert.ThrowsException<IndexNotFoundException>(() => _ = _appointments.Single(t => t.Owner, "Test"));
+        _ = Assert.ThrowsExactly<IndexNotFoundException>(() => _ = _appointments.Single(t => t.Owner, "Test"));
     }
 
     [TestMethod]

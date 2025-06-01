@@ -45,7 +45,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
     {
         if (!SupportsNonUniqueKeys)
         {
-            _ = Assert.ThrowsException<ArgumentException>(() => CreateIndexWithData(GetNonUniqueData()));
+            _ = Assert.ThrowsExactly<ArgumentException>(() => CreateIndexWithData(GetNonUniqueData()));
         }
     }
 }
