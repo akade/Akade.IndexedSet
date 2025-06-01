@@ -1,22 +1,23 @@
 ﻿using Akade.IndexedSet.Concurrency;
-using System.Collections.Immutable;
+using System.Collections.Frozen;
 
 namespace Akade.IndexedSet.Benchmarks.RealWorld.EventSourcedAggregateCache;
 internal static class EventHandlers
 {
-    private static readonly Dictionary<Type, Action<ConcurrentIndexedSet<AggregateId, Aggregate>, AggregateEvent>> _eventHandler = new()
+    private static readonly FrozenDictionary<Type, Action<ConcurrentIndexedSet<AggregateId, Aggregate>, AggregateEvent>> _eventHandler =
+        new Dictionary<Type, Action<ConcurrentIndexedSet<AggregateId, Aggregate>, AggregateEvent>>()
         {
             { typeof(AggregateAdded), (state, @event) => HandleEvent(state, (AggregateAdded)@event) },
             { typeof(AggregateShared), (state, @event) => HandleEvent(state, (AggregateShared)@event) }
-    };
+        }.ToFrozenDictionary();
 
     private static void HandleEvent(ConcurrentIndexedSet<AggregateId, Aggregate> state, AggregateShared @event)
     {
         if (state.TryGetSingle(@event.Id, out Aggregate? existingAggregate))
         {
-            _ = state.Update(existingAggregate, aggregate => aggregate with
+            _ = state.Update(existingAggregate, @event, static (aggregate, @event) => aggregate with
             {
-                SharedWith = existingAggregate.SharedWith.Add(@event.SharedWith)
+                SharedWith = aggregate.SharedWith.Add(@event.SharedWith)
             });
         }
     }
