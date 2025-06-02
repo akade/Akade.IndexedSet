@@ -365,7 +365,7 @@ public class IndexedSet<TElement>
     }
 
     /// <summary>
-    /// Searches for elements that have keys that are greator than the supplied value.
+    /// Searches for elements that have keys that are greater than the supplied value.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
@@ -381,7 +381,7 @@ public class IndexedSet<TElement>
     }
 
     /// <summary>
-    /// Searches for elements that have keys that are greator than the supplied value.
+    /// Searches for elements that have keys that are greater than the supplied value.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
@@ -397,7 +397,7 @@ public class IndexedSet<TElement>
     }
 
     /// <summary>
-    /// Searches for elements that have keys that are greator or equal than the supplied value.
+    /// Searches for elements that have keys that are greater or equal than the supplied value.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
@@ -413,7 +413,7 @@ public class IndexedSet<TElement>
     }
 
     /// <summary>
-    /// Searches for elements that have keys that are greator or equal than the supplied value.
+    /// Searches for elements that have keys that are greater or equal than the supplied value.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
@@ -698,7 +698,7 @@ public class IndexedSet<TElement>
     }
 
     /// <summary>
-    /// Returns all elements that contain the given char sequence or a simalar one.
+    /// Returns all elements that contain the given char sequence or a similar one.
     /// </summary>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
@@ -713,7 +713,7 @@ public class IndexedSet<TElement>
     }
 
     /// <summary>
-    /// Returns all elements that contain the given char sequence or a simalar one.
+    /// Returns all elements that contain the given char sequence or a similar one.
     /// </summary>
     /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. 
     /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>

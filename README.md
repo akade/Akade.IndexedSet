@@ -1,11 +1,9 @@
 ﻿# Akade.IndexedSet
 
 ![.Net Version](https://img.shields.io/badge/dynamic/xml?color=%23512bd4&label=version&query=%2F%2FTargetFrameworks%5B1%5D&url=https://raw.githubusercontent.com/akade/Akade.IndexedSet/main/Akade.IndexedSet/Akade.IndexedSet.csproj&logo=.net)
-[![CI Build](https://github.com/akade/Akade.IndexedSet/actions/workflows/ci-build.yml/badge.svg?branch=master)](https://github.com/akade/Akade.IndexedSet/actions/workflows/ci-build.yml)
+[![CI Build](https://github.com/akade/Akade.IndexedSet/actions/workflows/ci-build.yml/badge.svg?branch=main)](https://github.com/akade/Akade.IndexedSet/actions/workflows/ci-build.yml)
 [![NuGet version (Akade.IndexedSet)](https://img.shields.io/nuget/v/Akade.IndexedSet.svg)](https://www.nuget.org/packages/Akade.IndexedSet/)
 [![MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/akade/Akade.IndexedSet#readme)
-[![Static Badge](https://img.shields.io/badge/API%20Docs-DNDocs-43bc00?logo=readme&logoColor=white)](https://www.robiniadocs.com/d/akadeinde/api/Akade.IndexedSet.IndexedSet-1.html)
-
 
 A convenient data structure supporting efficient in-memory indexing and querying, including range queries and fuzzy string matching.
 In a nutshell, it allows you to write LINQ-like queries *without* enumerating through the entire list. If you are currently completely enumerating
@@ -29,7 +27,7 @@ through your data, expect huge [speedups](docs/Benchmarks.md) and much better sc
   - [FAQs](#faqs)
     - [How do I use multiple index types for the same property?](#how-do-i-use-multiple-index-types-for-the-same-property)
     - [How do I update key values if the elements are already in the set?](#how-do-i-update-key-values-if-the-elements-are-already-in-the-set)
-    - [How do I do case-insensitive (fuzzy) string matching (Prefix, FullTextIndex)?](#how-do-i-do-case-insensitve-fuzzy-string-matching-prefix-fulltextindex)
+    - [How do I do case-insensitve (fuzzy) string matching (Prefix, FullTextIndex)?](#how-do-i-do-case-insensitve-fuzzy-string-matching-prefix-fulltextindex)
   - [Roadmap](#roadmap)
 <!--/TOC-->
 
