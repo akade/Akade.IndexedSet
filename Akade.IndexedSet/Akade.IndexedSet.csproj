@@ -34,6 +34,7 @@
 	    <PrivateAssets>all</PrivateAssets>
 	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	  </PackageReference>
+	  <PackageReference Include="System.Numerics.Tensors" Version="9.0.5" />
 	</ItemGroup>
 	
 	<ItemGroup>
