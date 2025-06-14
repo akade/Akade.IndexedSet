@@ -34,6 +34,25 @@ public class AABBTests
         Assert.IsFalse(a.Contains(b));
         Assert.IsFalse(b.Contains(a));
     }
+
+    [TestMethod]
+    // fully contained AABB should return true
+    [DataRow(0f, 0f, 1f, 1f, 0.5f, 0.5f, 0.75f, 0.75f, true)]
+    // partially contained AABB should return true
+    [DataRow(0f, 0f, 1f, 1f, 0.5f, 0.5f, 1.5f, 1.5f, true)]
+    // touching should return true
+    [DataRow(0f, 0f, 1f, 1f, 1f, 1f, 2f, 2f, true)]
+    // not touching should return false
+    [DataRow(0f, 0f, 1f, 1f, 2f, 2f, 3f, 3f, false)]
+
+    public void Intersects(float aX1, float aY1, float aX2, float aY2, float bX1, float bY1, float bX2, float bY2, bool result)
+    {
+        AABB<float> aabb1 = new([aX1, aY1], [aX2, aY2]);
+        AABB<float> aabb2 = new([bX1, bY1], [bX2, bY2]);
+
+        Assert.AreEqual(result, aabb1.Intersects(aabb2));
+        Assert.AreEqual(result, aabb2.Intersects(aabb1));
+    }
 }
 
 #endif

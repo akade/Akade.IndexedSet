@@ -1,6 +1,7 @@
 ﻿#if NET9_0_OR_GREATER
 using System.Diagnostics;
 using System.Numerics;
+using System.Numerics.Tensors;
 using System.Runtime.InteropServices;
 
 namespace Akade.IndexedSet.DataStructures.RTree;
@@ -18,6 +19,7 @@ internal sealed partial class RTree<TElement, TValue>
                 return;
             case InsertionResultSplit<TElement, TValue> split:
                 insertion_stack.Push(new InsertionAction<TElement, TValue>(InsertionActionType.Split, split.Node));
+
                 break;
             case InsertionResultReinsert<TElement, TValue> reinsert:
                 for (int i = 0; i < reinsert.level; i++)
@@ -38,11 +40,9 @@ internal sealed partial class RTree<TElement, TValue>
                     ParentNode<TElement, TValue> newRoot = new();
                     ParentNode<TElement, TValue> oldRoot = _root;
                     _root = newRoot;
-                    newRoot.MergeAABB(oldRoot.GetAABB(_getAABB));
-                    newRoot.MergeAABB(node.GetAABB(_getAABB));
-
                     newRoot.Children.Add(oldRoot);
                     newRoot.Children.Add(node);
+                    newRoot.RecalculateAABB(_getAABB);
                     targetHeight += 1;
 
                     break;
@@ -57,7 +57,6 @@ internal sealed partial class RTree<TElement, TValue>
                             insertion_stack.Push(new InsertionAction<TElement, TValue>(InsertionActionType.Split, split.Node));
                             break;
                         case InsertionResultReinsert<TElement, TValue>:
-                            throw new InvalidOperationException("Should never happen: Bug?");
                         default:
                             throw new InvalidOperationException("Should never happen: Bug?");
                     }
@@ -65,12 +64,64 @@ internal sealed partial class RTree<TElement, TValue>
                     break;
             }
         }
+#if DEBUG
+        CheckForCorruption();
+#endif
+    }
+
+    private void CheckForCorruption()
+    {
+        Span<TValue> buffer = stackalloc TValue[_dimensions * 2];
+
+        Stack<ParentNode<TElement, TValue>> stack = new();
+        stack.Push(_root);
+
+        while (stack.TryPop(out ParentNode<TElement, TValue>? node))
+        {
+            if (node.IsEmptyAABB)
+            {
+                throw new InvalidOperationException("Node has an empty AABB, which is not allowed.");
+            }
+            if (node.Children.Count < _settings.MinNodeEntries || node.Children.Count > _settings.MaxNodeEntries)
+            {
+                throw new InvalidOperationException($"Node has an invalid number of children: {node.Children.Count}");
+            }
+
+            bool first = true;
+
+            foreach (Node<TElement, TValue> child in node.Children)
+            {
+                AABB<TValue> aabb = child.GetAABB(_getAABB);
+
+                if (first)
+                {
+                    aabb.CopyTo(buffer);
+                    first = false;
+                }
+                else
+                {
+                    aabb.MergeInto(buffer);
+                }
+
+                if (child is ParentNode<TElement, TValue> parentChild)
+                {
+                    stack.Push(parentChild);
+                }
+            }
+
+            var mergedAABB = AABB<TValue>.CreateFromCombinedBuffer(buffer);
+
+            if (!mergedAABB.Equals(node.GetAABB(_getAABB)))
+            {
+                throw new InvalidOperationException("Node's AABB does not match the merged AABBs of its children.");
+            }
+        }
+
     }
 
     private InsertionResult ForcedInsertion(ParentNode<TElement, TValue> node, Node<TElement, TValue> nodeToReinsert, int targetHeight)
     {
         node.MergeAABB(nodeToReinsert.GetAABB(_getAABB));
-
         int expandIndex = ChooseSubTree(node, nodeToReinsert);
 
         if (targetHeight == 0 || node.Children.Count < expandIndex)
@@ -79,19 +130,27 @@ internal sealed partial class RTree<TElement, TValue>
             return ResolveOverflowWithoutReinsertion(node);
         }
 
-        InsertionResult expand = ForcedInsertion((ParentNode<TElement, TValue>)node.Children[expandIndex], nodeToReinsert, targetHeight - 1);
+        var follow = (ParentNode<TElement, TValue>)node.Children[expandIndex];
+        InsertionResult expand = ForcedInsertion(follow, nodeToReinsert, targetHeight - 1);
 
         return expand switch
         {
             InsertionResultSplit<TElement, TValue> { Node: var child } => SplitWithoutReinsertion(node, child),
             _ => expand
         };
-
     }
+
+    private InsertionResult SplitWithoutReinsertion(ParentNode<TElement, TValue> node, Node<TElement, TValue> child)
+    {
+        node.MergeAABB(child.GetAABB(_getAABB));
+        node.Children.Add(child);
+        return ResolveOverflowWithoutReinsertion(node);
+    }
+
 
     private InsertionResult RecursiveInsert(ParentNode<TElement, TValue> node, LeafNode<TElement, TValue> leafNode, int currentHeight)
     {
-        node.MergeAABB(_getAABB(leafNode.element));
+        node.MergeAABB(_getAABB(leafNode.Element));
 
         int expandIndex = ChooseSubTree(node, leafNode);
 
@@ -101,7 +160,8 @@ internal sealed partial class RTree<TElement, TValue>
             return ResolveOverflow(node, currentHeight);
         }
 
-        InsertionResult expand = RecursiveInsert((ParentNode<TElement, TValue>)node.Children[expandIndex], leafNode, currentHeight + 1);
+        var follow = (ParentNode<TElement, TValue>)node.Children[expandIndex];
+        InsertionResult expand = RecursiveInsert(follow, leafNode, currentHeight + 1);
 
         return expand switch
         {
@@ -110,8 +170,22 @@ internal sealed partial class RTree<TElement, TValue>
             InsertionResultComplete => InsertionResultComplete.Instance,
             _ => throw new InvalidOperationException("Should never happen: Bug?")
         };
-
     }
+
+    private InsertionResultReinsert<TElement, TValue> Reinsert(ParentNode<TElement, TValue> node, InsertionResultReinsert<TElement, TValue> reinsert)
+    {
+        node.RecalculateAABB(_getAABB);
+        return reinsert;
+    }
+
+
+    private InsertionResult Split(ParentNode<TElement, TValue> node, Node<TElement, TValue> child, int currentHeight)
+    {
+        node.MergeAABB(child.GetAABB(_getAABB));
+        node.Children.Add(child);
+        return ResolveOverflow(node, currentHeight);
+    }
+
 
     private int ChooseSubTree(ParentNode<TElement, TValue> node, Node<TElement, TValue> toInsert)
     {
@@ -127,14 +201,16 @@ internal sealed partial class RTree<TElement, TValue>
         int inclusionCount = 0;
         TValue minArea = TValue.MaxValue;
         int minIndex = -1;
+        
+        Span<Node<TElement, TValue>> children = CollectionsMarshal.AsSpan(node.Children);
 
-        for (int index = 0; index < node.Children.Count; index++)
+        for (int index = 0; index < children.Length; index++)
         {
-            Node<TElement, TValue> child = node.Children[index];
+            Node<TElement, TValue> child = children[index];
 
             AABB<TValue> childAABB = child.GetAABB(_getAABB);
 
-            if (insertionAABB.Contains(childAABB))
+            if (childAABB.Contains(insertionAABB))
             {
                 inclusionCount++;
 
@@ -147,7 +223,7 @@ internal sealed partial class RTree<TElement, TValue>
             }
         }
 
-        if (inclusionCount == 0)
+        if (inclusionCount == 0) // check until here, one thing found
         {
             TValue minOverlapIncrease = TValue.Zero;
             TValue minAreaIncrease = TValue.Zero;
@@ -203,12 +279,6 @@ internal sealed partial class RTree<TElement, TValue>
         return minIndex;
     }
 
-    private InsertionResult SplitWithoutReinsertion(ParentNode<TElement, TValue> node, Node<TElement, TValue> child)
-    {
-        node.MergeAABB(child.GetAABB(_getAABB));
-        node.Children.Add(child);
-        return ResolveOverflowWithoutReinsertion(node);
-    }
 
     private InsertionResult ResolveOverflowWithoutReinsertion(ParentNode<TElement, TValue> node)
     {
@@ -217,13 +287,31 @@ internal sealed partial class RTree<TElement, TValue>
             : InsertionResultComplete.Instance;
     }
 
+    private InsertionResult ResolveOverflow(ParentNode<TElement, TValue> node, int currentHeight)
+    {
+        if (_settings.ReinsertionCount == 0)
+        {
+            return ResolveOverflowWithoutReinsertion(node);
+        }
+
+        if (node.Children.Count > _settings.MaxNodeEntries)
+        {
+            List<Node<TElement, TValue>> reinsertionNodes = GetNodesForReinsertaion(node);
+            return new InsertionResultReinsert<TElement, TValue>(reinsertionNodes, currentHeight);
+        }
+        else
+        {
+            return InsertionResultComplete.Instance;
+        }
+    }
+
     private Node<TElement, TValue> Split(ParentNode<TElement, TValue> node)
     {
         int axis = GetSplitAxis(node);
 
-        Debug.Assert(node.Children.Count > 2);
+        Debug.Assert(node.Children.Count >= 2);
 
-        node.Children.Sort((a, b) => a.GetAABB(_getAABB).Min[axis].CompareTo(b.GetAABB(_getAABB).Min[axis]));
+        node.Children.Sort((a, b) => a.GetAABB(_getAABB).Min[axis].CompareTo(b.GetAABB(_getAABB).Min[axis])); // TODO precreate a comparer for AABB<TValue> to avoid this allocation
 
         TValue bestOverlap = TValue.MaxValue;
         TValue bestArea = TValue.MaxValue;
@@ -232,7 +320,7 @@ internal sealed partial class RTree<TElement, TValue>
 
         Span<TValue> leftBuffer = stackalloc TValue[_dimensions * 2];
         Span<TValue> rightBuffer = stackalloc TValue[_dimensions * 2];
-        Span<Node<TElement, TValue>> childSpan;
+        Span<Node<TElement, TValue>> childSpan= CollectionsMarshal.AsSpan(node.Children);
 
         for (int k = minNodeEntries; k <= node.Children.Count - minNodeEntries; k++)
         {
@@ -242,8 +330,6 @@ internal sealed partial class RTree<TElement, TValue>
             AABB<TValue> secondAABB = secondChild.GetAABB(_getAABB);
             firstAABB.CopyTo(leftBuffer);
             secondAABB.CopyTo(rightBuffer);
-
-            childSpan = CollectionsMarshal.AsSpan(node.Children);
 
             foreach (Node<TElement, TValue> child in childSpan[..k])
             {
@@ -268,8 +354,6 @@ internal sealed partial class RTree<TElement, TValue>
                 bestIndex = k;
             }
         }
-
-        childSpan = CollectionsMarshal.AsSpan(node.Children);
 
         ParentNode<TElement, TValue> newNode = new(childSpan[bestIndex..], _getAABB);
         node.Children.RemoveRange(bestIndex, node.Children.Count - bestIndex);
@@ -310,7 +394,7 @@ internal sealed partial class RTree<TElement, TValue>
                 childSpan[i].GetAABB(_getAABB).MergeInto(right);
             }
 
-            for (int k = minNodeEntries; k <= until; k++)
+            for (int k = minNodeEntries; k < until; k++)
             {
                 left.CopyTo(leftModified);
                 right.CopyTo(rightModified);
@@ -341,43 +425,27 @@ internal sealed partial class RTree<TElement, TValue>
         return bestAxis;
     }
 
-    private InsertionResultReinsert<TElement, TValue> Reinsert(ParentNode<TElement, TValue> node, InsertionResultReinsert<TElement, TValue> reinsert)
-    {
-        node.RecalculateAABB(_getAABB);
-        return reinsert;
-    }
 
-    private InsertionResult Split(ParentNode<TElement, TValue> node, Node<TElement, TValue> child, int currentHeight)
-    {
-        node.MergeAABB(child.GetAABB(_getAABB));
-        node.Children.Add(child);
-        return ResolveOverflow(node, currentHeight);
-    }
-
-    private InsertionResult ResolveOverflow(ParentNode<TElement, TValue> node, int currentHeight)
-    {
-        if (_settings.ReinsertionCount == 0)
-        {
-            return ResolveOverflowWithoutReinsertion(node);
-        }
-
-        if (node.Children.Count > _settings.MaxNodeEntries)
-        {
-            List<Node<TElement, TValue>> reinsertionNodes = GetNodesForReinsertaion(node);
-            return new InsertionResultReinsert<TElement, TValue>(reinsertionNodes, currentHeight);
-        }
-        else
-        {
-            return InsertionResultComplete.Instance;
-        }
-    }
 
     private List<Node<TElement, TValue>> GetNodesForReinsertaion(ParentNode<TElement, TValue> node)
     {
-        Span<TValue> center = stackalloc TValue[_dimensions];
-        node.GetAABB(_getAABB).Center(center);
+        // TODO: think about optimizing, maybe with an comparer that has preallocated buffers and can be initialized with the center of the AABB
+        node.Children.Sort((left, right) =>
+        {
+            Span<TValue> center = stackalloc TValue[_dimensions];
+            node.GetAABB(_getAABB).Center(center);
 
-        node.Children.Sort((a, b) => a.GetAABB(_getAABB).Min[0].CompareTo(b.GetAABB(_getAABB).Min[0]));
+            Span<TValue> leftCenter = stackalloc TValue[_dimensions];
+            Span<TValue> rightCenter = stackalloc TValue[_dimensions];
+
+            left.GetAABB(_getAABB).Center(leftCenter);
+            right.GetAABB(_getAABB).Center(rightCenter);
+
+            TValue leftDistance = TensorPrimitives.Distance<TValue>(leftCenter, center);
+            TValue rightDistance = TensorPrimitives.Distance<TValue>(rightCenter, center);
+
+            return leftDistance.CompareTo(rightDistance);
+        });
 
         Span<Node<TElement, TValue>> childSpan = CollectionsMarshal.AsSpan(node.Children);
 
@@ -387,7 +455,7 @@ internal sealed partial class RTree<TElement, TValue>
         node.Children.RemoveRange(splitOffStart, node.Children.Count - splitOffStart);
 
         node.RecalculateAABB(_getAABB);
-
+        
         return reinsertionNodes;
     }
 }
@@ -395,7 +463,7 @@ internal sealed partial class RTree<TElement, TValue>
 
 internal readonly record struct InsertionAction<TElement, TValue>(InsertionActionType ActionType, Node<TElement, TValue> Node)
     where TElement : notnull
-    where TValue : unmanaged, INumber<TValue>
+    where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>
 {
 
 }
@@ -415,10 +483,10 @@ internal sealed record class InsertionResultComplete : InsertionResult
 
 internal sealed record class InsertionResultSplit<TElement, TValue>(Node<TElement, TValue> Node) : InsertionResult
     where TElement : notnull
-    where TValue : unmanaged, INumber<TValue>;
+    where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>;
 
 internal sealed record class InsertionResultReinsert<TElement, TValue>(List<Node<TElement, TValue>> Nodes, int level) : InsertionResult
     where TElement : notnull
-    where TValue : unmanaged, INumber<TValue>;
+    where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>;
 
 #endif

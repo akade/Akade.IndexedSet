@@ -2,16 +2,14 @@
 using System.Numerics;
 using System.Numerics.Tensors;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 namespace Akade.IndexedSet.DataStructures.RTree;
-
 
 /// <summary>
 /// Axis-aligned bounding box (AABB) for a generic unmanaged type T that supports numeric operations.
 /// </summary>
 internal readonly ref struct AABB<T>
-    where T : unmanaged, INumber<T>
+    where T : unmanaged, INumber<T>, IMinMaxValue<T>, IRootFunctions<T>
 {
     /// <summary>
     /// Lower (left) corner of the AABB.
@@ -96,8 +94,8 @@ internal readonly ref struct AABB<T>
 
     internal void MergeInto(Span<T> buffer)
     {
-        Span<T> minBuffer = [..buffer[..Min.Length]];
-        Span<T> maxBuffer = [..buffer[Min.Length..]];
+        Span<T> minBuffer = [.. buffer[..Min.Length]];
+        Span<T> maxBuffer = [.. buffer[Min.Length..]];
 
         TensorPrimitives.Min(Min, minBuffer, buffer[..Min.Length]);
         TensorPrimitives.Max(Max, maxBuffer, buffer[Min.Length..]);
@@ -142,6 +140,39 @@ internal readonly ref struct AABB<T>
         Span<T> diff = stackalloc T[Min.Length];
         TensorPrimitives.Subtract(Max, Min, diff);
         TensorPrimitives.Add(Min, diff, center);
+    }
+
+    internal bool Intersects(AABB<T> otherAABB)
+    {
+        Span<T> diff = stackalloc T[Min.Length];
+
+        TensorPrimitives.Subtract(Min, otherAABB.Max, diff);
+
+        if (TensorPrimitives.Max<T>(diff) > T.Zero)
+        {
+            return false;
+        }
+
+        TensorPrimitives.Subtract(Max, otherAABB.Min, diff);
+
+        return TensorPrimitives.Min<T>(diff) >= T.Zero;
+
+    }
+
+    public bool Equals(AABB<T> other)
+    {
+        if (Min.Length != other.Min.Length)
+        {
+            return false;
+        }
+       
+        return TensorPrimitives.Distance<T>(Min, other.Min) == T.Zero &&
+               TensorPrimitives.Distance<T>(Max, other.Max) == T.Zero;
+    }
+
+    public override string ToString()
+    {
+        return $"AABB(Min: [{string.Join(", ", Min.ToArray())}], Max: [{string.Join(", ", Max.ToArray())}])";
     }
 }
 
