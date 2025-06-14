@@ -40,10 +40,23 @@ public class RTreeTests
 
 
 
-        Span<double> searchRect = [8.79, 47.47, 8.80, 47.48];
+        Span<double> searchRect = [8.683342209696512, 47.41151475464969, 8.92130422393863, 47.53819397959311];
         AABB<double> searchAABB = AABB<double>.CreateFromCombinedBuffer(searchRect);
 
         IEnumerable<SwissZipCode> results = rTree.IntersectWith(searchAABB);
+
+        List<SwissZipCode> expectedResults = [];
+
+        foreach(SwissZipCode zipCode in zipCodeData)
+        {
+            AABB<double> zipCodeAABB = AABB<double>.CreateFromPoint(zipCode.GetCoordinatesSpan());  
+            if (searchAABB.Contains(zipCodeAABB))
+            {
+                expectedResults.Add(zipCode);
+            }
+        }
+
+        CollectionAssert.AreEquivalent(expectedResults, results.ToList());
 
         return;
     }

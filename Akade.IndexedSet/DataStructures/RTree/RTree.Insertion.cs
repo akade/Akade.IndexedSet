@@ -9,6 +9,8 @@ internal sealed partial class RTree<TElement, TValue>
 {
     internal void Insert(TElement element)
     {
+        Count++;
+
         InsertionResult first = RecursiveInsert(_root, new LeafNode<TElement, TValue>(element), 0);
         int targetHeight = 0;
         Stack<InsertionAction<TElement, TValue>> insertion_stack = new();
@@ -22,7 +24,7 @@ internal sealed partial class RTree<TElement, TValue>
 
                 break;
             case InsertionResultReinsert<TElement, TValue> reinsert:
-                for (int i = 0; i < reinsert.level; i++)
+                for (int i = 0; i < reinsert.Nodes.Count; i++)
                 {
                     insertion_stack.Push(new InsertionAction<TElement, TValue>(InsertionActionType.Reinsert, reinsert.Nodes[i]));
                 }
@@ -64,6 +66,7 @@ internal sealed partial class RTree<TElement, TValue>
                     break;
             }
         }
+
 #if DEBUG
         CheckForCorruption();
 #endif
@@ -76,45 +79,44 @@ internal sealed partial class RTree<TElement, TValue>
         Stack<ParentNode<TElement, TValue>> stack = new();
         stack.Push(_root);
 
+        int count = 0;
+
         while (stack.TryPop(out ParentNode<TElement, TValue>? node))
         {
             if (node.IsEmptyAABB)
             {
                 throw new InvalidOperationException("Node has an empty AABB, which is not allowed.");
             }
-            if (node.Children.Count < _settings.MinNodeEntries || node.Children.Count > _settings.MaxNodeEntries)
+            if ((_root != node && node.Children.Count < _settings.MinNodeEntries) || node.Children.Count > _settings.MaxNodeEntries)
             {
                 throw new InvalidOperationException($"Node has an invalid number of children: {node.Children.Count}");
             }
 
-            bool first = true;
+            AABB<TValue> parent = node.GetAABB(_getAABB);
 
             foreach (Node<TElement, TValue> child in node.Children)
             {
                 AABB<TValue> aabb = child.GetAABB(_getAABB);
 
-                if (first)
+                if(!parent.Contains(aabb))
                 {
-                    aabb.CopyTo(buffer);
-                    first = false;
-                }
-                else
-                {
-                    aabb.MergeInto(buffer);
+                    throw new InvalidOperationException($"Child AABB {aabb.ToString()} is not contained in parent AABB {parent.ToString()}.");
                 }
 
                 if (child is ParentNode<TElement, TValue> parentChild)
                 {
                     stack.Push(parentChild);
                 }
+                else
+                {
+                    count++;
+                }
             }
+        }
 
-            var mergedAABB = AABB<TValue>.CreateFromCombinedBuffer(buffer);
-
-            if (!mergedAABB.Equals(node.GetAABB(_getAABB)))
-            {
-                throw new InvalidOperationException("Node's AABB does not match the merged AABBs of its children.");
-            }
+        if (count != Count)
+        {
+            throw new InvalidOperationException($"Count mismatch: Expected {Count}, but found {count} leaf nodes.");
         }
 
     }
@@ -189,14 +191,15 @@ internal sealed partial class RTree<TElement, TValue>
 
     private int ChooseSubTree(ParentNode<TElement, TValue> node, Node<TElement, TValue> toInsert)
     {
-        if (node.Children.FirstOrDefault() is not ParentNode<TElement, TValue> parent)
+        Node<TElement, TValue>? firstChild = node.Children.FirstOrDefault();
+        if (firstChild is null or LeafNode<TElement, TValue>)
         {
             return int.MaxValue;
         }
 
-        bool allLeaves = parent.Children.FirstOrDefault() is null or LeafNode<TElement, TValue>;
+        bool allLeaves = firstChild is ParentNode<TElement, TValue> { Children: [LeafNode<TElement, TValue>, ..] };
 
-        AABB<TValue> insertionAABB = toInsert.GetAABB(_getAABB);
+        AABB <TValue> insertionAABB = toInsert.GetAABB(_getAABB);
 
         int inclusionCount = 0;
         TValue minArea = TValue.MaxValue;

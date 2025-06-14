@@ -31,7 +31,7 @@ internal sealed partial class RTree<TElement, TValue>
             {
                 if (leafNode.GetAABB(_getAABB).Intersects(aabb))
                 {
-                    results.Add(leafNode.Element);
+                   results.Add(leafNode.Element);
                 }
             }
 

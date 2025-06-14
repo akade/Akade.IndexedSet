@@ -29,7 +29,8 @@ internal sealed partial class RTree<TElement, TValue>
         _settings = settings;
     }
 
-   
+    public int Count { get; private set; }
+
 }
 
 

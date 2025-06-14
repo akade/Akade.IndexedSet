@@ -37,19 +37,13 @@ internal sealed class ParentNode<TElement, TValue> : Node<TElement, TValue>
         return new AABB<TValue>(Min.Span, Max.Span);
     }
 
-    public bool IsEmptyAABB => Min.Length == 0;
+    public bool IsEmptyAABB => Min.IsEmpty;
 
     internal void MergeAABB(AABB<TValue> other)
     {
         if (IsEmptyAABB)
         {
-            var backingMemory = new TValue[other.Min.Length * 2];
-
-            Min = backingMemory.AsMemory(0, other.Min.Length);
-            Max = backingMemory.AsMemory(other.Min.Length, other.Max.Length);
-
-            other.Min.CopyTo(Min.Span);
-            other.Max.CopyTo(Max.Span);
+            InitMemory(other);
             return;
         }
 
@@ -62,13 +56,27 @@ internal sealed class ParentNode<TElement, TValue> : Node<TElement, TValue>
         buffer.CopyTo(Max.Span);
     }
 
+    private void InitMemory(AABB<TValue> aabb)
+    {
+        if (IsEmptyAABB)
+        {
+            int dimensions = aabb.Min.Length;
+            var backingMemory = new TValue[dimensions * 2];
+
+            Min = backingMemory.AsMemory(0, dimensions);
+            Max = backingMemory.AsMemory(dimensions, dimensions);
+            aabb.Min.CopyTo(Min.Span);
+            aabb.Max.CopyTo(Max.Span);
+        }
+    }
+
     internal void RecalculateAABB(Func<TElement, AABB<TValue>> getAABB)
     {
         Span<Node<TElement, TValue>> childSpan = CollectionsMarshal.AsSpan(Children);
 
         AABB<TValue> firstChild = childSpan[0].GetAABB(getAABB);
-        firstChild.Min.CopyTo(Min.Span);
-        firstChild.Max.CopyTo(Max.Span);
+        
+        InitMemory(firstChild);    
 
         for (int i = 1; i < childSpan.Length; i++)
         {

@@ -62,7 +62,7 @@ internal sealed record class SwissZipCode
 
     public override string ToString()
     {
-        return $"{Name} ({ZipCode}) - {MunicipalityName} ({CantonCode})";
+        return $"{Name} ({ZipCode}) - {MunicipalityName} ({CantonCode}) - {Coordinates}";
     }
 
     public ReadOnlySpan<double> GetCoordinatesSpan()
@@ -82,6 +82,11 @@ internal readonly struct Coordinates
     {
         Easting = easting;
         Northing = northing;
+    }
+
+    public override string ToString()
+    {
+        return $"{Easting}, {Northing}";
     }
 
 }
