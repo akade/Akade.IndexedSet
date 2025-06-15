@@ -1,5 +1,7 @@
 ﻿#if NET9_0_OR_GREATER
 
+using System.Numerics.Tensors;
+
 namespace Akade.IndexedSet.DataStructures.RTree;
 internal sealed partial class RTree<TElement, TValue>
 {
@@ -31,7 +33,7 @@ internal sealed partial class RTree<TElement, TValue>
             {
                 if (leafNode.GetAABB(_getAABB).Intersects(aabb))
                 {
-                   results.Add(leafNode.Element);
+                    results.Add(leafNode.Element);
                 }
             }
 
@@ -39,6 +41,36 @@ internal sealed partial class RTree<TElement, TValue>
         return results;
     }
 
+    public IEnumerable<(TElement element, TValue distance)> GetNearestNeighbours(TValue[] position)
+    {
+        ArgumentOutOfRangeException.ThrowIfNotEqual(position.Length, _dimensions, nameof(position));
+
+        PriorityQueue<Node<TElement, TValue>, TValue> queue = new();
+        queue.Enqueue(_root, TValue.Zero);
+
+        int count = 0;
+
+        while (queue.TryDequeue(out Node<TElement, TValue>? currentNode, out TValue distance))
+        {
+            count++;
+            Console.WriteLine($"Processing node {count} with distance {distance}");
+            if (currentNode is ParentNode<TElement, TValue> parentNode)
+            {
+                foreach (Node<TElement, TValue> child in parentNode.Children)
+                {
+                    AABB<TValue> childAABB = child.GetAABB(_getAABB);
+
+                    TValue childDistance = childAABB.BoundaryDistance(position);
+
+                    queue.Enqueue(child, childDistance);
+                }
+            }
+            else if (currentNode is LeafNode<TElement, TValue> leafNode)
+            {
+                yield return (leafNode.Element, distance);
+            }
+        }
+    }
 }
 
 #endif

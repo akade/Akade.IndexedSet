@@ -165,7 +165,7 @@ internal readonly ref struct AABB<T>
         {
             return false;
         }
-       
+
         return TensorPrimitives.Distance<T>(Min, other.Min) == T.Zero &&
                TensorPrimitives.Distance<T>(Max, other.Max) == T.Zero;
     }
@@ -173,6 +173,34 @@ internal readonly ref struct AABB<T>
     public override string ToString()
     {
         return $"AABB(Min: [{string.Join(", ", Min.ToArray())}], Max: [{string.Join(", ", Max.ToArray())}])";
+    }
+
+    internal bool Contains(ReadOnlySpan<T> position)
+    {
+        Span<T> buffer = stackalloc T[Min.Length];
+
+        TensorPrimitives.Subtract(position, Min, buffer);
+
+        if (TensorPrimitives.Min<T>(buffer) < T.Zero)
+        {
+            return false; // position is less than Min in at least one dimension
+        }
+
+        TensorPrimitives.Subtract(Max, position, buffer);
+
+        return TensorPrimitives.Min<T>(buffer) >= T.Zero; // position is greater than Max in at least one dimension
+    }
+
+    internal T BoundaryDistance(T[] position)
+    {
+        Span<T> buffer = stackalloc T[Min.Length];
+        Span<T> closestPoint = stackalloc T[Min.Length];
+
+        // clamp position to the AABB bounds
+        TensorPrimitives.Max(Min, position, buffer);
+        TensorPrimitives.Min(Max, buffer, closestPoint);
+
+        return TensorPrimitives.Distance<T>(closestPoint, position);
     }
 }
 

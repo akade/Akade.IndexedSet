@@ -3,6 +3,7 @@ using Akade.IndexedSet.DataStructures;
 using Akade.IndexedSet.DataStructures.RTree;
 using Akade.IndexedSet.Tests.Data;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Numerics.Tensors;
 
 namespace Akade.IndexedSet.Tests.DataStructures.RTree;
 
@@ -57,6 +58,18 @@ public class RTreeTests
         }
 
         CollectionAssert.AreEquivalent(expectedResults, results.ToList());
+
+
+        double[] winterthur = [8.729481588728078, 47.48885146772];
+        List<(SwissZipCode element, double distance)> nearestNeighbours = rTree.GetNearestNeighbours(winterthur).Take(10).ToList();
+
+       var expectedNearestNeighbours = zipCodeData
+            .Select(zip => (zip, TensorPrimitives.Distance(zip.GetCoordinatesSpan(), winterthur)))
+            .OrderBy(x => x.Item2)
+            .Take(10)
+            .ToList();
+
+        CollectionAssert.AreEquivalent(expectedNearestNeighbours, nearestNeighbours);
 
         return;
     }
