@@ -80,6 +80,12 @@ internal sealed partial class RTree<TElement, TValue>
             throw new InvalidOperationException($"Count mismatch: Expected {Count}, but found {count} leaf nodes.");
         }
     }
+
+    internal void Clear()
+    {
+        _root = new ParentNode<TElement, TValue>();
+        Count = 0;
+    }
 }
 
 #endif 

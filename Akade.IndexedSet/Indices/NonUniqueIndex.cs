@@ -1,4 +1,6 @@
-﻿namespace Akade.IndexedSet.Indices;
+﻿using Akade.IndexedSet.Utils;
+
+namespace Akade.IndexedSet.Indices;
 
 /// <summary>
 /// Nonunique index implementation based on <see cref="DataStructures.Lookup{TKey, TElement}"/>
@@ -13,9 +15,9 @@ internal sealed class NonUniqueIndex<TElement, TIndexKey>(IEqualityComparer<TInd
         _ = _data.Add(key, value);
     }
 
-    internal override void AddRange(IEnumerable<KeyValuePair<TIndexKey, TElement>> elementsToAdd)
+    internal override void AddRange(IKeyValueEnumerator<TIndexKey, TElement> elementsToAdd)
     {
-        if (elementsToAdd.TryGetNonEnumeratedCount(out int count))
+        if (elementsToAdd.TryGetEstimatedCount(out int count))
         {
             _ = _data.EnsureCapacity(_data.Count + count);
         }

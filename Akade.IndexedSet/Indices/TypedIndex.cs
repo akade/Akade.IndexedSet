@@ -1,19 +1,25 @@
-﻿namespace Akade.IndexedSet.Indices;
+﻿using Akade.IndexedSet.Utils;
+
+namespace Akade.IndexedSet.Indices;
 
 /// <summary>
 /// Fully-generic index including on the index key
 /// </summary>
 internal abstract class TypedIndex<TElement, TIndexKey>(string name) : Index<TElement>(name)
+#if NET9_0_OR_GREATER
+    where TIndexKey : notnull, allows ref struct
+#else
     where TIndexKey : notnull
+#endif
 {
     internal abstract void Add(TIndexKey key, TElement value);
     internal abstract void Remove(TIndexKey key, TElement value);
 
-    internal virtual void AddRange(IEnumerable<KeyValuePair<TIndexKey, TElement>> enumerable)
+    internal virtual void AddRange(IKeyValueEnumerator<TIndexKey, TElement> elementsToAdd)
     {
-        foreach (KeyValuePair<TIndexKey, TElement> kvp in enumerable)
+        while (elementsToAdd.MoveNext())
         {
-            Add(kvp.Key, kvp.Value);
+            Add(elementsToAdd.CurrentKey, elementsToAdd.CurrentValue);
         }
     }
 

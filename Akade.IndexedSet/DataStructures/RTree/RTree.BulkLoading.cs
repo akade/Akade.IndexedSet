@@ -57,11 +57,14 @@ internal partial class RTree<TElement, TValue>
             int end = Math.Min(start + nodesPerPart, leafNodes.Length);
             Span<LeafNode<TElement, TValue>> partNodes = leafNodes[start..end];
 
-            ParentNode<TElement, TValue> childNode = new();
-            SplitAndAdd(childNode, (currentDimension + 1) % _dimensions, partNodes, axisComparers);
-            
-            currentParent.Children.Add(childNode);
-            currentParent.MergeAABB(childNode.GetAABB(_getAABB));
+            if (partNodes.Length > 0)
+            {
+                ParentNode<TElement, TValue> childNode = new();
+                SplitAndAdd(childNode, (currentDimension + 1) % _dimensions, partNodes, axisComparers);
+
+                currentParent.Children.Add(childNode);
+                currentParent.MergeAABB(childNode.GetAABB(_getAABB));
+            }
         }
 
     }
