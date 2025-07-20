@@ -9,9 +9,14 @@ internal sealed partial class RTree<TElement, TValue>
 {
     internal void Insert(TElement element)
     {
+        Insert(new LeafNode<TElement, TValue>(element));
+    }
+
+    internal void Insert(LeafNode<TElement, TValue> leafToInsert)
+    {
         Count++;
 
-        InsertionResult first = RecursiveInsert(_root, new LeafNode<TElement, TValue>(element), 0);
+        InsertionResult first = RecursiveInsert(_root, leafToInsert, 0);
         int targetHeight = 0;
         Stack<InsertionAction<TElement, TValue>> insertion_stack = new();
 
@@ -67,59 +72,9 @@ internal sealed partial class RTree<TElement, TValue>
             }
         }
 
-#if DEBUG
         CheckForCorruption();
-#endif
     }
 
-    private void CheckForCorruption()
-    {
-        Span<TValue> buffer = stackalloc TValue[_dimensions * 2];
-
-        Stack<ParentNode<TElement, TValue>> stack = new();
-        stack.Push(_root);
-
-        int count = 0;
-
-        while (stack.TryPop(out ParentNode<TElement, TValue>? node))
-        {
-            if (node.IsEmptyAABB)
-            {
-                throw new InvalidOperationException("Node has an empty AABB, which is not allowed.");
-            }
-            if ((_root != node && node.Children.Count < _settings.MinNodeEntries) || node.Children.Count > _settings.MaxNodeEntries)
-            {
-                throw new InvalidOperationException($"Node has an invalid number of children: {node.Children.Count}");
-            }
-
-            AABB<TValue> parent = node.GetAABB(_getAABB);
-
-            foreach (Node<TElement, TValue> child in node.Children)
-            {
-                AABB<TValue> aabb = child.GetAABB(_getAABB);
-
-                if(!parent.Contains(aabb))
-                {
-                    throw new InvalidOperationException($"Child AABB {aabb.ToString()} is not contained in parent AABB {parent.ToString()}.");
-                }
-
-                if (child is ParentNode<TElement, TValue> parentChild)
-                {
-                    stack.Push(parentChild);
-                }
-                else
-                {
-                    count++;
-                }
-            }
-        }
-
-        if (count != Count)
-        {
-            throw new InvalidOperationException($"Count mismatch: Expected {Count}, but found {count} leaf nodes.");
-        }
-
-    }
 
     private InsertionResult ForcedInsertion(ParentNode<TElement, TValue> node, Node<TElement, TValue> nodeToReinsert, int targetHeight)
     {
@@ -427,8 +382,6 @@ internal sealed partial class RTree<TElement, TValue>
         }
         return bestAxis;
     }
-
-
 
     private List<Node<TElement, TValue>> GetNodesForReinsertaion(ParentNode<TElement, TValue> node)
     {

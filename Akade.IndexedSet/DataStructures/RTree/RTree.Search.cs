@@ -41,7 +41,7 @@ internal sealed partial class RTree<TElement, TValue>
         return results;
     }
 
-    public IEnumerable<(TElement element, TValue distance)> GetNearestNeighbours(TValue[] position)
+    public IEnumerable<(TElement element, TValue distance)> GetNearestNeighbours(Memory<TValue> position)
     {
         ArgumentOutOfRangeException.ThrowIfNotEqual(position.Length, _dimensions, nameof(position));
 
@@ -60,7 +60,7 @@ internal sealed partial class RTree<TElement, TValue>
                 {
                     AABB<TValue> childAABB = child.GetAABB(_getAABB);
 
-                    TValue childDistance = childAABB.BoundaryDistance(position);
+                    TValue childDistance = childAABB.BoundaryDistance(position.Span);
 
                     queue.Enqueue(child, childDistance);
                 }

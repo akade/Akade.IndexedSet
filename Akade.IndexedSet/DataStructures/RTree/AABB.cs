@@ -191,7 +191,7 @@ internal readonly ref struct AABB<T>
         return TensorPrimitives.Min<T>(buffer) >= T.Zero; // position is greater than Max in at least one dimension
     }
 
-    internal T BoundaryDistance(T[] position)
+    internal T BoundaryDistance(ReadOnlySpan<T> position)
     {
         Span<T> buffer = stackalloc T[Min.Length];
         Span<T> closestPoint = stackalloc T[Min.Length];
@@ -200,7 +200,7 @@ internal readonly ref struct AABB<T>
         TensorPrimitives.Max(Min, position, buffer);
         TensorPrimitives.Min(Max, buffer, closestPoint);
 
-        return TensorPrimitives.Distance<T>(closestPoint, position);
+        return TensorPrimitives.Distance(closestPoint, position);
     }
 }
 
