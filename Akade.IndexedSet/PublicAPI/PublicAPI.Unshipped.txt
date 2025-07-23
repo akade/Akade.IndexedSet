@@ -1,1 +1,2 @@
 ﻿#nullable enable
+virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithSpatialIndex<TValue>(System.Func<TElement, System.Span<TValue>, keyAccessor!, string?>! indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!

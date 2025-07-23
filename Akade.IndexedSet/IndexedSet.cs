@@ -834,14 +834,22 @@ public class IndexedSet<TElement>
     }
 
     internal void AddIndex<TIndexKey, TIndex>(Func<TElement, TIndexKey> indexAccessor, TIndex index)
+#if NET9_0_OR_GREATER
+        where TIndexKey : notnull, allows ref struct
+#else
         where TIndexKey : notnull
+#endif
         where TIndex : TypedIndex<TElement, TIndexKey>
     {
         AddIndex(new SingleKeyIndexWriter<TElement, TIndexKey, TIndex>(indexAccessor, index), index);
     }
 
     internal void AddIndex<TIndexKey, TIndex>(Func<TElement, IEnumerable<TIndexKey>> indexAccessor, TIndex index)
+#if NET9_0_OR_GREATER
+        where TIndexKey : notnull, allows ref struct
+#else
         where TIndexKey : notnull
+#endif
         where TIndex : TypedIndex<TElement, TIndexKey>
     {
         AddIndex(new MultiKeyIndexWriter<TElement, TIndexKey, TIndex>(indexAccessor, index), index);

@@ -6,14 +6,12 @@ using System.Runtime.InteropServices;
 namespace Akade.IndexedSet.DataStructures.RTree;
 
 internal abstract class Node<TElement, TValue>
-    where TElement : notnull
     where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>
 {
     internal abstract AABB<TValue> GetAABB(Func<TElement, AABB<TValue>> getAABB);
 }
 
 internal sealed class ParentNode<TElement, TValue> : Node<TElement, TValue>
-    where TElement : notnull
     where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>
 {
     public List<Node<TElement, TValue>> Children = [];
@@ -91,7 +89,6 @@ internal sealed class ParentNode<TElement, TValue> : Node<TElement, TValue>
 }
 
 internal sealed class LeafNode<TElement, TValue>(TElement element) : Node<TElement, TValue>
-    where TElement : notnull
     where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>
 {
     public TElement Element { get; } = element;

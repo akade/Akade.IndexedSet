@@ -7,7 +7,6 @@ using System.Numerics;
 namespace Akade.IndexedSet.Indices;
 
 internal sealed class SpatialIndex<TElement, TValue>(Func<TElement, AABB<TValue>> getAABB, int dimensions, RTreeSettings settings, string name) : TypedIndex<TElement, AABB<TValue>>(name)
-    where TElement : notnull
     where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>
 {
     private readonly RTree<TElement, TValue> _tree = new(getAABB, dimensions, settings);
@@ -62,6 +61,15 @@ internal sealed class SpatialIndex<TElement, TValue>(Func<TElement, AABB<TValue>
     internal override IEnumerable<TElement> Where(AABB<TValue> indexKey)
     {
         return _tree.IntersectWith(indexKey);
+    }
+}
+
+internal static class SpatialExtensions
+{
+    public static Func<T, AABB<float>> GetSpatialIndexKeyAccessor<T>(this Func<T, Span<float>> pointAccessor)
+        where T : notnull
+    {
+        return element => AABB<float>.CreateFromPoint(pointAccessor(element));
     }
 }
 

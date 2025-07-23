@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 namespace Akade.IndexedSet.DataStructures.RTree;
-internal partial class RTree<TElement, TValue>
+internal sealed partial class RTree<TElement, TValue>
 {
     public void BulkLoad(IEnumerable<TElement> elements)
     {

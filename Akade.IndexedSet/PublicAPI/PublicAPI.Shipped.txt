@@ -154,3 +154,8 @@ virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithUniqueIndex<TIndexKey>(
 Akade.IndexedSet.StringUtilities.CharEqualityComparer
 static Akade.IndexedSet.StringUtilities.CharEqualityComparer.IgnoreCase(System.Globalization.CultureInfo! cultureInfo) -> System.Collections.Generic.IEqualityComparer<char>!
 static Akade.IndexedSet.StringUtilities.CharEqualityComparer.OrdinalIgnoreCase.get -> System.Collections.Generic.IEqualityComparer<char>!
+
+
+
+override Akade.IndexedSet.IndexedSetBuilder<TPrimaryKey, TElement>.WithFullTextIndex(System.Func<TElement, System.Collections.Generic.IEnumerable<string!>!>! keyAccessor, System.Collections.Generic.IEqualityComparer<char>? comparer = null, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!
+override Akade.IndexedSet.IndexedSetBuilder<TPrimaryKey, TElement>.WithPrefixIndex(System.Func<TElement, System.Collections.Generic.IEnumerable<string!>!>! keyAccessor, System.Collections.Generic.IEqualityComparer<char>? comparer = null, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TPrimaryKey, TElement>!

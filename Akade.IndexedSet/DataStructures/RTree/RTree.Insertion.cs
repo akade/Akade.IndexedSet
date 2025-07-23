@@ -214,6 +214,7 @@ internal sealed partial class RTree<TElement, TValue>
                         }
 
                         AABB<TValue> otherAABB = otherChild.GetAABB(_getAABB);
+
                         overlap += aabb.IntersectionArea(otherAABB);
                         newOverlap += newAABB.IntersectionArea(otherAABB);
                     }
@@ -418,7 +419,6 @@ internal sealed partial class RTree<TElement, TValue>
 
 
 internal readonly record struct InsertionAction<TElement, TValue>(InsertionActionType ActionType, Node<TElement, TValue> Node)
-    where TElement : notnull
     where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>
 {
 
@@ -438,11 +438,9 @@ internal sealed record class InsertionResultComplete : InsertionResult
 }
 
 internal sealed record class InsertionResultSplit<TElement, TValue>(Node<TElement, TValue> Node) : InsertionResult
-    where TElement : notnull
     where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>;
 
 internal sealed record class InsertionResultReinsert<TElement, TValue>(List<Node<TElement, TValue>> Nodes, int level) : InsertionResult
-    where TElement : notnull
     where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>;
 
 #endif

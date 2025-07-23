@@ -28,7 +28,7 @@ internal sealed partial class RTree<TElement, TValue>
                     {
                         stack.Push(childParentNode);
                     }
-                    else if (child is LeafNode<TElement, TValue> leafNode && leafNode.Element.Equals(element))
+                    else if (child is LeafNode<TElement, TValue> leafNode && (leafNode.Element?.Equals(element) ?? false))
                     {
                         targetNode = leafNode;
                         // We found the target node, no need to continue searching

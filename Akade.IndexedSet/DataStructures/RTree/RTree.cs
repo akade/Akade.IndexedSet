@@ -12,7 +12,6 @@ namespace Akade.IndexedSet.DataStructures.RTree;
 
 // TODO: explore on how to specialize with minimal code duplication for Vector2 & Vector3
 internal sealed partial class RTree<TElement, TValue>
-    where TElement : notnull
     where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>
 {
     private readonly Func<TElement, AABB<TValue>> _getAABB;

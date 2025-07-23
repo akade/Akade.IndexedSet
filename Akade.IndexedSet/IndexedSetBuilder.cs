@@ -1,8 +1,10 @@
 ﻿// Ignore Spelling: Accessor
 
 using Akade.IndexedSet.Concurrency;
+using Akade.IndexedSet.DataStructures.RTree;
 using Akade.IndexedSet.Indices;
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Akade.IndexedSet;
@@ -89,7 +91,7 @@ public class IndexedSetBuilder<TElement>
     }
 
     /// <summary>
-    /// Configures the <see cref="IndexedSet{TPrimaryKey, TElement}"/> to have an unique index based on a secondary key.
+    /// Configures the <see cref="IndexedSet{TElement}"/> to have an unique index based on a secondary key.
     /// The secondary key can be any expression that does not change while the element is within the indexed set, even
     /// tuples or calculated expressions. The name of the index is based on the string representation of the expression
     /// and passed by the compiler to <paramref name="indexName"/>. The convention is to always use x as a lambda parameter:
@@ -113,7 +115,7 @@ public class IndexedSetBuilder<TElement>
     }
 
     /// <summary>
-    /// Configures the <see cref="IndexedSet{TPrimaryKey, TElement}"/> to have an unique index based on a secondary key.
+    /// Configures the <see cref="IndexedSet{TElement}"/> to have an unique index based on a secondary key.
     /// The secondary key can be any expression that does not change while the element is within the indexed set, even
     /// tuples or calculated expressions. The name of the index is based on the string representation of the expression
     /// and passed by the compiler to <paramref name="indexName"/>. The convention is to always use x as a lambda parameter:
@@ -137,7 +139,7 @@ public class IndexedSetBuilder<TElement>
     }
 
     /// <summary>
-    /// Configures the <see cref="IndexedSet{TPrimaryKey, TElement}"/> to have a nonunique index based on a secondary key.
+    /// Configures the <see cref="IndexedSet{TElement}"/> to have a nonunique index based on a secondary key.
     /// The secondary key can be any expression that does not change while the element is within the indexed set, even
     /// tuples or calculated expressions. The name of the index is based on the string representation of the expression
     /// and passed by the compiler to <paramref name="indexName"/>. The convention is to always use x as a lambda parameter:
@@ -161,7 +163,7 @@ public class IndexedSetBuilder<TElement>
     }
 
     /// <summary>
-    /// Configures the <see cref="IndexedSet{TPrimaryKey, TElement}"/> to have a nonunique index based on a secondary key.
+    /// Configures the <see cref="IndexedSet{TElement}"/> to have a nonunique index based on a secondary key.
     /// The secondary key can be any expression that does not change while the element is within the indexed set, even
     /// tuples or calculated expressions. The name of the index is based on the string representation of the expression
     /// and passed by the compiler to <paramref name="indexName"/>. The convention is to always use x as a lambda parameter:
@@ -185,7 +187,7 @@ public class IndexedSetBuilder<TElement>
     }
 
     /// <summary>
-    /// Configures the <see cref="IndexedSet{TPrimaryKey, TElement}"/> to have a nonunique index based on a secondary key that supports range queries.
+    /// Configures the <see cref="IndexedSet{TElement}"/> to have a nonunique index based on a secondary key that supports range queries.
     /// The secondary key can be any expression that does not change while the element is within the indexed set, even
     /// tuples or calculated expressions. The name of the index is based on the string representation of the expression
     /// and passed by the compiler to <paramref name="indexName"/>. The convention is to always use x as a lambda parameter:
@@ -209,7 +211,7 @@ public class IndexedSetBuilder<TElement>
     }
 
     /// <summary>
-    /// Configures the <see cref="IndexedSet{TPrimaryKey, TElement}"/> to have a nonunique index based on a secondary key that supports range queries.
+    /// Configures the <see cref="IndexedSet{TElement}"/> to have a nonunique index based on a secondary key that supports range queries.
     /// The secondary key can be any expression that does not change while the element is within the indexed set, even
     /// tuples or calculated expressions. The name of the index is based on the string representation of the expression
     /// and passed by the compiler to <paramref name="indexName"/>. The convention is to always use x as a lambda parameter:
@@ -233,7 +235,7 @@ public class IndexedSetBuilder<TElement>
     }
 
     /// <summary>
-    /// Configures the <see cref="IndexedSet{TPrimaryKey, TElement}"/> to have a full text index based on a secondary key that 
+    /// Configures the <see cref="IndexedSet{TElement}"/> to have a full text index based on a secondary key that 
     /// supports fuzzy search on string startswith/contains queries. The secondary key can be any expression that does not change while 
     /// the element is within the indexed set. The name of the index is based on the 
     /// string representation of the expression and passed by the compiler to <paramref name="indexName"/>. 
@@ -255,7 +257,7 @@ public class IndexedSetBuilder<TElement>
     }
 
     /// <summary>
-    /// Configures the <see cref="IndexedSet{TPrimaryKey, TElement}"/> to have a full text index based on a secondary key that 
+    /// Configures the <see cref="IndexedSet{TElement}"/> to have a full text index based on a secondary key that 
     /// supports fuzzy search on string startswith/contains queries. The secondary key can be any expression that does not change while 
     /// the element is within the indexed set. The name of the index is based on the 
     /// string representation of the expression and passed by the compiler to <paramref name="indexName"/>. 
@@ -278,7 +280,7 @@ public class IndexedSetBuilder<TElement>
     }
 
     /// <summary>
-    /// Configures the <see cref="IndexedSet{TPrimaryKey, TElement}"/> to have a prefix index based on a secondary key that 
+    /// Configures the <see cref="IndexedSet{TElement}"/> to have a prefix index based on a secondary key that 
     /// supports fuzzy search on string startswith queries. The secondary key can be any expression that does not change while 
     /// the element is within the indexed set. The name of the index is based on the 
     /// string representation of the expression and passed by the compiler to <paramref name="indexName"/>. 
@@ -300,7 +302,7 @@ public class IndexedSetBuilder<TElement>
     }
 
     /// <summary>
-    /// Configures the <see cref="IndexedSet{TPrimaryKey, TElement}"/> to have a prefix index based on a secondary key that 
+    /// Configures the <see cref="IndexedSet{TElement}"/> to have a prefix index based on a secondary key that 
     /// supports fuzzy search on string startswith queries. The secondary key can be any expression that does not change while 
     /// the element is within the indexed set. The name of the index is based on the 
     /// string representation of the expression and passed by the compiler to <paramref name="indexName"/>. 
@@ -321,6 +323,33 @@ public class IndexedSetBuilder<TElement>
 
         return this;
     }
+
+#if NET9_0_OR_GREATER
+    /// <summary>
+    /// Configures the <see cref="IndexedSet{TElement}"/> to have a spatial (point) index based on a secondary key that 
+    /// supports fast spatial queries (range and nearest neighbor search).
+    /// 
+    /// The secondary key can be any expression that does not change while the element is within the indexed set. The name of the index is based on the 
+    /// string representation of the expression and passed by the compiler to <paramref name="indexName"/>. 
+    /// The convention is to always use x as a lambda parameter: x => x.Point. Alternativly, you can also always use the same method from a static class.
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="keyAccessor"></param>
+    /// <param name="dimensions"></param>
+    /// <param name="indexName"></param>
+    /// <returns></returns>
+    public virtual IndexedSetBuilder<TElement> WithSpatialIndex<TValue>(Func<TElement, Span<TValue>> keyAccessor, int dimensions, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+        where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>
+    {
+        ArgumentNullException.ThrowIfNull(indexName);
+
+        Func<TElement, AABB<TValue>> aabbAccessor = element => AABB<TValue>.CreateFromPoint(keyAccessor(element));
+
+        _result.AddIndex(aabbAccessor, new SpatialIndex<TElement, TValue>(aabbAccessor, dimensions, RTreeSettings.Default, indexName));
+
+        return this;
+    }
+#endif
 
     /// <summary>
     /// Builds and returns the configured <see cref="IndexedSet{TPrimaryKey, TElement}"/>
@@ -407,7 +436,23 @@ public class IndexedSetBuilder<TPrimaryKey, TElement> : IndexedSetBuilder<TEleme
     }
 
     /// <inheritdoc />
+    [Experimental(Experiments.TextSearchImprovements, UrlFormat = Experiments.UrlTemplate)]
+    public override IndexedSetBuilder<TElement> WithFullTextIndex(Func<TElement, IEnumerable<string>> keyAccessor, IEqualityComparer<char>? comparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    {
+        _ = base.WithFullTextIndex(keyAccessor, comparer, indexName);
+        return this;
+    }
+
+    /// <inheritdoc />
     public override IndexedSetBuilder<TPrimaryKey, TElement> WithPrefixIndex(Func<TElement, string> keyAccessor, IEqualityComparer<char>? comparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    {
+        _ = base.WithPrefixIndex(keyAccessor, comparer, indexName);
+        return this;
+    }
+
+    /// <inheritdoc />
+    [Experimental(Experiments.TextSearchImprovements, UrlFormat = Experiments.UrlTemplate)]
+    public override IndexedSetBuilder<TPrimaryKey, TElement> WithPrefixIndex(Func<TElement, IEnumerable<string>> keyAccessor, IEqualityComparer<char>? comparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
     {
         _ = base.WithPrefixIndex(keyAccessor, comparer, indexName);
         return this;
