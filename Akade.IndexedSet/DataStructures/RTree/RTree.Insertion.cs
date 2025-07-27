@@ -5,33 +5,33 @@ using System.Numerics.Tensors;
 using System.Runtime.InteropServices;
 
 namespace Akade.IndexedSet.DataStructures.RTree;
-internal sealed partial class RTree<TElement, TValue>
+internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope, TEnvelopeMath>
 {
     internal void Insert(TElement element)
     {
-        Insert(new LeafNode<TElement, TValue>(element));
+        Insert(new LeafNode(element));
     }
 
-    internal void Insert(LeafNode<TElement, TValue> leafToInsert)
+    internal void Insert(LeafNode leafToInsert)
     {
         Count++;
 
         InsertionResult first = RecursiveInsert(_root, leafToInsert, 0);
         int targetHeight = 0;
-        Stack<InsertionAction<TElement, TValue>> insertion_stack = new();
+        Stack<InsertionAction> insertion_stack = new();
 
         switch (first)
         {
             case InsertionResultComplete:
                 return;
-            case InsertionResultSplit<TElement, TValue> split:
-                insertion_stack.Push(new InsertionAction<TElement, TValue>(InsertionActionType.Split, split.Node));
+            case InsertionResultSplit split:
+                insertion_stack.Push(new InsertionAction(InsertionActionType.Split, split.Node));
 
                 break;
-            case InsertionResultReinsert<TElement, TValue> reinsert:
+            case InsertionResultReinsert reinsert:
                 for (int i = 0; i < reinsert.Nodes.Count; i++)
                 {
-                    insertion_stack.Push(new InsertionAction<TElement, TValue>(InsertionActionType.Reinsert, reinsert.Nodes[i]));
+                    insertion_stack.Push(new InsertionAction(InsertionActionType.Reinsert, reinsert.Nodes[i]));
                 }
                 targetHeight = reinsert.level;
                 break;
@@ -39,13 +39,13 @@ internal sealed partial class RTree<TElement, TValue>
                 throw new InvalidOperationException("Should never happen: Bug?");
         }
 
-        while (insertion_stack.TryPop(out InsertionAction<TElement, TValue> next))
+        while (insertion_stack.TryPop(out InsertionAction next))
         {
             switch (next)
             {
                 case { ActionType: InsertionActionType.Split, Node: var node }:
-                    ParentNode<TElement, TValue> newRoot = new();
-                    ParentNode<TElement, TValue> oldRoot = _root;
+                    ParentNode newRoot = new();
+                    ParentNode oldRoot = _root;
                     _root = newRoot;
                     newRoot.Children.Add(oldRoot);
                     newRoot.Children.Add(node);
@@ -60,10 +60,10 @@ internal sealed partial class RTree<TElement, TValue>
                     {
                         case InsertionResultComplete:
                             break; ;
-                        case InsertionResultSplit<TElement, TValue> split:
-                            insertion_stack.Push(new InsertionAction<TElement, TValue>(InsertionActionType.Split, split.Node));
+                        case InsertionResultSplit split:
+                            insertion_stack.Push(new InsertionAction(InsertionActionType.Split, split.Node));
                             break;
-                        case InsertionResultReinsert<TElement, TValue>:
+                        case InsertionResultReinsert:
                         default:
                             throw new InvalidOperationException("Should never happen: Bug?");
                     }
@@ -75,10 +75,9 @@ internal sealed partial class RTree<TElement, TValue>
         CheckForCorruption();
     }
 
-
-    private InsertionResult ForcedInsertion(ParentNode<TElement, TValue> node, Node<TElement, TValue> nodeToReinsert, int targetHeight)
+    private InsertionResult ForcedInsertion(ParentNode node, Node nodeToReinsert, int targetHeight)
     {
-        node.MergeAABB(nodeToReinsert.GetAABB(_getAABB));
+        node.MergeEnvelope(nodeToReinsert.GetEnvelope(_getAABB));
         int expandIndex = ChooseSubTree(node, nodeToReinsert);
 
         if (targetHeight == 0 || node.Children.Count < expandIndex)
@@ -87,27 +86,26 @@ internal sealed partial class RTree<TElement, TValue>
             return ResolveOverflowWithoutReinsertion(node);
         }
 
-        var follow = (ParentNode<TElement, TValue>)node.Children[expandIndex];
+        var follow = (ParentNode)node.Children[expandIndex];
         InsertionResult expand = ForcedInsertion(follow, nodeToReinsert, targetHeight - 1);
 
         return expand switch
         {
-            InsertionResultSplit<TElement, TValue> { Node: var child } => SplitWithoutReinsertion(node, child),
+            InsertionResultSplit { Node: var child } => SplitWithoutReinsertion(node, child),
             _ => expand
         };
     }
 
-    private InsertionResult SplitWithoutReinsertion(ParentNode<TElement, TValue> node, Node<TElement, TValue> child)
+    private InsertionResult SplitWithoutReinsertion(ParentNode node, Node child)
     {
-        node.MergeAABB(child.GetAABB(_getAABB));
+        node.MergeEnvelope(child.GetEnvelope(_getAABB));
         node.Children.Add(child);
         return ResolveOverflowWithoutReinsertion(node);
     }
 
-
-    private InsertionResult RecursiveInsert(ParentNode<TElement, TValue> node, LeafNode<TElement, TValue> leafNode, int currentHeight)
+    private InsertionResult RecursiveInsert(ParentNode node, LeafNode leafNode, int currentHeight)
     {
-        node.MergeAABB(_getAABB(leafNode.Element));
+        node.MergeEnvelope(_getAABB(leafNode.Element));
 
         int expandIndex = ChooseSubTree(node, leafNode);
 
@@ -117,62 +115,60 @@ internal sealed partial class RTree<TElement, TValue>
             return ResolveOverflow(node, currentHeight);
         }
 
-        var follow = (ParentNode<TElement, TValue>)node.Children[expandIndex];
+        var follow = (ParentNode)node.Children[expandIndex];
         InsertionResult expand = RecursiveInsert(follow, leafNode, currentHeight + 1);
 
         return expand switch
         {
-            InsertionResultSplit<TElement, TValue> { Node: var child } => Split(node, child, currentHeight),
-            InsertionResultReinsert<TElement, TValue> reinsert => Reinsert(node, reinsert),
+            InsertionResultSplit { Node: var child } => Split(node, child, currentHeight),
+            InsertionResultReinsert reinsert => Reinsert(node, reinsert),
             InsertionResultComplete => InsertionResultComplete.Instance,
             _ => throw new InvalidOperationException("Should never happen: Bug?")
         };
     }
 
-    private InsertionResultReinsert<TElement, TValue> Reinsert(ParentNode<TElement, TValue> node, InsertionResultReinsert<TElement, TValue> reinsert)
+    private InsertionResultReinsert Reinsert(ParentNode node, InsertionResultReinsert reinsert)
     {
         node.RecalculateAABB(_getAABB);
         return reinsert;
     }
 
-
-    private InsertionResult Split(ParentNode<TElement, TValue> node, Node<TElement, TValue> child, int currentHeight)
+    private InsertionResult Split(ParentNode node, Node child, int currentHeight)
     {
-        node.MergeAABB(child.GetAABB(_getAABB));
+        node.MergeEnvelope(child.GetEnvelope(_getAABB));
         node.Children.Add(child);
         return ResolveOverflow(node, currentHeight);
     }
 
-
-    private int ChooseSubTree(ParentNode<TElement, TValue> node, Node<TElement, TValue> toInsert)
+    private int ChooseSubTree(ParentNode node, Node toInsert)
     {
-        Node<TElement, TValue>? firstChild = node.Children.FirstOrDefault();
-        if (firstChild is null or LeafNode<TElement, TValue>)
+        Node? firstChild = node.Children.FirstOrDefault();
+        if (firstChild is null or LeafNode)
         {
             return int.MaxValue;
         }
 
-        bool allLeaves = firstChild is ParentNode<TElement, TValue> { Children: [LeafNode<TElement, TValue>, ..] };
+        bool allLeaves = firstChild is ParentNode { Children: [LeafNode, ..] };
 
-        AABB <TValue> insertionAABB = toInsert.GetAABB(_getAABB);
+        TEnvelope insertionAABB = toInsert.GetEnvelope(_getAABB);
 
         int inclusionCount = 0;
         TValue minArea = TValue.MaxValue;
         int minIndex = -1;
-        
-        Span<Node<TElement, TValue>> children = CollectionsMarshal.AsSpan(node.Children);
+
+        Span<Node> children = CollectionsMarshal.AsSpan(node.Children);
 
         for (int index = 0; index < children.Length; index++)
         {
-            Node<TElement, TValue> child = children[index];
+            Node child = children[index];
 
-            AABB<TValue> childAABB = child.GetAABB(_getAABB);
+            TEnvelope childAABB = child.GetEnvelope(_getAABB);
 
-            if (childAABB.Contains(insertionAABB))
+            if (TEnvelopeMath.Contains(childAABB, insertionAABB))
             {
                 inclusionCount++;
 
-                TValue childArea = childAABB.Area();
+                TValue childArea = TEnvelopeMath.Area(childAABB);
                 if (childArea < minArea)
                 {
                     minArea = childArea;
@@ -187,17 +183,16 @@ internal sealed partial class RTree<TElement, TValue>
             TValue minAreaIncrease = TValue.Zero;
             minArea = TValue.Zero;
 
-            Span<TValue> buffer = stackalloc TValue[_dimensions * 2];
+            TEnvelope buffer = TEnvelopeMath.Init(_dimensions);
 
             for (int index = 0; index < node.Children.Count; index++)
             {
-                Node<TElement, TValue> child = node.Children[index];
+                Node child = node.Children[index];
 
-                AABB<TValue> aabb = child.GetAABB(_getAABB);
-                aabb.CopyTo(buffer);
-                insertionAABB.MergeInto(buffer);
+                TEnvelope aabb = child.GetEnvelope(_getAABB);
+                TEnvelopeMath.CopyTo(aabb, buffer);
 
-                var newAABB = AABB<TValue>.CreateFromCombinedBuffer(buffer);
+                TEnvelopeMath.MergeInto(insertionAABB, buffer);
 
                 TValue overlapIncrease = TValue.Zero;
 
@@ -206,24 +201,24 @@ internal sealed partial class RTree<TElement, TValue>
                     TValue overlap = TValue.Zero;
                     TValue newOverlap = TValue.Zero;
 
-                    foreach (Node<TElement, TValue> otherChild in node.Children)
+                    foreach (Node otherChild in node.Children)
                     {
                         if (otherChild == child)
                         {
                             continue;
                         }
 
-                        AABB<TValue> otherAABB = otherChild.GetAABB(_getAABB);
+                        TEnvelope otherAABB = otherChild.GetEnvelope(_getAABB);
 
-                        overlap += aabb.IntersectionArea(otherAABB);
-                        newOverlap += newAABB.IntersectionArea(otherAABB);
+                        overlap += TEnvelopeMath.IntersectionArea(aabb, otherAABB);
+                        newOverlap += TEnvelopeMath.IntersectionArea(buffer, otherAABB);
                     }
 
                     overlapIncrease = newOverlap - overlap;
                 }
 
-                TValue area = newAABB.Area();
-                TValue areaIncrease = area - aabb.Area();
+                TValue area = TEnvelopeMath.Area(buffer);
+                TValue areaIncrease = area - TEnvelopeMath.Area(aabb);
 
                 if (index == 0 || (overlapIncrease < minOverlapIncrease && areaIncrease < minAreaIncrease && area < minArea))
                 {
@@ -238,15 +233,14 @@ internal sealed partial class RTree<TElement, TValue>
         return minIndex;
     }
 
-
-    private InsertionResult ResolveOverflowWithoutReinsertion(ParentNode<TElement, TValue> node)
+    private InsertionResult ResolveOverflowWithoutReinsertion(ParentNode node)
     {
         return node.Children.Count > _settings.MaxNodeEntries
-            ? new InsertionResultSplit<TElement, TValue>(Split(node))
+            ? new InsertionResultSplit(Split(node))
             : InsertionResultComplete.Instance;
     }
 
-    private InsertionResult ResolveOverflow(ParentNode<TElement, TValue> node, int currentHeight)
+    private InsertionResult ResolveOverflow(ParentNode node, int currentHeight)
     {
         if (_settings.ReinsertionCount == 0)
         {
@@ -255,8 +249,8 @@ internal sealed partial class RTree<TElement, TValue>
 
         if (node.Children.Count > _settings.MaxNodeEntries)
         {
-            List<Node<TElement, TValue>> reinsertionNodes = GetNodesForReinsertaion(node);
-            return new InsertionResultReinsert<TElement, TValue>(reinsertionNodes, currentHeight);
+            List<Node> reinsertionNodes = GetNodesForReinsertaion(node);
+            return new InsertionResultReinsert(reinsertionNodes, currentHeight);
         }
         else
         {
@@ -264,47 +258,45 @@ internal sealed partial class RTree<TElement, TValue>
         }
     }
 
-    private Node<TElement, TValue> Split(ParentNode<TElement, TValue> node)
+    private Node Split(ParentNode node)
     {
         int axis = GetSplitAxis(node);
 
         Debug.Assert(node.Children.Count >= 2);
 
-        node.Children.Sort((a, b) => a.GetAABB(_getAABB).Min[axis].CompareTo(b.GetAABB(_getAABB).Min[axis])); // TODO precreate a comparer for AABB<TValue> to avoid this allocation
+        node.Children.Sort(_axisComparers[axis]);
 
         TValue bestOverlap = TValue.MaxValue;
         TValue bestArea = TValue.MaxValue;
         int minNodeEntries = _settings.MinNodeEntries;
         int bestIndex = minNodeEntries;
 
-        Span<TValue> leftBuffer = stackalloc TValue[_dimensions * 2];
-        Span<TValue> rightBuffer = stackalloc TValue[_dimensions * 2];
-        Span<Node<TElement, TValue>> childSpan= CollectionsMarshal.AsSpan(node.Children);
+        TEnvelope leftAABB = TEnvelopeMath.Init(_dimensions);
+        TEnvelope rightAABB = TEnvelopeMath.Init(_dimensions);
+        Span<Node> childSpan = CollectionsMarshal.AsSpan(node.Children);
 
         for (int k = minNodeEntries; k <= node.Children.Count - minNodeEntries; k++)
         {
-            Node<TElement, TValue> firstChild = node.Children[k - 1];
-            Node<TElement, TValue> secondChild = node.Children[k];
-            AABB<TValue> firstAABB = firstChild.GetAABB(_getAABB);
-            AABB<TValue> secondAABB = secondChild.GetAABB(_getAABB);
-            firstAABB.CopyTo(leftBuffer);
-            secondAABB.CopyTo(rightBuffer);
+            Node firstChild = node.Children[k - 1];
+            Node secondChild = node.Children[k];
+            TEnvelope firstAABB = firstChild.GetEnvelope(_getAABB);
+            TEnvelope secondAABB = secondChild.GetEnvelope(_getAABB);
 
-            foreach (Node<TElement, TValue> child in childSpan[..k])
+            TEnvelopeMath.CopyTo(firstAABB, leftAABB);
+            TEnvelopeMath.CopyTo(secondAABB, rightAABB);
+
+            foreach (Node child in childSpan[..k])
             {
-                child.GetAABB(_getAABB).MergeInto(leftBuffer);
+                TEnvelopeMath.MergeInto(child.GetEnvelope(_getAABB), leftAABB);
             }
 
-            foreach (Node<TElement, TValue> child in childSpan[k..])
+            foreach (Node child in childSpan[k..])
             {
-                child.GetAABB(_getAABB).MergeInto(rightBuffer);
+                TEnvelopeMath.MergeInto(child.GetEnvelope(_getAABB), rightAABB);
             }
 
-            var leftAABB = AABB<TValue>.CreateFromCombinedBuffer(leftBuffer);
-            var rightAABB = AABB<TValue>.CreateFromCombinedBuffer(rightBuffer);
-
-            TValue overlap = leftAABB.IntersectionArea(rightAABB);
-            TValue area = leftAABB.Area() + rightAABB.Area();
+            TValue overlap = TEnvelopeMath.IntersectionArea(leftAABB, rightAABB);
+            TValue area = TEnvelopeMath.Area(leftAABB) + TEnvelopeMath.Area(rightAABB);
 
             if (k == minNodeEntries || (overlap < bestOverlap && area < bestArea))
             {
@@ -314,65 +306,62 @@ internal sealed partial class RTree<TElement, TValue>
             }
         }
 
-        ParentNode<TElement, TValue> newNode = new(childSpan[bestIndex..], _getAABB);
+        ParentNode newNode = new(childSpan[bestIndex..], _getAABB);
         node.Children.RemoveRange(bestIndex, node.Children.Count - bestIndex);
         node.RecalculateAABB(_getAABB);
         return newNode;
     }
 
-    private int GetSplitAxis(ParentNode<TElement, TValue> node)
+    private int GetSplitAxis(ParentNode node)
     {
         TValue bestPerimeter = TValue.MaxValue;
         int bestAxis = 0;
         int minNodeEntries = _settings.MinNodeEntries;
         int until = node.Children.Count - minNodeEntries + 1;
 
-        Span<TValue> left = stackalloc TValue[_dimensions * 2];
-        Span<TValue> right = stackalloc TValue[_dimensions * 2];
+        TEnvelope left = TEnvelopeMath.Init(_dimensions);
+        TEnvelope right = TEnvelopeMath.Init(_dimensions);
 
-        Span<TValue> leftModified = stackalloc TValue[_dimensions * 2];
-        Span<TValue> rightModified = stackalloc TValue[_dimensions * 2];
+        TEnvelope leftModified = TEnvelopeMath.Init(_dimensions);
+        TEnvelope rightModified = TEnvelopeMath.Init(_dimensions);
 
-        Span<Node<TElement, TValue>> childSpan = CollectionsMarshal.AsSpan(node.Children);
+        Span<Node> childSpan = CollectionsMarshal.AsSpan(node.Children);
 
         for (int axis = 0; axis < _dimensions; axis++)
         {
-            node.Children.Sort((a, b) => a.GetAABB(_getAABB).Min[axis].CompareTo(b.GetAABB(_getAABB).Min[axis]));
+            node.Children.Sort(_axisComparers[axis]);
 
             // initialize the memory for left and right AABBs
-            childSpan[0].GetAABB(_getAABB).CopyTo(left);
-            childSpan[until].GetAABB(_getAABB).CopyTo(right);
+            TEnvelopeMath.CopyTo(left, childSpan[0].GetEnvelope(_getAABB));
+            TEnvelopeMath.CopyTo(right, childSpan[until].GetEnvelope(_getAABB));
 
             for (int i = 1; i < until; i++)
             {
-                childSpan[i].GetAABB(_getAABB).MergeInto(left);
+                TEnvelopeMath.MergeInto(left, childSpan[i].GetEnvelope(_getAABB));
             }
 
             for (int i = until + 1; i < node.Children.Count; i++)
             {
-                childSpan[i].GetAABB(_getAABB).MergeInto(right);
+                TEnvelopeMath.MergeInto(right, childSpan[i].GetEnvelope(_getAABB));
             }
 
             for (int k = minNodeEntries; k < until; k++)
             {
-                left.CopyTo(leftModified);
-                right.CopyTo(rightModified);
+                TEnvelopeMath.CopyTo(left, leftModified);
+                TEnvelopeMath.CopyTo(right, rightModified);
 
-                foreach (Node<TElement, TValue> child in childSpan[..k])
+                foreach (Node child in childSpan[..k])
                 {
-                    child.GetAABB(_getAABB).MergeInto(leftModified);
+                    TEnvelopeMath.MergeInto(child.GetEnvelope(_getAABB), leftModified);
                 }
 
-                foreach (Node<TElement, TValue> child in childSpan[k..])
+                foreach (Node child in childSpan[k..])
                 {
-                    child.GetAABB(_getAABB).MergeInto(rightModified);
+                    TEnvelopeMath.MergeInto(child.GetEnvelope(_getAABB), rightModified);
                 }
-
-                var leftAABB = AABB<TValue>.CreateFromCombinedBuffer(leftModified);
-                var rightAABB = AABB<TValue>.CreateFromCombinedBuffer(rightModified);
 
                 // We can use the half perimeter as we are only interested in the relative size and are axis-aligned
-                TValue perimeter = leftAABB.HalfPerimeter() + rightAABB.HalfPerimeter();
+                TValue perimeter = TEnvelopeMath.HalfPerimeter(leftModified) + TEnvelopeMath.HalfPerimeter(rightModified);
 
                 if (perimeter < bestPerimeter)
                 {
@@ -384,19 +373,19 @@ internal sealed partial class RTree<TElement, TValue>
         return bestAxis;
     }
 
-    private List<Node<TElement, TValue>> GetNodesForReinsertaion(ParentNode<TElement, TValue> node)
+    private List<Node> GetNodesForReinsertaion(ParentNode node)
     {
         // TODO: think about optimizing, maybe with an comparer that has preallocated buffers and can be initialized with the center of the AABB
         node.Children.Sort((left, right) =>
         {
             Span<TValue> center = stackalloc TValue[_dimensions];
-            node.GetAABB(_getAABB).Center(center);
+            TEnvelopeMath.CopyCenterTo(node.GetEnvelope(_getAABB), center);
 
             Span<TValue> leftCenter = stackalloc TValue[_dimensions];
             Span<TValue> rightCenter = stackalloc TValue[_dimensions];
 
-            left.GetAABB(_getAABB).Center(leftCenter);
-            right.GetAABB(_getAABB).Center(rightCenter);
+            TEnvelopeMath.CopyCenterTo(left.GetEnvelope(_getAABB), leftCenter);
+            TEnvelopeMath.CopyCenterTo(right.GetEnvelope(_getAABB), rightCenter);
 
             TValue leftDistance = TensorPrimitives.Distance<TValue>(leftCenter, center);
             TValue rightDistance = TensorPrimitives.Distance<TValue>(rightCenter, center);
@@ -404,43 +393,35 @@ internal sealed partial class RTree<TElement, TValue>
             return leftDistance.CompareTo(rightDistance);
         });
 
-        Span<Node<TElement, TValue>> childSpan = CollectionsMarshal.AsSpan(node.Children);
+        Span<Node> childSpan = CollectionsMarshal.AsSpan(node.Children);
 
         int splitOffStart = node.Children.Count - _settings.ReinsertionCount;
-        List<Node<TElement, TValue>> reinsertionNodes = new(node.Children.Count - splitOffStart);
+        List<Node> reinsertionNodes = new(node.Children.Count - splitOffStart);
         reinsertionNodes.AddRange(childSpan[splitOffStart..]);
         node.Children.RemoveRange(splitOffStart, node.Children.Count - splitOffStart);
 
         node.RecalculateAABB(_getAABB);
-        
+
         return reinsertionNodes;
     }
+
+    internal readonly record struct InsertionAction(InsertionActionType ActionType, Node Node)
+    {
+
+    }
+
+    internal enum InsertionActionType
+    {
+        Split,
+        Reinsert
+    }
+
+    internal abstract record class InsertionResult;
+    internal sealed record class InsertionResultComplete : InsertionResult
+    {
+        public static InsertionResultComplete Instance { get; } = new();
+    }
+    internal sealed record class InsertionResultSplit(Node Node) : InsertionResult;
+    internal sealed record class InsertionResultReinsert(List<Node> Nodes, int level) : InsertionResult;
 }
-
-
-internal readonly record struct InsertionAction<TElement, TValue>(InsertionActionType ActionType, Node<TElement, TValue> Node)
-    where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>
-{
-
-}
-
-internal enum InsertionActionType
-{
-    Split,
-    Reinsert
-}
-
-internal abstract record class InsertionResult;
-
-internal sealed record class InsertionResultComplete : InsertionResult
-{
-    public static InsertionResultComplete Instance { get; } = new();
-}
-
-internal sealed record class InsertionResultSplit<TElement, TValue>(Node<TElement, TValue> Node) : InsertionResult
-    where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>;
-
-internal sealed record class InsertionResultReinsert<TElement, TValue>(List<Node<TElement, TValue>> Nodes, int level) : InsertionResult
-    where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>;
-
 #endif

@@ -5,102 +5,91 @@ using System.Runtime.InteropServices;
 
 namespace Akade.IndexedSet.DataStructures.RTree;
 
-internal abstract class Node<TElement, TValue>
-    where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>
+internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope, TEnvelopeMath>
 {
-    internal abstract AABB<TValue> GetAABB(Func<TElement, AABB<TValue>> getAABB);
-}
 
-internal sealed class ParentNode<TElement, TValue> : Node<TElement, TValue>
-    where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>
-{
-    public List<Node<TElement, TValue>> Children = [];
-
-    public ParentNode() 
+    internal abstract class Node
     {
-        
+        internal abstract TEnvelope GetEnvelope(Func<TElement, TEnvelope> getAABB);
     }
 
-    public ParentNode(Span<Node<TElement, TValue>> span, Func<TElement, AABB<TValue>> getAABB)
+    internal sealed class ParentNode : Node
     {
-        Children.AddRange(span);
-        RecalculateAABB(getAABB);
-    }
+        public List<Node> Children = [];
 
-    public Memory<TValue> Min { get; private set; }
-    public Memory<TValue> Max { get; private set; }
-
-    internal override AABB<TValue> GetAABB(Func<TElement, AABB<TValue>> getAABB)
-    {
-        return new AABB<TValue>(Min.Span, Max.Span);
-    }
-
-    public bool IsEmptyAABB => Min.IsEmpty;
-
-    internal void MergeAABB(AABB<TValue> other)
-    {
-        if (IsEmptyAABB)
+        public ParentNode()
         {
-            InitMemory(other);
-            return;
+
         }
 
-        Span<TValue> buffer = stackalloc TValue[Min.Length];
-
-        TensorPrimitives.Min(Min.Span, other.Min, buffer);
-        buffer.CopyTo(Min.Span);
-
-        TensorPrimitives.Max(Max.Span, other.Max, buffer);
-        buffer.CopyTo(Max.Span);
-    }
-
-    private void InitMemory(AABB<TValue> aabb)
-    {
-        if (IsEmptyAABB)
+        public ParentNode(Span<Node> span, Func<TElement, TEnvelope> getAABB)
         {
-            int dimensions = aabb.Min.Length;
-            var backingMemory = new TValue[dimensions * 2];
-
-            Min = backingMemory.AsMemory(0, dimensions);
-            Max = backingMemory.AsMemory(dimensions, dimensions);
-            aabb.Min.CopyTo(Min.Span);
-            aabb.Max.CopyTo(Max.Span);
+            Children.AddRange(span);
+            RecalculateAABB(getAABB);
         }
-    }
 
-    internal void RecalculateAABB(Func<TElement, AABB<TValue>> getAABB)
-    {
-        Span<Node<TElement, TValue>> childSpan = CollectionsMarshal.AsSpan(Children);
+        public TMemoryEnvelope Envelope { get; set; } = TEnvelopeMath.GetEmptyMemory();
 
-        AABB<TValue> firstChild = childSpan[0].GetAABB(getAABB);
-        
-        InitMemory(firstChild);    
-
-        for (int i = 1; i < childSpan.Length; i++)
+        internal override TEnvelope GetEnvelope(Func<TElement, TEnvelope> getAABB)
         {
-            MergeAABB(Children[i].GetAABB(getAABB));
+            return TEnvelopeMath.AsEnvelope(Envelope);
+        }
+
+        public bool IsEmptyEnvelope => TEnvelopeMath.IsEmpty(Envelope);
+
+        internal void MergeEnvelope(TEnvelope other)
+        {
+            if (IsEmptyEnvelope)
+            {
+                InitMemory(other);
+                return;
+            }
+
+            TEnvelopeMath.Merge(Envelope, other, Envelope);
+        }
+
+        private void InitMemory(TEnvelope aabb)
+        {
+            if (IsEmptyEnvelope)
+            {
+                Envelope = TEnvelopeMath.InitMemory(TEnvelopeMath.GetDimensions(aabb));
+                TEnvelopeMath.CopyTo(aabb, Envelope);
+            }
+        }
+
+        internal void RecalculateAABB(Func<TElement, TEnvelope> getAABB)
+        {
+            Span<Node> childSpan = CollectionsMarshal.AsSpan(Children);
+
+            TEnvelope firstChild = childSpan[0].GetEnvelope(getAABB);
+
+            InitMemory(firstChild);
+
+            for (int i = 1; i < childSpan.Length; i++)
+            {
+                MergeEnvelope(Children[i].GetEnvelope(getAABB));
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"ParentNode: {Children.Count} children, AABB: {TEnvelopeMath.ToString(Envelope)}";
         }
     }
 
-    public override string ToString()
+    internal sealed class LeafNode(TElement element) : Node
     {
-        return $"ParentNode: {Children.Count} children, AABB: {GetAABB(null!).ToString()}";
-    }
-}
+        public TElement Element { get; } = element;
 
-internal sealed class LeafNode<TElement, TValue>(TElement element) : Node<TElement, TValue>
-    where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>
-{
-    public TElement Element { get; } = element;
+        internal override TEnvelope GetEnvelope(Func<TElement, TEnvelope> getAABB)
+        {
+            return getAABB(Element);
+        }
 
-    internal override AABB<TValue> GetAABB(Func<TElement, AABB<TValue>> getAABB)
-    {
-        return getAABB(Element);
-    }
-
-    public override string ToString()
-    {
-        return $"LeafNode: {Element}";
+        public override string ToString()
+        {
+            return $"LeafNode: {Element}";
+        }
     }
 }
 

@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 namespace Akade.IndexedSet.DataStructures.RTree;
-internal sealed partial class RTree<TElement, TValue>
+internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope, TEnvelopeMath>
 {
     public void BulkLoad(IEnumerable<TElement> elements)
     {
@@ -11,34 +11,27 @@ internal sealed partial class RTree<TElement, TValue>
             throw new InvalidOperationException("Bulk loading can only be done on an empty R-Tree");
         }
 
-        var leafNodesList = elements.Select(elem => new LeafNode<TElement, TValue>(elem))
+        var leafNodesList = elements.Select(elem => new LeafNode(elem))
                                     .ToList();
 
         // We are using OMT: Overlap Minimizing Top-Down algorithm for bulk loading
         // - slower than STR but should produce better query performance
         // - at each level, we sort the leaf nodes by their AABBs by alternating axis and split according to the maximum node occupancy
 
-        Span<LeafNode<TElement, TValue>> leafNodes = CollectionsMarshal.AsSpan(leafNodesList);
+        Span<LeafNode> leafNodes = CollectionsMarshal.AsSpan(leafNodesList);
 
-        Comparison<LeafNode<TElement, TValue>>[] axisComparers = Enumerable.Range(0, _dimensions)
-            .Select(i => new Comparison<LeafNode<TElement, TValue>>((a, b) =>
-            {
-                AABB<TValue> aabbA = a.GetAABB(_getAABB);
-                AABB<TValue> aabbB = b.GetAABB(_getAABB);
-                return aabbA.Min[i].CompareTo(aabbB.Min[i]);
-            }))
-            .ToArray();
+      
 
-        SplitAndAdd(_root, currentDimension: 0, leafNodes, axisComparers);
+        SplitAndAdd(_root, currentDimension: 0, leafNodes);
     }
 
-    private void SplitAndAdd(ParentNode<TElement, TValue> currentParent, int currentDimension, Span<LeafNode<TElement, TValue>> leafNodes, Comparison<LeafNode<TElement, TValue>>[] axisComparers)
+    private void SplitAndAdd(ParentNode currentParent, int currentDimension, Span<LeafNode> leafNodes)
     {
-        leafNodes.Sort(axisComparers[currentDimension]);
+        leafNodes.Sort(_axisComparers[currentDimension]);
 
         if (leafNodes.Length <= _settings.MaxNodeEntries)
         {
-            foreach (LeafNode<TElement, TValue> leafNode in leafNodes)
+            foreach (LeafNode leafNode in leafNodes)
             {
                 currentParent.Children.Add(leafNode);
             }
@@ -55,15 +48,15 @@ internal sealed partial class RTree<TElement, TValue>
         {
             int start = i * nodesPerPart;
             int end = Math.Min(start + nodesPerPart, leafNodes.Length);
-            Span<LeafNode<TElement, TValue>> partNodes = leafNodes[start..end];
+            Span<LeafNode> partNodes = leafNodes[start..end];
 
             if (partNodes.Length > 0)
             {
-                ParentNode<TElement, TValue> childNode = new();
-                SplitAndAdd(childNode, (currentDimension + 1) % _dimensions, partNodes, axisComparers);
+                ParentNode childNode = new();
+                SplitAndAdd(childNode, (currentDimension + 1) % _dimensions, partNodes);
 
                 currentParent.Children.Add(childNode);
-                currentParent.MergeAABB(childNode.GetAABB(_getAABB));
+                currentParent.MergeEnvelope(childNode.GetEnvelope(_getAABB));
             }
         }
 

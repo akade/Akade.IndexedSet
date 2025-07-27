@@ -2,33 +2,33 @@
 
 
 namespace Akade.IndexedSet.DataStructures.RTree;
-internal sealed partial class RTree<TElement, TValue>
+internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope, TEnvelopeMath>
 {
     public bool Remove(TElement element)
     {
-        AABB<TValue> aabb = _getAABB(element);
+        TEnvelope aabb = _getAABB(element);
 
-        Dictionary<Node<TElement, TValue>, ParentNode<TElement, TValue>> parentByNode = [];
+        Dictionary<Node, ParentNode> parentByNode = [];
 
-        Stack<ParentNode<TElement, TValue>> stack = new();
+        Stack<ParentNode> stack = new();
         stack.Push(_root);
 
-        Node<TElement, TValue>? targetNode = null;
+        Node? targetNode = null;
 
 
-        while (stack.TryPop(out ParentNode<TElement, TValue>? currentNode))
+        while (stack.TryPop(out ParentNode? currentNode))
         {
-            if (currentNode.GetAABB(_getAABB).Intersects(aabb))
+            if (TEnvelopeMath.Intersects(currentNode.GetEnvelope(_getAABB), aabb))
             {
-                foreach (Node<TElement, TValue> child in currentNode.Children)
+                foreach (Node child in currentNode.Children)
                 {
                     parentByNode[child] = currentNode;
 
-                    if (child is ParentNode<TElement, TValue> childParentNode)
+                    if (child is ParentNode childParentNode)
                     {
                         stack.Push(childParentNode);
                     }
-                    else if (child is LeafNode<TElement, TValue> leafNode && (leafNode.Element?.Equals(element) ?? false))
+                    else if (child is LeafNode leafNode && (leafNode.Element?.Equals(element) ?? false))
                     {
                         targetNode = leafNode;
                         // We found the target node, no need to continue searching
@@ -46,7 +46,7 @@ internal sealed partial class RTree<TElement, TValue>
 
         Count--;
 
-        ParentNode<TElement, TValue>? parentNode = parentByNode[targetNode];
+        ParentNode? parentNode = parentByNode[targetNode];
         _ = parentNode.Children.Remove(targetNode);
         parentNode.RecalculateAABB(_getAABB);
 
@@ -54,13 +54,13 @@ internal sealed partial class RTree<TElement, TValue>
         // - Remove parent nodes up the path if any underflow occurs
         // - Reinsert all their children
         // There is some room for improvement here down the line
-        List<LeafNode<TElement, TValue>> nodesForReinsertion = [];
+        List<LeafNode> nodesForReinsertion = [];
         while (parentNode is not null && parentNode != _root)
         {
             if (parentNode.Children.Count < _settings.MinNodeEntries && parentNode != _root)
             {
                 AddAllLeafNodes(parentNode, nodesForReinsertion);
-                ParentNode<TElement, TValue> parentOfParentNode = parentByNode[parentNode];
+                ParentNode parentOfParentNode = parentByNode[parentNode];
                 _ = parentOfParentNode.Children.Remove(parentNode);
                 parentOfParentNode.RecalculateAABB(_getAABB);
                 parentNode = parentOfParentNode;
@@ -71,7 +71,7 @@ internal sealed partial class RTree<TElement, TValue>
             }
         }
 
-        foreach (LeafNode<TElement, TValue> node in nodesForReinsertion)
+        foreach (LeafNode node in nodesForReinsertion)
         {
             Insert(node.Element);
         }
@@ -80,17 +80,17 @@ internal sealed partial class RTree<TElement, TValue>
         return true;
     }
 
-    private static void AddAllLeafNodes(ParentNode<TElement, TValue> parentNode, List<LeafNode<TElement, TValue>> nodesForReinsertion)
+    private static void AddAllLeafNodes(ParentNode parentNode, List<LeafNode> nodesForReinsertion)
     {
-        foreach (Node<TElement, TValue> child in parentNode.Children)
+        foreach (Node child in parentNode.Children)
         {
-            if (child is LeafNode<TElement, TValue> leafNode)
+            if (child is LeafNode leafNode)
             {
                 nodesForReinsertion.Add(leafNode);
             }
-            else if (child is ParentNode<TElement, TValue> childParentNode)
+            else if (child is ParentNode childParentNode)
             {
-                RTree<TElement, TValue>.AddAllLeafNodes(childParentNode, nodesForReinsertion);
+                AddAllLeafNodes(childParentNode, nodesForReinsertion);
             }
         }
     }
