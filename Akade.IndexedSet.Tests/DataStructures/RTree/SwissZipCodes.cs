@@ -27,7 +27,7 @@ public class RTreeTests
                 rTree.Insert(zipCode);
             }
         }
-        rTree.CheckForCorruption();
+        rTree.CheckForCorruption(useBulkLoading);
         return (rTree, zipCodeData);
     }
 
@@ -97,10 +97,10 @@ public class RTreeTests
             _ = removedItems.Add(zipCodeToRemove);
         }
 
-        rTree.CheckForCorruption();
 
         var nearestNeighbours = rTree.GetNearestNeighbours(winterthur).Take(10).ToList();
         CollectionAssert.AreEquivalent(expectedNearestNeighbours, nearestNeighbours);
+        rTree.CheckForCorruption(useBulkLoading);
     }
 
 }

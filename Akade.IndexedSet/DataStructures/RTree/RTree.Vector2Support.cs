@@ -105,7 +105,7 @@ internal struct Vector2Math : IEnvelopeMath<Vector2, VecRec2, float>
         var min = Vector2.Max(minA, minB);
         var max = Vector2.Min(maxA, maxB);
 
-        return min.X < max.X && min.Y < max.Y;
+        return min.X <= max.X && min.Y <= max.Y;
     }
 
     public static bool IsEmpty(VecRec2 memoryEnvelope)

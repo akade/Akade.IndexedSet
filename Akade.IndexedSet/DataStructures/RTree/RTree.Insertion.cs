@@ -71,7 +71,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             }
         }
 
-        CheckForCorruption();
+        CheckForCorruption(false);
     }
 
     private InsertionResult ForcedInsertion(ParentNode node, Node nodeToReinsert, int targetHeight)

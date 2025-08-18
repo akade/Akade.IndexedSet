@@ -26,7 +26,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             RecalculateAABB(getAABB);
         }
 
-        public TEnvelope Envelope { get => _envelope; set => _envelope = value; }
+        public TEnvelope Envelope => _envelope;
 
         internal override TEnvelope GetEnvelope(Func<TElement, TEnvelope> getAABB)
         {
@@ -37,9 +37,10 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 
         internal void MergeEnvelope(TEnvelope other)
         {
-            if (HasInitializedEnvelope)
+            if (!HasInitializedEnvelope)
             {
-                Envelope = other;
+                _envelope = other;
+                HasInitializedEnvelope = true;
             }
             else
             {
@@ -49,9 +50,9 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 
         private void InitMemory(TEnvelope aabb)
         {
-            if (HasInitializedEnvelope)
+            if (!HasInitializedEnvelope)
             {
-                Envelope = TEnvelopeMath.Empty(TEnvelopeMath.GetDimensions(aabb));
+                _envelope = TEnvelopeMath.Empty(TEnvelopeMath.GetDimensions(aabb));
                 TEnvelopeMath.CopyTo(aabb, ref _envelope);
                 HasInitializedEnvelope = true;
             }

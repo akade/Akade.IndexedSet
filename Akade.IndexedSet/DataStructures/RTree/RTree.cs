@@ -52,7 +52,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
     }
 
     [Conditional("TEST")]
-    internal void CheckForCorruption()
+    internal void CheckForCorruption(bool isBulkLoaded)
     {
         Stack<ParentNode> stack = new();
         stack.Push(_root);
@@ -65,9 +65,9 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             {
                 throw new InvalidOperationException("Node has an uninitialized AABB, which is not allowed.");
             }
-            if ((_root != node && node.Children.Count < _settings.MinNodeEntries) || node.Children.Count > _settings.MaxNodeEntries)
+            if ((_root != node && !isBulkLoaded && node.Children.Count < _settings.MinNodeEntries) || node.Children.Count > _settings.MaxNodeEntries)
             {
-                throw new InvalidOperationException($"Node has an invalid number of children: {node.Children.Count}");
+                throw new InvalidOperationException($"Node has an invalid number of children: {node.Children.Count} [{_settings.MinNodeEntries} - {_settings.MaxNodeEntries}]");
             }
 
             TEnvelope parent = node.GetEnvelope(_getAABB);

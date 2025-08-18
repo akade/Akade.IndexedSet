@@ -54,7 +54,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         List<LeafNode> nodesForReinsertion = [];
         while (parentNode is not null && parentNode != _root)
         {
-            if (parentNode.Children.Count < _settings.MinNodeEntries && parentNode != _root)
+            if (parentNode.Children.Count < _settings.MinNodeEntries)
             {
                 AddAllLeafNodes(parentNode, nodesForReinsertion);
                 ParentNode parentOfParentNode = parentByNode[parentNode];
@@ -67,7 +67,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
                 parentNode = null;
             }
         }
-
+        Count -= nodesForReinsertion.Count;
         foreach (LeafNode node in nodesForReinsertion)
         {
             Insert(node.Element);

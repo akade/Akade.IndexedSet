@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace Akade.IndexedSet.DataStructures.RTree;
 internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath>
@@ -13,14 +14,11 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         var leafNodesList = elements.Select(elem => new LeafNode(elem))
                                     .ToList();
 
-        // We are using OMT: Overlap Minimizing Top-Down algorithm for bulk loading
+        // We are using OMT: 
         // - slower than STR but should produce better query performance
         // - at each level, we sort the leaf nodes by their AABBs by alternating axis and split according to the maximum node occupancy
 
         Span<LeafNode> leafNodes = CollectionsMarshal.AsSpan(leafNodesList);
-
-      
-
         SplitAndAdd(_root, currentDimension: 0, leafNodes);
     }
 
@@ -40,10 +38,12 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         }
 
         // Split the leaf nodes into M parts
-        int parts = (int)Math.Ceiling((double)leafNodes.Length / _settings.MaxNodeEntries);
-        int nodesPerPart = (int)Math.Ceiling((double)leafNodes.Length / parts);
+        int nodesPerPart = (int)Math.Ceiling((double)leafNodes.Length / _settings.MaxNodeEntries);
+        int parts = (int)Math.Ceiling((double)leafNodes.Length / nodesPerPart);
 
-        for(int i = 0; i < parts; i++)
+        // For bulkloading, we permit that the last node can have less than MinNodeEntries
+
+        for (int i = 0; i < parts; i++)
         {
             int start = i * nodesPerPart;
             int end = Math.Min(start + nodesPerPart, leafNodes.Length);
