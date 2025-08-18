@@ -1,5 +1,4 @@
-﻿#if NET9_0_OR_GREATER
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
@@ -11,9 +10,10 @@ namespace Akade.IndexedSet.DataStructures.RTree;
 /// </summary>
 
 // TODO: explore on how to specialize with minimal code duplication for Vector2 & Vector3
-internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope, TEnvelopeMath>
-    where TEnvelope : allows ref struct
-    where TEnvelopeMath : struct, IEnvelopeMath<TEnvelope, TValue, TMemoryEnvelope>
+internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath>
+    where TPoint : struct
+    where TEnvelope : struct
+    where TEnvelopeMath : struct, IEnvelopeMath<TPoint, TEnvelope, TValue>
     where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>
 {
     private readonly Func<TElement, TEnvelope> _getAABB;
@@ -51,7 +51,7 @@ internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope
         Count = 0;
     }
 
-    [Conditional("Test")]
+    [Conditional("TEST")]
     internal void CheckForCorruption()
     {
         Stack<ParentNode> stack = new();
@@ -61,9 +61,9 @@ internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope
 
         while (stack.TryPop(out ParentNode? node))
         {
-            if (node.IsEmptyEnvelope)
+            if (!node.HasInitializedEnvelope)
             {
-                throw new InvalidOperationException("Node has an empty AABB, which is not allowed.");
+                throw new InvalidOperationException("Node has an uninitialized AABB, which is not allowed.");
             }
             if ((_root != node && node.Children.Count < _settings.MinNodeEntries) || node.Children.Count > _settings.MaxNodeEntries)
             {
@@ -98,5 +98,3 @@ internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope
         }
     }
 }
-
-#endif 

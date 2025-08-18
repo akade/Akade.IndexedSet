@@ -3,6 +3,7 @@ using Akade.IndexedSet.DataStructures;
 using Akade.IndexedSet.DataStructures.RTree;
 using Akade.IndexedSet.Tests.Data;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Numerics;
 using System.Numerics.Tensors;
 
 namespace Akade.IndexedSet.Tests.DataStructures.RTree;
@@ -10,10 +11,10 @@ namespace Akade.IndexedSet.Tests.DataStructures.RTree;
 [TestClass]
 public class RTreeTests
 {
-    private static async Task<(RTree<SwissZipCode, double> rTree, IEnumerable<SwissZipCode> zipCodeData)> CreateRTreeAsync(bool useBulkLoading)
+    private static async Task<(RTree<SwissZipCode, Vector2, VecRec2, float, Vector2Math> rTree, IEnumerable<SwissZipCode> zipCodeData)> CreateRTreeAsync(bool useBulkLoading)
     {
         IEnumerable<SwissZipCode> zipCodeData = await SwissZipCodes.LoadAsync();
-        RTree<SwissZipCode, double> rTree = new(s => AABB<double>.CreateFromPoint(s.GetCoordinatesSpan()), 2, RTreeSettings.Default);
+        RTree<SwissZipCode, Vector2, VecRec2, float, Vector2Math> rTree = new(s => VecRec2.CreateFromPoint(s.Coordinates), 2, RTreeSettings.Default);
 
         if (useBulkLoading)
         {
@@ -35,22 +36,21 @@ public class RTreeTests
     [DataRow(false)]
     public async Task Intersection(bool useBulkLoading)
     {
-        (RTree<SwissZipCode, double> rTree, IEnumerable<SwissZipCode> zipCodeData) = await CreateRTreeAsync(useBulkLoading);
+        (RTree<SwissZipCode, Vector2, VecRec2, float, Vector2Math>? rTree, IEnumerable<SwissZipCode> zipCodeData) = await CreateRTreeAsync(useBulkLoading);
 
-        Span<double> searchRect = [8.683342209696512, 47.41151475464969, 8.92130422393863, 47.53819397959311];
-        var searchAABB = AABB<double>.CreateFromCombinedBuffer(searchRect);
+        VecRec2 searchRect = new(8.683342209696512f, 47.41151475464969f, 8.92130422393863f, 47.53819397959311f);
 
         List<SwissZipCode> expectedResults = [];
         foreach (SwissZipCode zipCode in zipCodeData)
         {
-            var zipCodeAABB = AABB<double>.CreateFromPoint(zipCode.GetCoordinatesSpan());
-            if (searchAABB.Contains(zipCodeAABB))
+            var zipCodeAABB = VecRec2.CreateFromPoint(zipCode.Coordinates);
+            if (Vector2Math.Contains(searchRect, zipCodeAABB))
             {
                 expectedResults.Add(zipCode);
             }
         }
 
-        IEnumerable<SwissZipCode> results = rTree.IntersectWith(searchAABB);
+        IEnumerable<SwissZipCode> results = rTree.IntersectWith(searchRect);
         CollectionAssert.AreEquivalent(expectedResults, results.ToList());
     }
 
@@ -59,11 +59,11 @@ public class RTreeTests
     [DataRow(false)]
     public async Task NearestNeighbours(bool useBulkLoading)
     {
-        (RTree<SwissZipCode, double> rTree, IEnumerable<SwissZipCode> zipCodeData) = await CreateRTreeAsync(useBulkLoading);
-        double[] winterthur = [8.729481588728078, 47.48885146772];
+        (RTree<SwissZipCode, Vector2, VecRec2, float, Vector2Math>? rTree, IEnumerable<SwissZipCode> zipCodeData) = await CreateRTreeAsync(useBulkLoading);
+        Vector2 winterthur = new(8.729481588728078f, 47.48885146772f);
 
         var expectedNearestNeighbours = zipCodeData
-           .Select(zip => (zip, TensorPrimitives.Distance(zip.GetCoordinatesSpan(), winterthur)))
+           .Select(zip => (zip, Vector2.Distance(zip.Coordinates, winterthur)))
            .OrderBy(x => x.Item2)
            .Take(10)
            .ToList();
@@ -77,11 +77,11 @@ public class RTreeTests
     [DataRow(false)]
     public async Task Removal_of_5_random_entries(bool useBulkLoading)
     {
-        (RTree<SwissZipCode, double> rTree, IEnumerable<SwissZipCode> zipCodeData) = await CreateRTreeAsync(useBulkLoading);
-        double[] winterthur = [8.729481588728078, 47.48885146772];
+        (RTree<SwissZipCode, Vector2, VecRec2, float, Vector2Math>? rTree, IEnumerable<SwissZipCode> zipCodeData) = await CreateRTreeAsync(useBulkLoading);
+        Vector2 winterthur = new(8.729481588728078f, 47.48885146772f);
 
         var expectedNearestNeighbours = zipCodeData
-            .Select(zip => (zip, TensorPrimitives.Distance(zip.GetCoordinatesSpan(), winterthur)))
+            .Select(zip => (zip, Vector2.Distance(zip.Coordinates, winterthur)))
             .OrderBy(x => x.Item2)
             .Take(15)
             .ToList();

@@ -1,11 +1,10 @@
-﻿#if NET9_0_OR_GREATER
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Numerics;
 using System.Numerics.Tensors;
 using System.Runtime.InteropServices;
 
 namespace Akade.IndexedSet.DataStructures.RTree;
-internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope, TEnvelopeMath>
+internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath>
 {
     internal void Insert(TElement element)
     {
@@ -183,16 +182,16 @@ internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope
             TValue minAreaIncrease = TValue.Zero;
             minArea = TValue.Zero;
 
-            TEnvelope buffer = TEnvelopeMath.Init(_dimensions);
+            TEnvelope buffer = TEnvelopeMath.Empty(_dimensions);
 
             for (int index = 0; index < node.Children.Count; index++)
             {
                 Node child = node.Children[index];
 
                 TEnvelope aabb = child.GetEnvelope(_getAABB);
-                TEnvelopeMath.CopyTo(aabb, buffer);
+                buffer = aabb;
 
-                TEnvelopeMath.MergeInto(insertionAABB, buffer);
+                TEnvelopeMath.MergeInto(insertionAABB, ref buffer);
 
                 TValue overlapIncrease = TValue.Zero;
 
@@ -271,8 +270,8 @@ internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope
         int minNodeEntries = _settings.MinNodeEntries;
         int bestIndex = minNodeEntries;
 
-        TEnvelope leftAABB = TEnvelopeMath.Init(_dimensions);
-        TEnvelope rightAABB = TEnvelopeMath.Init(_dimensions);
+        TEnvelope leftAABB = TEnvelopeMath.Empty(_dimensions);
+        TEnvelope rightAABB = TEnvelopeMath.Empty(_dimensions);
         Span<Node> childSpan = CollectionsMarshal.AsSpan(node.Children);
 
         for (int k = minNodeEntries; k <= node.Children.Count - minNodeEntries; k++)
@@ -282,17 +281,17 @@ internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope
             TEnvelope firstAABB = firstChild.GetEnvelope(_getAABB);
             TEnvelope secondAABB = secondChild.GetEnvelope(_getAABB);
 
-            TEnvelopeMath.CopyTo(firstAABB, leftAABB);
-            TEnvelopeMath.CopyTo(secondAABB, rightAABB);
+            leftAABB = firstAABB;
+            rightAABB = secondAABB;
 
             foreach (Node child in childSpan[..k])
             {
-                TEnvelopeMath.MergeInto(child.GetEnvelope(_getAABB), leftAABB);
+                TEnvelopeMath.MergeInto(child.GetEnvelope(_getAABB), ref leftAABB);
             }
 
             foreach (Node child in childSpan[k..])
             {
-                TEnvelopeMath.MergeInto(child.GetEnvelope(_getAABB), rightAABB);
+                TEnvelopeMath.MergeInto(child.GetEnvelope(_getAABB), ref rightAABB);
             }
 
             TValue overlap = TEnvelopeMath.IntersectionArea(leftAABB, rightAABB);
@@ -319,11 +318,11 @@ internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope
         int minNodeEntries = _settings.MinNodeEntries;
         int until = node.Children.Count - minNodeEntries + 1;
 
-        TEnvelope left = TEnvelopeMath.Init(_dimensions);
-        TEnvelope right = TEnvelopeMath.Init(_dimensions);
+        TEnvelope left = TEnvelopeMath.Empty(_dimensions);
+        TEnvelope right = TEnvelopeMath.Empty(_dimensions);
 
-        TEnvelope leftModified = TEnvelopeMath.Init(_dimensions);
-        TEnvelope rightModified = TEnvelopeMath.Init(_dimensions);
+        TEnvelope leftModified = TEnvelopeMath.Empty(_dimensions);
+        TEnvelope rightModified = TEnvelopeMath.Empty(_dimensions);
 
         Span<Node> childSpan = CollectionsMarshal.AsSpan(node.Children);
 
@@ -332,32 +331,32 @@ internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope
             node.Children.Sort(_axisComparers[axis]);
 
             // initialize the memory for left and right AABBs
-            TEnvelopeMath.CopyTo(left, childSpan[0].GetEnvelope(_getAABB));
-            TEnvelopeMath.CopyTo(right, childSpan[until].GetEnvelope(_getAABB));
+            left = childSpan[0].GetEnvelope(_getAABB);
+            right = childSpan[until].GetEnvelope(_getAABB);
 
             for (int i = 1; i < until; i++)
             {
-                TEnvelopeMath.MergeInto(left, childSpan[i].GetEnvelope(_getAABB));
+                TEnvelopeMath.MergeInto(childSpan[i].GetEnvelope(_getAABB), ref left);
             }
 
             for (int i = until + 1; i < node.Children.Count; i++)
             {
-                TEnvelopeMath.MergeInto(right, childSpan[i].GetEnvelope(_getAABB));
+                TEnvelopeMath.MergeInto(childSpan[i].GetEnvelope(_getAABB), ref right);
             }
 
             for (int k = minNodeEntries; k < until; k++)
             {
-                TEnvelopeMath.CopyTo(left, leftModified);
-                TEnvelopeMath.CopyTo(right, rightModified);
+                leftModified = left;
+                rightModified = right;
 
                 foreach (Node child in childSpan[..k])
                 {
-                    TEnvelopeMath.MergeInto(child.GetEnvelope(_getAABB), leftModified);
+                    TEnvelopeMath.MergeInto(child.GetEnvelope(_getAABB), ref leftModified);
                 }
 
                 foreach (Node child in childSpan[k..])
                 {
-                    TEnvelopeMath.MergeInto(child.GetEnvelope(_getAABB), rightModified);
+                    TEnvelopeMath.MergeInto(child.GetEnvelope(_getAABB), ref rightModified);
                 }
 
                 // We can use the half perimeter as we are only interested in the relative size and are axis-aligned
@@ -424,4 +423,3 @@ internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope
     internal sealed record class InsertionResultSplit(Node Node) : InsertionResult;
     internal sealed record class InsertionResultReinsert(List<Node> Nodes, int level) : InsertionResult;
 }
-#endif

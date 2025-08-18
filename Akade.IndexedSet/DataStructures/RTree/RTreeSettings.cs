@@ -1,5 +1,4 @@
-﻿#if NET9_0_OR_GREATER
-namespace Akade.IndexedSet.DataStructures.RTree;
+﻿namespace Akade.IndexedSet.DataStructures.RTree;
 internal readonly record struct RTreeSettings(int MinNodeEntries, int MaxNodeEntries, int ReinsertionCount)
 {
     public void Validate()
@@ -14,5 +13,3 @@ internal readonly record struct RTreeSettings(int MinNodeEntries, int MaxNodeEnt
 
     public static RTreeSettings Default => new(3, 6, 2);
 }
-
-#endif

@@ -324,7 +324,6 @@ public class IndexedSetBuilder<TElement>
         return this;
     }
 
-#if NET9_0_OR_GREATER
     /// <summary>
     /// Configures the <see cref="IndexedSet{TElement}"/> to have a spatial (point) index based on a secondary key that 
     /// supports fast spatial queries (range and nearest neighbor search).
@@ -333,23 +332,22 @@ public class IndexedSetBuilder<TElement>
     /// string representation of the expression and passed by the compiler to <paramref name="indexName"/>. 
     /// The convention is to always use x as a lambda parameter: x => x.Point. Alternativly, you can also always use the same method from a static class.
     /// </summary>
-    /// <typeparam name="TValue"></typeparam>
-    /// <param name="keyAccessor"></param>
-    /// <param name="dimensions"></param>
-    /// <param name="indexName"></param>
-    /// <returns></returns>
-    public virtual IndexedSetBuilder<TElement> WithSpatialIndex<TValue>(Func<TElement, Span<TValue>> keyAccessor, int dimensions, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
-        where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>
+    public virtual IndexedSetBuilder<TElement> WithSpatialIndex<TPoint>(Func<TElement, TPoint> keyAccessor, int dimensions, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+        where TPoint : struct
     {
         ArgumentNullException.ThrowIfNull(indexName);
 
-        Func<TElement, AABB<TValue>> aabbAccessor = element => AABB<TValue>.CreateFromPoint(keyAccessor(element));
 
-        _result.AddIndex(aabbAccessor, new SpatialIndex<TElement, TValue>(aabbAccessor, dimensions, RTreeSettings.Default, indexName));
+        if (typeof(TPoint) == typeof(Vector2))
+        {
+            // TODO: check if the compiler can optimize the cast / boxing away
+            Func<TElement, VecRec2> aabbAccessor = element => VecRec2.CreateFromPoint((Vector2)(object)keyAccessor(element));
+            SpatialIndex<TElement, Vector2, VecRec2, float, Vector2Math> spatialIndex = new(aabbAccessor, dimensions, RTreeSettings.Default, indexName);
+            _result.AddIndex(aabbAccessor, spatialIndex);
+        }
 
         return this;
     }
-#endif
 
     /// <summary>
     /// Builds and returns the configured <see cref="IndexedSet{TPrimaryKey, TElement}"/>

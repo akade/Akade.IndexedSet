@@ -1,11 +1,8 @@
-﻿#if NET9_0_OR_GREATER
-using System.Numerics;
-using System.Numerics.Tensors;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace Akade.IndexedSet.DataStructures.RTree;
 
-internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope, TEnvelopeMath>
+internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath>
 {
 
     internal abstract class Node
@@ -16,6 +13,7 @@ internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope
     internal sealed class ParentNode : Node
     {
         public List<Node> Children = [];
+        private TEnvelope _envelope;
 
         public ParentNode()
         {
@@ -28,32 +26,34 @@ internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope
             RecalculateAABB(getAABB);
         }
 
-        public TMemoryEnvelope Envelope { get; set; } = TEnvelopeMath.GetEmptyMemory();
+        public TEnvelope Envelope { get => _envelope; set => _envelope = value; }
 
         internal override TEnvelope GetEnvelope(Func<TElement, TEnvelope> getAABB)
         {
-            return TEnvelopeMath.AsEnvelope(Envelope);
+            return Envelope;
         }
 
-        public bool IsEmptyEnvelope => TEnvelopeMath.IsEmpty(Envelope);
+        public bool HasInitializedEnvelope { get; private set; } = false;
 
         internal void MergeEnvelope(TEnvelope other)
         {
-            if (IsEmptyEnvelope)
+            if (HasInitializedEnvelope)
             {
-                InitMemory(other);
-                return;
+                Envelope = other;
             }
-
-            TEnvelopeMath.Merge(Envelope, other, Envelope);
+            else
+            {
+                TEnvelopeMath.Merge(Envelope, other, ref _envelope);
+            }
         }
 
         private void InitMemory(TEnvelope aabb)
         {
-            if (IsEmptyEnvelope)
+            if (HasInitializedEnvelope)
             {
-                Envelope = TEnvelopeMath.InitMemory(TEnvelopeMath.GetDimensions(aabb));
-                TEnvelopeMath.CopyTo(aabb, Envelope);
+                Envelope = TEnvelopeMath.Empty(TEnvelopeMath.GetDimensions(aabb));
+                TEnvelopeMath.CopyTo(aabb, ref _envelope);
+                HasInitializedEnvelope = true;
             }
         }
 
@@ -93,4 +93,3 @@ internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope
     }
 }
 
-#endif

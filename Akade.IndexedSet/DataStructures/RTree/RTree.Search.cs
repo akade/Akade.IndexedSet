@@ -1,9 +1,5 @@
-﻿#if NET9_0_OR_GREATER
-
-using System.Numerics.Tensors;
-
-namespace Akade.IndexedSet.DataStructures.RTree;
-internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope, TEnvelopeMath>
+﻿namespace Akade.IndexedSet.DataStructures.RTree;
+internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath>
 {
     public IEnumerable<TElement> IntersectWith(TEnvelope aabb)
     {
@@ -17,7 +13,7 @@ internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope
             Node currentNode = stack.Pop();
             if (currentNode is ParentNode parentNode)
             {
-                if (parentNode.IsEmptyEnvelope)
+                if (!parentNode.HasInitializedEnvelope)
                 {
                     continue;
                 }
@@ -41,10 +37,8 @@ internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope
         return results;
     }
 
-    public IEnumerable<(TElement element, TValue distance)> GetNearestNeighbours(Memory<TValue> position)
+    public IEnumerable<(TElement element, TValue distance)> GetNearestNeighbours(TPoint position)
     {
-        ArgumentOutOfRangeException.ThrowIfNotEqual(position.Length, _dimensions, nameof(position));
-
         PriorityQueue<Node, TValue> queue = new();
         queue.Enqueue(_root, TValue.Zero);
 
@@ -60,7 +54,7 @@ internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope
                 {
                     TEnvelope childAABB = child.GetEnvelope(_getAABB);
 
-                    TValue childDistance = TEnvelopeMath.DistanceToBoundary(childAABB, position.Span);
+                    TValue childDistance = TEnvelopeMath.DistanceToBoundary(childAABB, position);
 
                     queue.Enqueue(child, childDistance);
                 }
@@ -72,5 +66,3 @@ internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope
         }
     }
 }
-
-#endif

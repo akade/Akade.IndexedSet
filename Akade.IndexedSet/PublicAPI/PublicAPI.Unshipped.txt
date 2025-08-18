@@ -1,2 +1,11 @@
 ﻿#nullable enable
-virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithSpatialIndex<TValue>(System.Func<TElement, System.Span<TValue>, keyAccessor!, string?>! indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!
+Akade.IndexedSet.VecRec2
+Akade.IndexedSet.VecRec2.Max.get -> System.Numerics.Vector2
+Akade.IndexedSet.VecRec2.Max.set -> void
+Akade.IndexedSet.VecRec2.Min.get -> System.Numerics.Vector2
+Akade.IndexedSet.VecRec2.Min.set -> void
+Akade.IndexedSet.VecRec2.VecRec2() -> void
+Akade.IndexedSet.VecRec2.VecRec2(float minX, float minY, float maxX, float maxY) -> void
+Akade.IndexedSet.VecRec2.VecRec2(System.Numerics.Vector2 Min, System.Numerics.Vector2 Max) -> void
+static Akade.IndexedSet.VecRec2.CreateFromPoint(System.Numerics.Vector2 vector2) -> Akade.IndexedSet.VecRec2
+virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithSpatialIndex<TPoint>(System.Func<TElement, TPoint>! keyAccessor, int dimensions, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!

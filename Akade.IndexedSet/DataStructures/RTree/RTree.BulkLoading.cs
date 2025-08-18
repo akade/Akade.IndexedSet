@@ -1,8 +1,7 @@
-﻿#if NET9_0_OR_GREATER
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace Akade.IndexedSet.DataStructures.RTree;
-internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope, TEnvelopeMath>
+internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath>
 {
     public void BulkLoad(IEnumerable<TElement> elements)
     {
@@ -62,4 +61,3 @@ internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope
 
     }
 }
-#endif

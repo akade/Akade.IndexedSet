@@ -1,27 +1,29 @@
-﻿#if NET9_0_OR_GREATER
-using Akade.IndexedSet.DataStructures.RTree;
+﻿using Akade.IndexedSet.DataStructures.RTree;
 using Akade.IndexedSet.Extensions;
 using Akade.IndexedSet.Utils;
 using System.Numerics;
 
 namespace Akade.IndexedSet.Indices;
 
-internal sealed class SpatialIndex<TElement, TValue>(Func<TElement, AABB<TValue>> getAABB, int dimensions, RTreeSettings settings, string name) : TypedIndex<TElement, AABB<TValue>>(name)
+internal sealed class SpatialIndex<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath>(Func<TElement, TEnvelope> getAABB, int dimensions, RTreeSettings settings, string name) : TypedIndex<TElement, TEnvelope>(name)
+    where TPoint : struct
+    where TEnvelope : struct 
     where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>
+    where TEnvelopeMath : struct, IEnvelopeMath<TPoint, TEnvelope, TValue>
 {
-    private readonly RTree<TElement, TValue> _tree = new(getAABB, dimensions, settings);
+    private readonly RTree<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath> _tree = new(getAABB, dimensions, settings);
 
     public override void Clear()
     {
         _tree.Clear();
     }
 
-    internal override void Add(AABB<TValue> key, TElement value)
+    internal override void Add(TEnvelope key, TElement value)
     {
         _tree.Insert(value);
     }
 
-    internal override void AddRange(IKeyValueEnumerator<AABB<TValue>, TElement> elementsToAdd)
+    internal override void AddRange(IKeyValueEnumerator<TEnvelope, TElement> elementsToAdd)
     {
         if (_tree.Count == 0)
         {
@@ -33,17 +35,17 @@ internal sealed class SpatialIndex<TElement, TValue>(Func<TElement, AABB<TValue>
         }
     }
 
-    internal override void Remove(AABB<TValue> key, TElement value)
+    internal override void Remove(TEnvelope key, TElement value)
     {
         _ = _tree.Remove(value);
     }
 
-    internal override TElement Single(AABB<TValue> indexKey)
+    internal override TElement Single(TEnvelope indexKey)
     {
         return _tree.IntersectWith(indexKey).SingleThrowingKeyNotFoundException();
     }
 
-    internal override bool TryGetSingle(AABB<TValue> indexKey, out TElement? element)
+    internal override bool TryGetSingle(TEnvelope indexKey, out TElement? element)
     {
         IEnumerable<TElement> allMatches = _tree.IntersectWith(indexKey);
         IEnumerator<TElement> enumerator = allMatches.GetEnumerator();
@@ -58,19 +60,8 @@ internal sealed class SpatialIndex<TElement, TValue>(Func<TElement, AABB<TValue>
         return !enumerator.MoveNext();
     }
 
-    internal override IEnumerable<TElement> Where(AABB<TValue> indexKey)
+    internal override IEnumerable<TElement> Where(TEnvelope indexKey)
     {
         return _tree.IntersectWith(indexKey);
     }
 }
-
-internal static class SpatialExtensions
-{
-    public static Func<T, AABB<float>> GetSpatialIndexKeyAccessor<T>(this Func<T, Span<float>> pointAccessor)
-        where T : notnull
-    {
-        return element => AABB<float>.CreateFromPoint(pointAccessor(element));
-    }
-}
-
-#endif

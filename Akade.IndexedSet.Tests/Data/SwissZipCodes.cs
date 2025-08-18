@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -24,8 +25,8 @@ internal static class SwissZipCodes
         {
             string[] parts = line.Split(';');
 
-            double easting = double.Parse(parts[6], CultureInfo.InvariantCulture);
-            double northing = double.Parse(parts[7], CultureInfo.InvariantCulture);
+            float easting = float.Parse(parts[6], CultureInfo.InvariantCulture);
+            float northing = float.Parse(parts[7], CultureInfo.InvariantCulture);
 
             zipCodes.Add(new SwissZipCode()
             {
@@ -64,21 +65,15 @@ internal sealed record class SwissZipCode
     {
         return $"{Name} ({ZipCode}) - {MunicipalityName} ({CantonCode}) - {Coordinates}";
     }
-
-    public ReadOnlySpan<double> GetCoordinatesSpan()
-    {
-        return MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<Coordinates, double>(ref _coordinates), 2);
-    }
-
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 0)]
 internal readonly struct Coordinates
 {
-    internal readonly double Easting;
-    internal readonly double Northing;
+    internal readonly float Easting;
+    internal readonly float Northing;
 
-    public Coordinates(double easting, double northing) : this()
+    public Coordinates(float easting, float northing) : this()
     {
         Easting = easting;
         Northing = northing;
@@ -89,4 +84,8 @@ internal readonly struct Coordinates
         return $"{Easting}, {Northing}";
     }
 
+    public static implicit operator Vector2(Coordinates coordinates)
+    {
+        return new Vector2(coordinates.Easting, coordinates.Northing);
+    }
 }

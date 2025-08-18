@@ -1,8 +1,5 @@
-﻿#if NET9_0_OR_GREATER
-
-
-namespace Akade.IndexedSet.DataStructures.RTree;
-internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope, TEnvelopeMath>
+﻿namespace Akade.IndexedSet.DataStructures.RTree;
+internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath>
 {
     public bool Remove(TElement element)
     {
@@ -95,5 +92,3 @@ internal sealed partial class RTree<TElement, TEnvelope, TValue, TMemoryEnvelope
         }
     }
 }
-
-#endif
