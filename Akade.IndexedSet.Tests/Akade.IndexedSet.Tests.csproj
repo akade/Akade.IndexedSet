@@ -20,6 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Akade.IndexedSet.SampleData\Akade.IndexedSet.SampleData.csproj" />
 	  <ProjectReference Include="..\Akade.IndexedSet\Akade.IndexedSet.csproj" />
 	</ItemGroup>
 

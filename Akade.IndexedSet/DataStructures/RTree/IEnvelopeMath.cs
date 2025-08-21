@@ -29,8 +29,10 @@ internal interface IEnvelopeMath<TPoint, TEnvelope, TValue>
 
 
     static abstract void Merge(TEnvelope a, TEnvelope b, ref TEnvelope result);
-
     static abstract void MergeInto(TEnvelope a, ref TEnvelope b);
+
+    static abstract TEnvelope Create(TPoint min, TPoint max);
+    static abstract TEnvelope CreateFromPoint(TPoint point);
 
     static abstract string ToString(TEnvelope envelope);
 }

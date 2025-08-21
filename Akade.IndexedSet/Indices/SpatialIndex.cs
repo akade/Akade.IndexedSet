@@ -5,7 +5,7 @@ using System.Numerics;
 
 namespace Akade.IndexedSet.Indices;
 
-internal sealed class SpatialIndex<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath>(Func<TElement, TEnvelope> getAABB, int dimensions, RTreeSettings settings, string name) : TypedIndex<TElement, TEnvelope>(name)
+internal sealed class SpatialIndex<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath>(Func<TElement, TEnvelope> getAABB, int dimensions, RTreeSettings settings, string name) : TypedIndex<TElement, TPoint>(name)
     where TPoint : struct
     where TEnvelope : struct 
     where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>
@@ -18,12 +18,12 @@ internal sealed class SpatialIndex<TElement, TPoint, TEnvelope, TValue, TEnvelop
         _tree.Clear();
     }
 
-    internal override void Add(TEnvelope key, TElement value)
+    internal override void Add(TPoint key, TElement value)
     {
         _tree.Insert(value);
     }
 
-    internal override void AddRange(IKeyValueEnumerator<TEnvelope, TElement> elementsToAdd)
+    internal override void AddRange(IKeyValueEnumerator<TPoint, TElement> elementsToAdd)
     {
         if (_tree.Count == 0)
         {
@@ -35,19 +35,21 @@ internal sealed class SpatialIndex<TElement, TPoint, TEnvelope, TValue, TEnvelop
         }
     }
 
-    internal override void Remove(TEnvelope key, TElement value)
+    internal override void Remove(TPoint key, TElement value)
     {
         _ = _tree.Remove(value);
     }
 
-    internal override TElement Single(TEnvelope indexKey)
+    internal override TElement Single(TPoint indexKey)
     {
-        return _tree.IntersectWith(indexKey).SingleThrowingKeyNotFoundException();
+        TEnvelope envelope = TEnvelopeMath.CreateFromPoint(indexKey);
+        return _tree.IntersectWith(envelope).SingleThrowingKeyNotFoundException();
     }
 
-    internal override bool TryGetSingle(TEnvelope indexKey, out TElement? element)
+    internal override bool TryGetSingle(TPoint indexKey, out TElement? element)
     {
-        IEnumerable<TElement> allMatches = _tree.IntersectWith(indexKey);
+        TEnvelope envelope = TEnvelopeMath.CreateFromPoint(indexKey);
+        IEnumerable<TElement> allMatches = _tree.IntersectWith(envelope);
         IEnumerator<TElement> enumerator = allMatches.GetEnumerator();
 
         if (!enumerator.MoveNext())
@@ -60,8 +62,22 @@ internal sealed class SpatialIndex<TElement, TPoint, TEnvelope, TValue, TEnvelop
         return !enumerator.MoveNext();
     }
 
-    internal override IEnumerable<TElement> Where(TEnvelope indexKey)
+    internal override IEnumerable<TElement> Where(TPoint indexKey)
     {
-        return _tree.IntersectWith(indexKey);
+        TEnvelope envelope = TEnvelopeMath.CreateFromPoint(indexKey);
+        return _tree.IntersectWith(envelope);
+    }
+
+    internal override IEnumerable<TElement> Range(TPoint start, TPoint end, bool inclusiveStart, bool inclusiveEnd)
+    {
+        TEnvelope bounds = TEnvelopeMath.Create(start, end);
+        // TODO: inclusivity is not handled yet
+        return _tree.IntersectWith(bounds);
+    }
+
+    internal override IEnumerable<TElement> NearestNeighbors(TPoint indexKey)
+    {
+        TEnvelope envelope = TEnvelopeMath.CreateFromPoint(indexKey);
+        return _tree.GetNearestNeighbours(indexKey).Select(x => x.element);
     }
 }

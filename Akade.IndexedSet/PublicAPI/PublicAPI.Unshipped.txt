@@ -1,11 +1,5 @@
 ﻿#nullable enable
-Akade.IndexedSet.VecRec2
-Akade.IndexedSet.VecRec2.Max.get -> System.Numerics.Vector2
-Akade.IndexedSet.VecRec2.Max.set -> void
-Akade.IndexedSet.VecRec2.Min.get -> System.Numerics.Vector2
-Akade.IndexedSet.VecRec2.Min.set -> void
-Akade.IndexedSet.VecRec2.VecRec2() -> void
-Akade.IndexedSet.VecRec2.VecRec2(float minX, float minY, float maxX, float maxY) -> void
-Akade.IndexedSet.VecRec2.VecRec2(System.Numerics.Vector2 Min, System.Numerics.Vector2 Max) -> void
-static Akade.IndexedSet.VecRec2.CreateFromPoint(System.Numerics.Vector2 vector2) -> Akade.IndexedSet.VecRec2
-virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithSpatialIndex<TPoint>(System.Func<TElement, TPoint>! keyAccessor, int dimensions, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.NearestNeighbors<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, TIndexKey value, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
+Akade.IndexedSet.IndexedSet<TElement>.NearestNeighbors<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, TIndexKey value, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
+override Akade.IndexedSet.IndexedSetBuilder<TPrimaryKey, TElement>.WithSpatialIndex<TPoint>(System.Func<TElement, TPoint>! keyAccessor, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TPrimaryKey, TElement>!
+virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithSpatialIndex<TPoint>(System.Func<TElement, TPoint>! keyAccessor, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!

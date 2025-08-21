@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Net.Http.Headers;
+using System.Numerics;
 
 namespace Akade.IndexedSet.DataStructures.RTree;
 internal struct Vector2Math : IEnvelopeMath<Vector2, VecRec2, float>
@@ -34,6 +35,16 @@ internal struct Vector2Math : IEnvelopeMath<Vector2, VecRec2, float>
     {
         target.Min = envelope.Min;
         target.Max = envelope.Max;
+    }
+
+    public static VecRec2 Create(Vector2 min, Vector2 max)
+    {
+        return new(min, max);
+    }
+
+    public static VecRec2 CreateFromPoint(Vector2 point)
+    {
+        return VecRec2.CreateFromPoint(point);
     }
 
     public static float DistanceToBoundary(VecRec2 envelope, Vector2 other)

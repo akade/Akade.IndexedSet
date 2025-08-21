@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace Akade.IndexedSet.DataStructures.RTree;
 internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath>
@@ -14,9 +13,18 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         var leafNodesList = elements.Select(elem => new LeafNode(elem))
                                     .ToList();
 
+        if(leafNodesList.Count == 0)
+        {
+            return;
+        }
+
         // We are using OMT: 
         // - slower than STR but should produce better query performance
         // - at each level, we sort the leaf nodes by their AABBs by alternating axis and split according to the maximum node occupancy
+
+
+        
+
 
         Span<LeafNode> leafNodes = CollectionsMarshal.AsSpan(leafNodesList);
         SplitAndAdd(_root, currentDimension: 0, leafNodes);
@@ -36,6 +44,13 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             Count += leafNodes.Length;
             return;
         }
+
+        int height = (int)Math.Ceiling(Math.Log(leafNodes.Length, _settings.MaxNodeEntries));
+        int numberOfSubTrees = (int)Math.Pow(_settings.MaxNodeEntries, height - 1);
+        int numberOfSlices = (int)Math.Floor(Math.Sqrt(Math.Ceiling(leafNodes.Length / (double)numberOfSubTrees)));
+
+        // Split into slices
+
 
         // Split the leaf nodes into M parts
         int nodesPerPart = (int)Math.Ceiling((double)leafNodes.Length / _settings.MaxNodeEntries);

@@ -33,7 +33,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             return Envelope;
         }
 
-        public bool HasInitializedEnvelope { get; private set; } = false;
+        public bool HasInitializedEnvelope { get; private set; }
 
         internal void MergeEnvelope(TEnvelope other)
         {

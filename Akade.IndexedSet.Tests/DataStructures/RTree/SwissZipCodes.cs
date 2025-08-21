@@ -1,10 +1,7 @@
-﻿#if NET9_0_OR_GREATER
-using Akade.IndexedSet.DataStructures;
-using Akade.IndexedSet.DataStructures.RTree;
-using Akade.IndexedSet.Tests.Data;
+﻿using Akade.IndexedSet.DataStructures.RTree;
+using Akade.IndexedSet.SampleData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Numerics;
-using System.Numerics.Tensors;
 
 namespace Akade.IndexedSet.Tests.DataStructures.RTree;
 
@@ -43,7 +40,7 @@ public class RTreeTests
         List<SwissZipCode> expectedResults = [];
         foreach (SwissZipCode zipCode in zipCodeData)
         {
-            var zipCodeAABB = VecRec2.CreateFromPoint(zipCode.Coordinates);
+            VecRec2 zipCodeAABB = VecRec2.CreateFromPoint(zipCode.Coordinates);
             if (Vector2Math.Contains(searchRect, zipCodeAABB))
             {
                 expectedResults.Add(zipCode);
@@ -97,12 +94,9 @@ public class RTreeTests
             _ = removedItems.Add(zipCodeToRemove);
         }
 
-
         var nearestNeighbours = rTree.GetNearestNeighbours(winterthur).Take(10).ToList();
         CollectionAssert.AreEquivalent(expectedNearestNeighbours, nearestNeighbours);
         rTree.CheckForCorruption(useBulkLoading);
     }
 
 }
-
-#endif

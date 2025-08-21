@@ -326,24 +326,37 @@ public class IndexedSetBuilder<TElement>
 
     /// <summary>
     /// Configures the <see cref="IndexedSet{TElement}"/> to have a spatial (point) index based on a secondary key that 
-    /// supports fast spatial queries (range and nearest neighbor search).
+    /// supports fast spatial queries (range and nearest neighbor search). Currently supported types: <see cref="Vector2"/> and <see cref="Vector3"/>
     /// 
     /// The secondary key can be any expression that does not change while the element is within the indexed set. The name of the index is based on the 
     /// string representation of the expression and passed by the compiler to <paramref name="indexName"/>. 
     /// The convention is to always use x as a lambda parameter: x => x.Point. Alternativly, you can also always use the same method from a static class.
     /// </summary>
-    public virtual IndexedSetBuilder<TElement> WithSpatialIndex<TPoint>(Func<TElement, TPoint> keyAccessor, int dimensions, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    public virtual IndexedSetBuilder<TElement> WithSpatialIndex<TPoint>(Func<TElement, TPoint> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
         where TPoint : struct
     {
         ArgumentNullException.ThrowIfNull(indexName);
 
-
         if (typeof(TPoint) == typeof(Vector2))
         {
-            // TODO: check if the compiler can optimize the cast / boxing away
-            Func<TElement, VecRec2> aabbAccessor = element => VecRec2.CreateFromPoint((Vector2)(object)keyAccessor(element));
-            SpatialIndex<TElement, Vector2, VecRec2, float, Vector2Math> spatialIndex = new(aabbAccessor, dimensions, RTreeSettings.Default, indexName);
-            _result.AddIndex(aabbAccessor, spatialIndex);
+            var castedAccessorVec2 = (Func<TElement, Vector2>)(object)keyAccessor;
+
+            VecRec2 vecrec2Accessor(TElement element) => VecRec2.CreateFromPoint(castedAccessorVec2(element));
+            SpatialIndex<TElement, Vector2, VecRec2, float, Vector2Math> spatialIndex = new(vecrec2Accessor, 2, RTreeSettings.Default, indexName);
+            _result.AddIndex(castedAccessorVec2, spatialIndex);
+        }
+        else if (typeof(TPoint) == typeof(Vector3))
+        {
+            var castedAccessorVec3 = (Func<TElement, Vector3>)(object)keyAccessor;
+
+            VecRec3 vecrec3Accessor(TElement element) => VecRec3.CreateFromPoint(castedAccessorVec3(element));
+            SpatialIndex<TElement, Vector3, VecRec3, float, Vector3Math> spatialIndex = new(vecrec3Accessor, 3, RTreeSettings.Default, indexName);
+            _result.AddIndex(castedAccessorVec3, spatialIndex);
+
+        }
+        else
+        {
+            throw new InvalidOperationException($"Currently only {nameof(Vector2)} and {nameof(Vector3)} are supported, {typeof(TPoint).Name} is not.");
         }
 
         return this;
@@ -453,6 +466,13 @@ public class IndexedSetBuilder<TPrimaryKey, TElement> : IndexedSetBuilder<TEleme
     public override IndexedSetBuilder<TPrimaryKey, TElement> WithPrefixIndex(Func<TElement, IEnumerable<string>> keyAccessor, IEqualityComparer<char>? comparer = null, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
     {
         _ = base.WithPrefixIndex(keyAccessor, comparer, indexName);
+        return this;
+    }
+
+    /// <inheritdoc />
+    public override IndexedSetBuilder<TPrimaryKey, TElement> WithSpatialIndex<TPoint>(Func<TElement, TPoint> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    {
+        _ = base.WithSpatialIndex(keyAccessor, indexName);
         return this;
     }
 

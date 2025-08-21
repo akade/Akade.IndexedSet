@@ -27,7 +27,10 @@ internal sealed class KeyValueEnumerator<TKey, TValue>(IEnumerable<TValue> value
 
     public TKey CurrentKey => _keyAccessor(_enumerator.Current);
     public TValue CurrentValue => _enumerator.Current;
-    public IEnumerable<TValue> GetRawValues() => values;
+    public IEnumerable<TValue> GetRawValues()
+    {
+        return values;
+    }
 
     public bool TryGetEstimatedCount(out int count)
     {
@@ -81,7 +84,10 @@ internal sealed class MultiKeyValueEnumerator<TKey, TValue>(IEnumerable<TValue> 
 
     public TKey CurrentKey => _currentKeysEnumerator!.Current;
     public TValue CurrentValue => _enumerator.Current;
-    public IEnumerable<TValue> GetRawValues() => values;
+    public IEnumerable<TValue> GetRawValues()
+    {
+        return values;
+    }
 
     public bool TryGetEstimatedCount(out int count)
     {

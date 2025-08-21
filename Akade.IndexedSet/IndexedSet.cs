@@ -4,6 +4,7 @@ using Akade.IndexedSet.Concurrency;
 using Akade.IndexedSet.Indices;
 using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Akade.IndexedSet;
@@ -726,6 +727,23 @@ public class IndexedSet<TElement>
     {
         TypedIndex<TElement, string> typedIndex = GetIndex<string>(indexName);
         return typedIndex.FuzzyContains(infix, maxDistance);
+    }
+
+
+    /// <summary>
+    /// Returns the nearest neighbors of the given value, lazily enumerating from the closest to the furthest neighbors.
+    /// Currently supports <see cref="Vector2"/> and <see cref="Vector3"/> as index keys.
+    /// </summary>
+    /// <typeparam name="TIndexKey"><see cref="Vector2"/> or <see cref="Vector3"/> </typeparam>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. </param>
+    /// <param name="value">The point to search the closest neighbors from</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
+    public IEnumerable<TElement> NearestNeighbors<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression(nameof(indexAccessor))] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        return typedIndex.NearestNeighbors(value);
     }
 
     /// <summary>

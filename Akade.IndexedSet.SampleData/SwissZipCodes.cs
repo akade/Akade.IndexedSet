@@ -1,19 +1,28 @@
 ﻿using System.Globalization;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Akade.IndexedSet.Tests.Data;
+namespace Akade.IndexedSet.SampleData;
 
 /// <summary>
 /// "Amtliches Ortschaftenverzeichnis mit Postleitzahl und Perimeter"
 /// https://www.swisstopo.admin.ch/en/official-directory-of-towns-and-cities
 /// </summary>
-internal static class SwissZipCodes
+public static class SwissZipCodes
 {
-    public static async Task<IEnumerable<SwissZipCode>> LoadAsync()
+    private const string pathFromTests = "../../../../Akade.IndexedSet.SampleData/AMTOVZ_CSV_WGS84.csv";
+
+    public static async Task<IEnumerable<SwissZipCode>> LoadAsync(string? prefix = null)
     {
-        await using FileStream stream = File.OpenRead("../../../Data/AMTOVZ_CSV_WGS84.csv");
+        string path = pathFromTests;
+
+        if (!string.IsNullOrEmpty(prefix))
+        {
+            path = Path.Combine(prefix, pathFromTests);
+            path = @"C:\Source\Repos\akade\Akade.IndexedSet\Akade.IndexedSet.SampleData\AMTOVZ_CSV_WGS84.csv";
+        }
+
+        await using FileStream stream = File.OpenRead(path);
         using StreamReader reader = new(stream);
         List<SwissZipCode> zipCodes = [];
 
@@ -47,17 +56,15 @@ internal static class SwissZipCodes
 }
 
 // Ortschaftsname;PLZ;Zusatzziffer;Gemeindename;BFS-Nr;Kantonskürzel;E;N;Sprache;Validity
-internal sealed record class SwissZipCode
+public sealed record class SwissZipCode
 {
-    private Coordinates _coordinates;
-
     public required string Name { get; init; }
     public required string ZipCode { get; init; }
     public required string? AdditionalDigit { get; init; }
     public required string MunicipalityName { get; init; }
     public required int MunicipalityNumber { get; init; }
     public required string? CantonCode { get; init; }
-    public required Coordinates Coordinates { get => _coordinates; init => _coordinates = value; }
+    public required Coordinates Coordinates { get; init; }
     public required string Language { get; init; }
     public required string Validity { get; init; }
 
@@ -68,10 +75,10 @@ internal sealed record class SwissZipCode
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 0)]
-internal readonly struct Coordinates
+public readonly struct Coordinates
 {
-    internal readonly float Easting;
-    internal readonly float Northing;
+    public readonly float Easting { get; }
+    public readonly float Northing { get; }
 
     public Coordinates(float easting, float northing) : this()
     {

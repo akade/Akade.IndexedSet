@@ -47,7 +47,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         while (queue.TryDequeue(out Node? currentNode, out TValue distance))
         {
             count++;
-            Console.WriteLine($"Processing node {count} with distance {distance}");
+            // Console.WriteLine($"Processing node {count} with distance {distance}");
             if (currentNode is ParentNode parentNode)
             {
                 foreach (Node child in parentNode.Children)

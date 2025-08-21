@@ -95,13 +95,13 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         };
     }
 
-    private InsertionResult SplitWithoutReinsertion(ParentNode node, Node child)
+    private InsertionResult SplitWithoutReinsertion(ParentNode node, ParentNode child)
     {
         node.MergeEnvelope(child.GetEnvelope(_getAABB));
         node.Children.Add(child);
         return ResolveOverflowWithoutReinsertion(node);
     }
-
+     
     private InsertionResult RecursiveInsert(ParentNode node, LeafNode leafNode, int currentHeight)
     {
         node.MergeEnvelope(_getAABB(leafNode.Element));
@@ -257,7 +257,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         }
     }
 
-    private Node Split(ParentNode node)
+    private ParentNode Split(ParentNode node)
     {
         int axis = GetSplitAxis(node);
 
@@ -420,6 +420,6 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
     {
         public static InsertionResultComplete Instance { get; } = new();
     }
-    internal sealed record class InsertionResultSplit(Node Node) : InsertionResult;
+    internal sealed record class InsertionResultSplit(ParentNode Node) : InsertionResult;
     internal sealed record class InsertionResultReinsert(List<Node> Nodes, int level) : InsertionResult;
 }

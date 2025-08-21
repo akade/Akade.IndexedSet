@@ -103,4 +103,9 @@ internal abstract class TypedIndex<TElement, TIndexKey>(string name) : Index<TEl
         throw new NotSupportedException($"Contain queries are not supported on {GetType().Name}-indices. Use a full text to support this scenario.");
     }
 
+    internal virtual IEnumerable<TElement> NearestNeighbors(TIndexKey indexKey)
+    {
+        throw new NotSupportedException($"Nearest queries are not supported on {GetType().Name}-indices. Use a spatial or vector index to support this scenario.");
+    }
+
 }
