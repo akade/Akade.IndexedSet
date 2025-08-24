@@ -5,6 +5,11 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 {
     public IEnumerable<TElement> IntersectWith(TEnvelope aabb)
     {
+        if (!TEnvelopeMath.Intersects(ref _root.GetEnvelope(), ref aabb))
+        {
+            return [];
+        }
+
         List<TElement> results = [];
         Stack<ParentNode> stack = new();
 
@@ -16,20 +21,17 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             {
                 continue;
             }
-            if (TEnvelopeMath.Intersects(ref currentNode.GetEnvelope(), ref aabb))
+            foreach (Node child in CollectionsMarshal.AsSpan(currentNode.Children))
             {
-                foreach (Node child in CollectionsMarshal.AsSpan(currentNode.Children))
+                if (TEnvelopeMath.Intersects(ref child.GetEnvelope(), ref aabb))
                 {
-                    if (TEnvelopeMath.Intersects(ref child.GetEnvelope(), ref aabb))
+                    if (child is ParentNode childParentNode)
                     {
-                        if (child is ParentNode childParentNode)
-                        {
-                            stack.Push(childParentNode);
-                        }
-                        else if (child is LeafNode leafNode)
-                        {
-                            results.Add(leafNode.Element);
-                        }
+                        stack.Push(childParentNode);
+                    }
+                    else if (child is LeafNode leafNode)
+                    {
+                        results.Add(leafNode.Element);
                     }
                 }
             }
