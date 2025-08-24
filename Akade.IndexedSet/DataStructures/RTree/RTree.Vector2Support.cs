@@ -110,13 +110,8 @@ internal struct Vector2Math : IEnvelopeMath<Vector2, VecRec2, float>
 
     public static bool Intersects(ref VecRec2 a, ref VecRec2 b)
     {
-        (Vector2 minA, Vector2 maxA) = a;
-        (Vector2 minB, Vector2 maxB) = b;
-
-        var min = Vector2.Max(minA, minB);
-        var max = Vector2.Min(maxA, maxB);
-
-        return min.X <= max.X && min.Y <= max.Y;
+        return a.Min.X <= b.Max.X && a.Max.X >= b.Min.X &&
+               a.Min.Y <= b.Max.Y && a.Max.Y >= b.Min.Y;
     }
 
     public static bool IsEmpty(VecRec2 memoryEnvelope)

@@ -1,4 +1,6 @@
-﻿namespace Akade.IndexedSet.DataStructures.RTree;
+﻿using System.Runtime.InteropServices;
+
+namespace Akade.IndexedSet.DataStructures.RTree;
 internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath>
 {
     public IEnumerable<TElement> IntersectWith(TEnvelope aabb)
@@ -19,7 +21,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
                 }
                 if (TEnvelopeMath.Intersects(ref parentNode.GetEnvelope(), ref aabb))
                 {
-                    foreach (Node child in parentNode.Children)
+                    foreach (Node child in CollectionsMarshal.AsSpan(parentNode.Children))
                     {
                         stack.Push(child);
                     }
