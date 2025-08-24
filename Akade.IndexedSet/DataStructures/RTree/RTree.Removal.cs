@@ -15,7 +15,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 
         while (stack.TryPop(out ParentNode? currentNode))
         {
-            if (TEnvelopeMath.Intersects(ref currentNode.GetEnvelope(), ref aabb))
+            if (TEnvelopeMath.Intersects(ref currentNode.Envelope, ref aabb))
             {
                 foreach (Node child in currentNode.Children)
                 {

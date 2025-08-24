@@ -5,32 +5,24 @@ namespace Akade.IndexedSet.DataStructures.RTree;
 internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath>
 {
 
-    internal abstract class Node
+    internal abstract class Node(TEnvelope envelope)
     {
-        internal abstract ref TEnvelope GetEnvelope();
+        public TEnvelope Envelope = envelope;
     }
 
     internal sealed class ParentNode : Node
     {
         public List<Node> Children = [];
-        private TEnvelope _envelope;
 
-        public ParentNode()
+        public ParentNode() : base(default)
         {
 
         }
 
-        public ParentNode(Span<Node> span)
+        public ParentNode(Span<Node> span) : base(default)
         {
             Children.AddRange(span);
             RecalculateAABB();
-        }
-
-        public TEnvelope Envelope => _envelope;
-
-        internal override ref TEnvelope GetEnvelope()
-        {
-            return ref _envelope;
         }
 
         public bool HasInitializedEnvelope { get; private set; }
@@ -39,12 +31,12 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         {
             if (!HasInitializedEnvelope)
             {
-                _envelope = other;
+                Envelope = other;
                 HasInitializedEnvelope = true;
             }
             else
             {
-                TEnvelopeMath.Merge(Envelope, other, ref _envelope);
+                TEnvelopeMath.Merge(Envelope, other, ref Envelope);
             }
         }
 
@@ -52,8 +44,8 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         {
             if (!HasInitializedEnvelope)
             {
-                _envelope = TEnvelopeMath.Empty(TEnvelopeMath.GetDimensions(aabb));
-                TEnvelopeMath.CopyTo(aabb, ref _envelope);
+                Envelope = TEnvelopeMath.Empty(TEnvelopeMath.GetDimensions(aabb));
+                TEnvelopeMath.CopyTo(aabb, ref Envelope);
                 HasInitializedEnvelope = true;
             }
         }
@@ -62,13 +54,13 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         {
             Span<Node> childSpan = CollectionsMarshal.AsSpan(Children);
 
-            TEnvelope firstChild = childSpan[0].GetEnvelope();
+            TEnvelope firstChild = childSpan[0].Envelope;
 
             InitMemory(firstChild);
 
             for (int i = 1; i < childSpan.Length; i++)
             {
-                MergeEnvelope(Children[i].GetEnvelope());
+                MergeEnvelope(Children[i].Envelope);
             }
         }
 
@@ -78,15 +70,13 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         }
     }
 
-    internal sealed class LeafNode(TElement element, TEnvelope envelope) : Node
+    internal sealed class LeafNode : Node
     {
-        private TEnvelope _envelope = envelope;
+        public TElement Element { get; }
 
-        public TElement Element { get; } = element;
-
-        internal override ref TEnvelope GetEnvelope()
+        public LeafNode(TElement element, TEnvelope envelope) : base(envelope)
         {
-            return ref _envelope;
+            Element = element;
         }
 
         public override string ToString()

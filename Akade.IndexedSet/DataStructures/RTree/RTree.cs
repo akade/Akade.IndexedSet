@@ -32,8 +32,8 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         // pre allocate axis comparers for each axis
         _axisComparers = Enumerable.Range(0, _dimensions).Select(axis => new Comparison<Node>((x, y) =>
         {
-            TEnvelope aabbX = x.GetEnvelope();
-            TEnvelope aabbY = y.GetEnvelope();
+            TEnvelope aabbX = x.Envelope;
+            TEnvelope aabbY = y.Envelope;
 
             TValue a = TEnvelopeMath.GetMin(aabbX, axis);
             TValue b = TEnvelopeMath.GetMin(aabbY, axis);
@@ -69,11 +69,11 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             //    throw new InvalidOperationException($"Node has an invalid number of children: {node.Children.Count} [{_settings.MinNodeEntries} - {_settings.MaxNodeEntries}]");
             //}
 
-            TEnvelope parent = node.GetEnvelope();
+            TEnvelope parent = node.Envelope;
 
             foreach (Node child in node.Children)
             {
-                TEnvelope aabb = child.GetEnvelope();
+                TEnvelope aabb = child.Envelope;
 
                 if (!TEnvelopeMath.Contains(parent, aabb))
                 {
@@ -103,10 +103,10 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 
         for (int i = 0; i < node.Children.Count; i++)
         {
-            TEnvelope aabbA = node.Children[i].GetEnvelope();
+            TEnvelope aabbA = node.Children[i].Envelope;
             for (int j = i + 1; j < node.Children.Count; j++)
             {
-                TEnvelope aabbB = node.Children[j].GetEnvelope();
+                TEnvelope aabbB = node.Children[j].Envelope;
                 totalOverlap += TEnvelopeMath.IntersectionArea(aabbA, aabbB);
             }
         }
