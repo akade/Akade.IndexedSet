@@ -6,35 +6,33 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
     public IEnumerable<TElement> IntersectWith(TEnvelope aabb)
     {
         List<TElement> results = [];
-        Stack<Node> stack = new();
+        Stack<ParentNode> stack = new();
 
         stack.Push(_root);
 
-        while (stack.Count > 0)
+        while (stack.TryPop(out ParentNode? currentNode))
         {
-            Node currentNode = stack.Pop();
-            if (currentNode is ParentNode parentNode)
+            if (!currentNode.HasInitializedEnvelope)
             {
-                if (!parentNode.HasInitializedEnvelope)
+                continue;
+            }
+            if (TEnvelopeMath.Intersects(ref currentNode.GetEnvelope(), ref aabb))
+            {
+                foreach (Node child in CollectionsMarshal.AsSpan(currentNode.Children))
                 {
-                    continue;
-                }
-                if (TEnvelopeMath.Intersects(ref parentNode.GetEnvelope(), ref aabb))
-                {
-                    foreach (Node child in CollectionsMarshal.AsSpan(parentNode.Children))
+                    if (TEnvelopeMath.Intersects(ref child.GetEnvelope(), ref aabb))
                     {
-                        stack.Push(child);
+                        if (child is ParentNode childParentNode)
+                        {
+                            stack.Push(childParentNode);
+                        }
+                        else if (child is LeafNode leafNode)
+                        {
+                            results.Add(leafNode.Element);
+                        }
                     }
                 }
             }
-            else if (currentNode is LeafNode leafNode)
-            {
-                if (TEnvelopeMath.Intersects(ref leafNode.GetEnvelope(), ref aabb))
-                {
-                    results.Add(leafNode.Element);
-                }
-            }
-
         }
 
         return results;
