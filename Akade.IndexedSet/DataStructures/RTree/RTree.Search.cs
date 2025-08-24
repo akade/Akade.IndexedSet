@@ -17,7 +17,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
                 {
                     continue;
                 }
-                if (TEnvelopeMath.Intersects(parentNode.GetEnvelope(_getAABB), aabb))
+                if (TEnvelopeMath.Intersects(parentNode.GetEnvelope(), aabb))
                 {
                     foreach (Node child in parentNode.Children)
                     {
@@ -27,7 +27,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             }
             else if (currentNode is LeafNode leafNode)
             {
-                if (TEnvelopeMath.Intersects(leafNode.GetEnvelope(_getAABB), aabb))
+                if (TEnvelopeMath.Intersects(leafNode.GetEnvelope(), aabb))
                 {
                     results.Add(leafNode.Element);
                 }
@@ -53,7 +53,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             {
                 foreach (Node child in parentNode.Children)
                 {
-                    TEnvelope childAABB = child.GetEnvelope(_getAABB);
+                    TEnvelope childAABB = child.GetEnvelope();
 
                     TValue childDistance = TEnvelopeMath.DistanceToBoundary(childAABB, position);
 

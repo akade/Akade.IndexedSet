@@ -10,7 +10,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             throw new InvalidOperationException("Bulk loading can only be done on an empty R-Tree");
         }
 
-        var leafNodesList = elements.Select(elem => new LeafNode(elem))
+        var leafNodesList = elements.Select(elem => new LeafNode(elem, _getAABB(elem)))
                                     .ToList();
 
         if (leafNodesList.Count == 0)
@@ -36,22 +36,17 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             {
                 currentParent.Children.Add(leafNode);
             }
-            currentParent.RecalculateAABB(_getAABB);
+            currentParent.RecalculateAABB();
             return;
         }
 
-        // This is still not working as intended
-        // References: 
-        // - https://github.com/viceroypenguin/RBush/blob/101b6fb915215d9d30294a1178fe09ebd6929d73/RBush/RBush.Utilities.cs#L176
-        // - https://github.com/georust/rstar/blob/master/rstar/src/algorithm/bulk_load/bulk_load_sequential.rs
-
-        // TODO: Calculate for each axis, if all have the same value then Math.Pow(numberOfClustersPerAxis, _dimensions) == _maxNodeEntries would need to match, otherwise
+        // TODO:Maybe calculate for each axis, if all have the same value then Math.Pow(numberOfClustersPerAxis, _dimensions) == _maxNodeEntries would need to match, otherwise
         // we violate that condition
         int numberOfClustersPerAxis = Math.Max(2, NumberOfClustersPerAxis(leafNodes.Length));
 
 
         ClusterAndAdd(currentParent, leafNodes, numberOfClustersPerAxis, 0);
-        currentParent.RecalculateAABB(_getAABB);
+        currentParent.RecalculateAABB();
     }
 
     private void ClusterAndAdd(ParentNode parent, Span<LeafNode> elements, int numberOfClustersPerAxis, int currentAxis)
@@ -61,7 +56,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             ParentNode subParent = new();
             SplitAndAdd(subParent, elements);
             parent.Children.Add(subParent);
-            parent.MergeEnvelope(subParent.GetEnvelope(_getAABB));
+            parent.MergeEnvelope(subParent.GetEnvelope());
         }
         else
         {

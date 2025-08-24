@@ -8,7 +8,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 {
     internal void Insert(TElement element)
     {
-        Insert(new LeafNode(element));
+        Insert(new LeafNode(element, _getAABB(element)));
     }
 
     internal void Insert(LeafNode leafToInsert)
@@ -48,7 +48,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
                     _root = newRoot;
                     newRoot.Children.Add(oldRoot);
                     newRoot.Children.Add(node);
-                    newRoot.RecalculateAABB(_getAABB);
+                    newRoot.RecalculateAABB();
                     targetHeight += 1;
 
                     break;
@@ -76,7 +76,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 
     private InsertionResult ForcedInsertion(ParentNode node, Node nodeToReinsert, int targetHeight)
     {
-        node.MergeEnvelope(nodeToReinsert.GetEnvelope(_getAABB));
+        node.MergeEnvelope(nodeToReinsert.GetEnvelope());
         int expandIndex = ChooseSubTree(node, nodeToReinsert);
 
         if (targetHeight == 0 || node.Children.Count < expandIndex)
@@ -97,7 +97,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 
     private InsertionResult SplitWithoutReinsertion(ParentNode node, ParentNode child)
     {
-        node.MergeEnvelope(child.GetEnvelope(_getAABB));
+        node.MergeEnvelope(child.GetEnvelope());
         node.Children.Add(child);
         return ResolveOverflowWithoutReinsertion(node);
     }
@@ -128,13 +128,13 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 
     private InsertionResultReinsert Reinsert(ParentNode node, InsertionResultReinsert reinsert)
     {
-        node.RecalculateAABB(_getAABB);
+        node.RecalculateAABB();
         return reinsert;
     }
 
     private InsertionResult Split(ParentNode node, Node child, int currentHeight)
     {
-        node.MergeEnvelope(child.GetEnvelope(_getAABB));
+        node.MergeEnvelope(child.GetEnvelope());
         node.Children.Add(child);
         return ResolveOverflow(node, currentHeight);
     }
@@ -149,7 +149,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 
         bool allLeaves = firstChild is ParentNode { Children: [LeafNode, ..] };
 
-        TEnvelope insertionAABB = toInsert.GetEnvelope(_getAABB);
+        TEnvelope insertionAABB = toInsert.GetEnvelope();
 
         int inclusionCount = 0;
         TValue minArea = TValue.MaxValue;
@@ -161,7 +161,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         {
             Node child = children[index];
 
-            TEnvelope childAABB = child.GetEnvelope(_getAABB);
+            TEnvelope childAABB = child.GetEnvelope();
 
             if (TEnvelopeMath.Contains(childAABB, insertionAABB))
             {
@@ -188,7 +188,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             {
                 Node child = node.Children[index];
 
-                TEnvelope aabb = child.GetEnvelope(_getAABB);
+                TEnvelope aabb = child.GetEnvelope();
                 buffer = aabb;
 
                 TEnvelopeMath.MergeInto(insertionAABB, ref buffer);
@@ -207,7 +207,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
                             continue;
                         }
 
-                        TEnvelope otherAABB = otherChild.GetEnvelope(_getAABB);
+                        TEnvelope otherAABB = otherChild.GetEnvelope();
 
                         overlap += TEnvelopeMath.IntersectionArea(aabb, otherAABB);
                         newOverlap += TEnvelopeMath.IntersectionArea(buffer, otherAABB);
@@ -278,20 +278,20 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         {
             Node firstChild = node.Children[k - 1];
             Node secondChild = node.Children[k];
-            TEnvelope firstAABB = firstChild.GetEnvelope(_getAABB);
-            TEnvelope secondAABB = secondChild.GetEnvelope(_getAABB);
+            TEnvelope firstAABB = firstChild.GetEnvelope();
+            TEnvelope secondAABB = secondChild.GetEnvelope();
 
             leftAABB = firstAABB;
             rightAABB = secondAABB;
 
             foreach (Node child in childSpan[..k])
             {
-                TEnvelopeMath.MergeInto(child.GetEnvelope(_getAABB), ref leftAABB);
+                TEnvelopeMath.MergeInto(child.GetEnvelope(), ref leftAABB);
             }
 
             foreach (Node child in childSpan[k..])
             {
-                TEnvelopeMath.MergeInto(child.GetEnvelope(_getAABB), ref rightAABB);
+                TEnvelopeMath.MergeInto(child.GetEnvelope(), ref rightAABB);
             }
 
             TValue overlap = TEnvelopeMath.IntersectionArea(leftAABB, rightAABB);
@@ -305,9 +305,9 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             }
         }
 
-        ParentNode newNode = new(childSpan[bestIndex..], _getAABB);
+        ParentNode newNode = new(childSpan[bestIndex..]);
         node.Children.RemoveRange(bestIndex, node.Children.Count - bestIndex);
-        node.RecalculateAABB(_getAABB);
+        node.RecalculateAABB();
         return newNode;
     }
 
@@ -331,17 +331,17 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             node.Children.Sort(_axisComparers[axis]);
 
             // initialize the memory for left and right AABBs
-            left = childSpan[0].GetEnvelope(_getAABB);
-            right = childSpan[until].GetEnvelope(_getAABB);
+            left = childSpan[0].GetEnvelope();
+            right = childSpan[until].GetEnvelope();
 
             for (int i = 1; i < until; i++)
             {
-                TEnvelopeMath.MergeInto(childSpan[i].GetEnvelope(_getAABB), ref left);
+                TEnvelopeMath.MergeInto(childSpan[i].GetEnvelope(), ref left);
             }
 
             for (int i = until + 1; i < node.Children.Count; i++)
             {
-                TEnvelopeMath.MergeInto(childSpan[i].GetEnvelope(_getAABB), ref right);
+                TEnvelopeMath.MergeInto(childSpan[i].GetEnvelope(), ref right);
             }
 
             for (int k = minNodeEntries; k < until; k++)
@@ -351,12 +351,12 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 
                 foreach (Node child in childSpan[..k])
                 {
-                    TEnvelopeMath.MergeInto(child.GetEnvelope(_getAABB), ref leftModified);
+                    TEnvelopeMath.MergeInto(child.GetEnvelope(), ref leftModified);
                 }
 
                 foreach (Node child in childSpan[k..])
                 {
-                    TEnvelopeMath.MergeInto(child.GetEnvelope(_getAABB), ref rightModified);
+                    TEnvelopeMath.MergeInto(child.GetEnvelope(), ref rightModified);
                 }
 
                 // We can use the half perimeter as we are only interested in the relative size and are axis-aligned
@@ -378,13 +378,13 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         node.Children.Sort((left, right) =>
         {
             Span<TValue> center = stackalloc TValue[_dimensions];
-            TEnvelopeMath.CopyCenterTo(node.GetEnvelope(_getAABB), center);
+            TEnvelopeMath.CopyCenterTo(node.GetEnvelope(), center);
 
             Span<TValue> leftCenter = stackalloc TValue[_dimensions];
             Span<TValue> rightCenter = stackalloc TValue[_dimensions];
 
-            TEnvelopeMath.CopyCenterTo(left.GetEnvelope(_getAABB), leftCenter);
-            TEnvelopeMath.CopyCenterTo(right.GetEnvelope(_getAABB), rightCenter);
+            TEnvelopeMath.CopyCenterTo(left.GetEnvelope(), leftCenter);
+            TEnvelopeMath.CopyCenterTo(right.GetEnvelope(), rightCenter);
 
             TValue leftDistance = TensorPrimitives.Distance<TValue>(leftCenter, center);
             TValue rightDistance = TensorPrimitives.Distance<TValue>(rightCenter, center);
@@ -399,7 +399,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         reinsertionNodes.AddRange(childSpan[splitOffStart..]);
         node.Children.RemoveRange(splitOffStart, node.Children.Count - splitOffStart);
 
-        node.RecalculateAABB(_getAABB);
+        node.RecalculateAABB();
 
         return reinsertionNodes;
     }

@@ -7,7 +7,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 
     internal abstract class Node
     {
-        internal abstract TEnvelope GetEnvelope(Func<TElement, TEnvelope> getAABB);
+        internal abstract TEnvelope GetEnvelope();
     }
 
     internal sealed class ParentNode : Node
@@ -20,15 +20,15 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 
         }
 
-        public ParentNode(Span<Node> span, Func<TElement, TEnvelope> getAABB)
+        public ParentNode(Span<Node> span)
         {
             Children.AddRange(span);
-            RecalculateAABB(getAABB);
+            RecalculateAABB();
         }
 
         public TEnvelope Envelope => _envelope;
 
-        internal override TEnvelope GetEnvelope(Func<TElement, TEnvelope> getAABB)
+        internal override TEnvelope GetEnvelope()
         {
             return Envelope;
         }
@@ -58,17 +58,17 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             }
         }
 
-        internal void RecalculateAABB(Func<TElement, TEnvelope> getAABB)
+        internal void RecalculateAABB()
         {
             Span<Node> childSpan = CollectionsMarshal.AsSpan(Children);
 
-            TEnvelope firstChild = childSpan[0].GetEnvelope(getAABB);
+            TEnvelope firstChild = childSpan[0].GetEnvelope();
 
             InitMemory(firstChild);
 
             for (int i = 1; i < childSpan.Length; i++)
             {
-                MergeEnvelope(Children[i].GetEnvelope(getAABB));
+                MergeEnvelope(Children[i].GetEnvelope());
             }
         }
 
@@ -78,13 +78,13 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         }
     }
 
-    internal sealed class LeafNode(TElement element) : Node
+    internal sealed class LeafNode(TElement element, TEnvelope envelope) : Node
     {
         public TElement Element { get; } = element;
 
-        internal override TEnvelope GetEnvelope(Func<TElement, TEnvelope> getAABB)
+        internal override TEnvelope GetEnvelope()
         {
-            return getAABB(Element);
+            return envelope;
         }
 
         public override string ToString()

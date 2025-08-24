@@ -15,7 +15,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 
         while (stack.TryPop(out ParentNode? currentNode))
         {
-            if (TEnvelopeMath.Intersects(currentNode.GetEnvelope(_getAABB), aabb))
+            if (TEnvelopeMath.Intersects(currentNode.GetEnvelope(), aabb))
             {
                 foreach (Node child in currentNode.Children)
                 {
@@ -45,7 +45,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 
         ParentNode? parentNode = parentByNode[targetNode];
         _ = parentNode.Children.Remove(targetNode);
-        parentNode.RecalculateAABB(_getAABB);
+        parentNode.RecalculateAABB();
 
         // We use a very simple remove strategy:
         // - Remove parent nodes up the path if any underflow occurs
@@ -59,7 +59,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
                 AddAllLeafNodes(parentNode, nodesForReinsertion);
                 ParentNode parentOfParentNode = parentByNode[parentNode];
                 _ = parentOfParentNode.Children.Remove(parentNode);
-                parentOfParentNode.RecalculateAABB(_getAABB);
+                parentOfParentNode.RecalculateAABB();
                 parentNode = parentOfParentNode;
             }
             else
