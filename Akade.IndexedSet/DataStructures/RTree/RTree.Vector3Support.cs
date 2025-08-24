@@ -48,11 +48,9 @@ internal struct Vector3Math : IEnvelopeMath<Vector3, VecRec3, float>
         return VecRec3.CreateFromPoint(point);
     }
 
-    public static float DistanceToBoundary(VecRec3 envelope, Vector3 other)
+    public static float DistanceToBoundary(ref VecRec3 envelope, Vector3 other)
     {
-        (Vector3 min, Vector3 max) = envelope;
-
-        var closestPoint = Vector3.Clamp(other, min, max);
+        var closestPoint = Vector3.Clamp(other, envelope.Min, envelope.Max);
         return Vector3.Distance(closestPoint, other);
     }
 
