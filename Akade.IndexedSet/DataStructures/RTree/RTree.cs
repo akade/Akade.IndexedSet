@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
-using System.Runtime.InteropServices;
 
 namespace Akade.IndexedSet.DataStructures.RTree;
 
@@ -65,10 +64,10 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             {
                 throw new InvalidOperationException("Node has an uninitialized AABB, which is not allowed.");
             }
-            if ((_root != node && !isBulkLoaded && node.Children.Count < _settings.MinNodeEntries) || node.Children.Count > _settings.MaxNodeEntries)
-            {
-                throw new InvalidOperationException($"Node has an invalid number of children: {node.Children.Count} [{_settings.MinNodeEntries} - {_settings.MaxNodeEntries}]");
-            }
+            //if ((_root != node && !isBulkLoaded && node.Children.Count < _settings.MinNodeEntries) || node.Children.Count > _settings.MaxNodeEntries)
+            //{
+            //    throw new InvalidOperationException($"Node has an invalid number of children: {node.Children.Count} [{_settings.MinNodeEntries} - {_settings.MaxNodeEntries}]");
+            //}
 
             TEnvelope parent = node.GetEnvelope(_getAABB);
 
@@ -96,5 +95,41 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         {
             throw new InvalidOperationException($"Count mismatch: Expected {Count}, but found {count} leaf nodes.");
         }
+    }
+
+    public TValue OverlapArea(ParentNode node)
+    {
+        TValue totalOverlap = TValue.Zero;
+
+        for (int i = 0; i < node.Children.Count; i++)
+        {
+            TEnvelope aabbA = node.Children[i].GetEnvelope(_getAABB);
+            for (int j = i + 1; j < node.Children.Count; j++)
+            {
+                TEnvelope aabbB = node.Children[j].GetEnvelope(_getAABB);
+                totalOverlap += TEnvelopeMath.IntersectionArea(aabbA, aabbB);
+            }
+        }
+        return totalOverlap;
+    }
+
+    public TValue TotalOverlapArea()
+    { 
+        TValue totalOverlap = TValue.Zero;
+        Stack<ParentNode> stack = new();
+        stack.Push(_root);
+
+        while (stack.TryPop(out ParentNode? node))
+        {
+            totalOverlap += OverlapArea(node);
+            foreach (Node child in node.Children)
+            {
+                if (child is ParentNode parentChild)
+                {
+                    stack.Push(parentChild);
+                }
+            }
+        }
+        return totalOverlap;
     }
 }

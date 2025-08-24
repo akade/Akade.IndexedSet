@@ -4,8 +4,8 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
     public IEnumerable<TElement> IntersectWith(TEnvelope aabb)
     {
         List<TElement> results = [];
-
         Stack<Node> stack = new();
+
         stack.Push(_root);
 
         while (stack.Count > 0)
@@ -34,6 +34,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             }
 
         }
+
         return results;
     }
 

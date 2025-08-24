@@ -19,8 +19,8 @@ public class SpatialIndexBenchmark
     private List<SwissZipCode> _swissZipCodes = null!;
     private IndexedSet<SwissZipCode> _setBulkLoaded = null!;
     private IndexedSet<SwissZipCode> _setNotBulkLoaded = null!;
-    private readonly RBush<SwissZipCodeRBushAdapter> _rbushBulkLoaded = new();
-    private readonly RBush<SwissZipCodeRBushAdapter> _rbushNotBulkLoaded = new();
+    private readonly RBush<SwissZipCodeRBushAdapter> _rbushBulkLoaded = new(6);
+    private readonly RBush<SwissZipCodeRBushAdapter> _rbushNotBulkLoaded = new(6);
 
     [GlobalSetup]
     public async Task SetupAsync()
@@ -35,67 +35,66 @@ public class SpatialIndexBenchmark
                                              .WithSpatialIndex<Vector2>(x => x.Coordinates)
                                              .Build();
 
-        RBush<SwissZipCodeRBushAdapter> r = new();
-        r.BulkLoad(swissZipCodes.Select(x => new SwissZipCodeRBushAdapter(x)));
+        _rbushBulkLoaded.BulkLoad(swissZipCodes.Select(x => new SwissZipCodeRBushAdapter(x)));
 
 
         _swissZipCodes.ForEach(x =>
         {
-            _setBulkLoaded.Add(x);
+            _setNotBulkLoaded.Add(x);
             _rbushNotBulkLoaded.Insert(new(x));
         });
     }
 
-    [Benchmark(Baseline = true)]
-    [BenchmarkCategory("Area")]
-    public int AreaLinq()
-    {
-        return _swissZipCodes.Where(x => x.Coordinates.Easting >= _min.X && x.Coordinates.Northing >= _min.Y
-                                      && x.Coordinates.Easting <= _min.Y && x.Coordinates.Northing <= _max.Y).Count();
-    }
+    //[Benchmark(Baseline = true)]
+    //[BenchmarkCategory("Area")]
+    //public int AreaLinq()
+    //{
+    //    return _swissZipCodes.Where(x => x.Coordinates.Easting >= _min.X && x.Coordinates.Northing >= _min.Y
+    //                                  && x.Coordinates.Easting <= _min.Y && x.Coordinates.Northing <= _max.Y).Count();
+    //}
 
-    [Benchmark(Baseline = true)]
-    [BenchmarkCategory("knn10")]
-    public int Knn10Linq()
-    {
-        return _swissZipCodes.OrderBy(x => Vector2.Distance(_min, x.Coordinates)).Take(10).Count();
-    }
+    //[Benchmark(Baseline = true)]
+    //[BenchmarkCategory("knn10")]
+    //public int Knn10Linq()
+    //{
+    //    return _swissZipCodes.OrderBy(x => Vector2.Distance(_min, x.Coordinates)).Take(10).Count();
+    //}
 
-    [Benchmark]
-    [BenchmarkCategory("Area")]
-    public int RBush_Area_BulkLoaded()
-    {
-        return _rbushBulkLoaded.Search(new Envelope(_min.X, _min.Y, _max.X, _max.Y)).Count;
-    }
+    //[Benchmark]
+    //[BenchmarkCategory("Area")]
+    //public int RBush_Area_BulkLoaded()
+    //{
+    //    return _rbushBulkLoaded.Search(new Envelope(_min.X, _min.Y, _max.X, _max.Y)).Count;
+    //}
 
-    [Benchmark]
-    [BenchmarkCategory("Area")]
-    public int RBush_Area_NotBulkLoaded()
-    {
-        return _rbushNotBulkLoaded.Search(new Envelope(_min.X, _min.Y, _max.X, _max.Y)).Count;
-    }
+    //[Benchmark]
+    //[BenchmarkCategory("Area")]
+    //public int RBush_Area_NotBulkLoaded()
+    //{
+    //    return _rbushNotBulkLoaded.Search(new Envelope(_min.X, _min.Y, _max.X, _max.Y)).Count;
+    //}
 
-    [Benchmark]
-    [BenchmarkCategory("knn10")]
-    public int RBush_Knn10_BulkLoaded()
-    {
-        return _rbushBulkLoaded.Knn(10, _min.X, _min.Y).Count;
-    }
+    //[Benchmark]
+    //[BenchmarkCategory("knn10")]
+    //public int RBush_Knn10_BulkLoaded()
+    //{
+    //    return _rbushBulkLoaded.Knn(10, _min.X, _min.Y).Count;
+    //}
 
-    [Benchmark]
-    [BenchmarkCategory("knn10")]
-    public int RBush_Knn10_NotBulkLoaded()
-    {
-        return _rbushNotBulkLoaded.Knn(10, _min.X, _min.Y).Count;
-    }
+    //[Benchmark]
+    //[BenchmarkCategory("knn10")]
+    //public int RBush_Knn10_NotBulkLoaded()
+    //{
+    //    return _rbushNotBulkLoaded.Knn(10, _min.X, _min.Y).Count;
+    //}
 
 
-    [Benchmark]
-    [BenchmarkCategory("Area")]
-    public int IndexedSet_Area_BulkLoaded()
-    {
-        return _setBulkLoaded.Range<Vector2>(x => x.Coordinates, _min, _max).Count();
-    }
+    //[Benchmark]
+    //[BenchmarkCategory("Area")]
+    //public int IndexedSet_Area_BulkLoaded()
+    //{
+    //    return _setBulkLoaded.Range<Vector2>(x => x.Coordinates, _min, _max).Count();
+    //}
 
     [Benchmark]
     [BenchmarkCategory("Area")]
@@ -104,19 +103,19 @@ public class SpatialIndexBenchmark
         return _setNotBulkLoaded.Range<Vector2>(x => x.Coordinates, _min, _max).Count();
     }
 
-    [Benchmark]
-    [BenchmarkCategory("knn10")]
-    public int IndexedSet_Knn10_BulkLoaded()
-    {
-        return _setBulkLoaded.NearestNeighbors<Vector2>(x => x.Coordinates, _min).Take(10).Count();
-    }
+    //[Benchmark]
+    //[BenchmarkCategory("knn10")]
+    //public int IndexedSet_Knn10_BulkLoaded()
+    //{
+    //    return _setBulkLoaded.NearestNeighbors<Vector2>(x => x.Coordinates, _min).Take(10).Count();
+    //}
 
-    [Benchmark]
-    [BenchmarkCategory("knn10")]
-    public int IndexedSet_Knn10_NotBulkLoaded()
-    {
-        return _setNotBulkLoaded.NearestNeighbors<Vector2>(x => x.Coordinates, _min).Take(10).Count();
-    }
+    //[Benchmark]
+    //[BenchmarkCategory("knn10")]
+    //public int IndexedSet_Knn10_NotBulkLoaded()
+    //{
+    //    return _setNotBulkLoaded.NearestNeighbors<Vector2>(x => x.Coordinates, _min).Take(10).Count();
+    //}
 
 
 }

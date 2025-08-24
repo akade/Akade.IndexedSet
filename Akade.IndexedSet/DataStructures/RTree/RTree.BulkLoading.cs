@@ -13,7 +13,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         var leafNodesList = elements.Select(elem => new LeafNode(elem))
                                     .ToList();
 
-        if(leafNodesList.Count == 0)
+        if (leafNodesList.Count == 0)
         {
             return;
         }
@@ -22,18 +22,14 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         // - slower than STR but should produce better query performance
         // - at each level, we sort the leaf nodes by their AABBs by alternating axis and split according to the maximum node occupancy
 
-
-        
-
-
         Span<LeafNode> leafNodes = CollectionsMarshal.AsSpan(leafNodesList);
-        SplitAndAdd(_root, currentDimension: 0, leafNodes);
+        SplitAndAdd(_root, leafNodes);
+
+        Count = leafNodes.Length;
     }
 
-    private void SplitAndAdd(ParentNode currentParent, int currentDimension, Span<LeafNode> leafNodes)
+    private void SplitAndAdd(ParentNode currentParent, Span<LeafNode> leafNodes)
     {
-        leafNodes.Sort(_axisComparers[currentDimension]);
-
         if (leafNodes.Length <= _settings.MaxNodeEntries)
         {
             foreach (LeafNode leafNode in leafNodes)
@@ -41,38 +37,59 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
                 currentParent.Children.Add(leafNode);
             }
             currentParent.RecalculateAABB(_getAABB);
-            Count += leafNodes.Length;
             return;
         }
 
-        int height = (int)Math.Ceiling(Math.Log(leafNodes.Length, _settings.MaxNodeEntries));
-        int numberOfSubTrees = (int)Math.Pow(_settings.MaxNodeEntries, height - 1);
-        int numberOfSlices = (int)Math.Floor(Math.Sqrt(Math.Ceiling(leafNodes.Length / (double)numberOfSubTrees)));
+        // This is still not working as intended
+        // References: 
+        // - https://github.com/viceroypenguin/RBush/blob/101b6fb915215d9d30294a1178fe09ebd6929d73/RBush/RBush.Utilities.cs#L176
+        // - https://github.com/georust/rstar/blob/master/rstar/src/algorithm/bulk_load/bulk_load_sequential.rs
 
-        // Split into slices
+        // TODO: Calculate for each axis, if all have the same value then Math.Pow(numberOfClustersPerAxis, _dimensions) == _maxNodeEntries would need to match, otherwise
+        // we violate that condition
+        int numberOfClustersPerAxis = Math.Max(2, NumberOfClustersPerAxis(leafNodes.Length));
 
 
-        // Split the leaf nodes into M parts
-        int nodesPerPart = (int)Math.Ceiling((double)leafNodes.Length / _settings.MaxNodeEntries);
-        int parts = (int)Math.Ceiling((double)leafNodes.Length / nodesPerPart);
+        ClusterAndAdd(currentParent, leafNodes, numberOfClustersPerAxis, 0);
+        currentParent.RecalculateAABB(_getAABB);
+    }
 
-        // For bulkloading, we permit that the last node can have less than MinNodeEntries
-
-        for (int i = 0; i < parts; i++)
+    private void ClusterAndAdd(ParentNode parent, Span<LeafNode> elements, int numberOfClustersPerAxis, int currentAxis)
+    {
+        if (currentAxis == _dimensions)
         {
-            int start = i * nodesPerPart;
-            int end = Math.Min(start + nodesPerPart, leafNodes.Length);
-            Span<LeafNode> partNodes = leafNodes[start..end];
-
-            if (partNodes.Length > 0)
-            {
-                ParentNode childNode = new();
-                SplitAndAdd(childNode, (currentDimension + 1) % _dimensions, partNodes);
-
-                currentParent.Children.Add(childNode);
-                currentParent.MergeEnvelope(childNode.GetEnvelope(_getAABB));
-            }
+            ParentNode subParent = new();
+            SplitAndAdd(subParent, elements);
+            parent.Children.Add(subParent);
+            parent.MergeEnvelope(subParent.GetEnvelope(_getAABB));
         }
+        else
+        {
+            // sort remaining nodes by the current axis
+            elements.Sort(_axisComparers[currentAxis]);
 
+            int numberOfElementsPerCluster = (elements.Length + numberOfClustersPerAxis - 1) / numberOfClustersPerAxis;
+
+            Span<LeafNode> remaining = elements; 
+            
+            while (remaining.Length > 0)
+            {
+                // Split off the first cluster
+                int currentSize = Math.Min(numberOfElementsPerCluster, remaining.Length);
+                Span<LeafNode> currentCluster = remaining[..currentSize];
+                remaining = remaining[currentSize..];
+
+                ClusterAndAdd(parent, currentCluster, numberOfClustersPerAxis, currentAxis + 1);
+            }
+
+        }
+    }
+
+    private int NumberOfClustersPerAxis(int numberOfElements)
+    {
+        int height = (int)Math.Ceiling(Math.Log(numberOfElements, _settings.MaxNodeEntries));
+        double numberOfSubTrees = Math.Pow(_settings.MaxNodeEntries, height - 1);
+        int numberOfClusters = (int)Math.Ceiling(numberOfElements / numberOfSubTrees);
+        return (int)Math.Ceiling(Math.Pow(numberOfClusters, 1d / _dimensions)); // for 2d, this is the square root. For 3d, this is the cube root, etc.
     }
 }
