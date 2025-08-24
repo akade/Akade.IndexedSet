@@ -22,7 +22,7 @@ internal interface IEnvelopeMath<TPoint, TEnvelope, TValue>
 
     static abstract void CopyCenterTo(TEnvelope envelope, Span<TValue> center);
 
-    static abstract bool Intersects(TEnvelope a, TEnvelope b);
+    static abstract bool Intersects(ref TEnvelope a, ref TEnvelope b);
     static abstract TValue IntersectionArea(TEnvelope a, TEnvelope b);
 
     static abstract bool Contains(TEnvelope a, TEnvelope b);

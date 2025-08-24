@@ -111,7 +111,7 @@ internal struct Vector3Math : IEnvelopeMath<Vector3, VecRec3, float>
         return size.X * size.Y * size.Z;
     }
 
-    public static bool Intersects(VecRec3 a, VecRec3 b)
+    public static bool Intersects(ref VecRec3 a, ref VecRec3 b)
     {
         (Vector3 minA, Vector3 maxA) = a;
         (Vector3 minB, Vector3 maxB) = b;

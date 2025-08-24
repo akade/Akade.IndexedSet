@@ -7,7 +7,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 
     internal abstract class Node
     {
-        internal abstract TEnvelope GetEnvelope();
+        internal abstract ref TEnvelope GetEnvelope();
     }
 
     internal sealed class ParentNode : Node
@@ -28,9 +28,9 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 
         public TEnvelope Envelope => _envelope;
 
-        internal override TEnvelope GetEnvelope()
+        internal override ref TEnvelope GetEnvelope()
         {
-            return Envelope;
+            return ref _envelope;
         }
 
         public bool HasInitializedEnvelope { get; private set; }
@@ -80,11 +80,13 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 
     internal sealed class LeafNode(TElement element, TEnvelope envelope) : Node
     {
+        private TEnvelope _envelope = envelope;
+
         public TElement Element { get; } = element;
 
-        internal override TEnvelope GetEnvelope()
+        internal override ref TEnvelope GetEnvelope()
         {
-            return envelope;
+            return ref _envelope;
         }
 
         public override string ToString()

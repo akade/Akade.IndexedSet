@@ -108,7 +108,7 @@ internal struct Vector2Math : IEnvelopeMath<Vector2, VecRec2, float>
         return size.X * size.Y;
     }
 
-    public static bool Intersects(VecRec2 a, VecRec2 b)
+    public static bool Intersects(ref VecRec2 a, ref VecRec2 b)
     {
         (Vector2 minA, Vector2 maxA) = a;
         (Vector2 minB, Vector2 maxB) = b;
