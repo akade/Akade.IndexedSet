@@ -1,40 +1,49 @@
-﻿using System.Runtime.InteropServices;
+﻿using Akade.IndexedSet.Utils;
+using System.Runtime.InteropServices;
 
 namespace Akade.IndexedSet.DataStructures.RTree;
 internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath>
 {
     public IEnumerable<TElement> IntersectWith(TEnvelope aabb)
     {
-        if (!TEnvelopeMath.Intersects(ref _root.Envelope, ref aabb))
+        if (Count == 0 || !TEnvelopeMath.Intersects(ref _root.Envelope, ref aabb))
         {
             return [];
         }
 
-        List<TElement> results = [];
-        Stack<ParentNode> stack = new();
+        List<TElement> results = new(16);
+        Stack<ParentNode> stack = ObjectPool<Stack<ParentNode>>.Instance.Rent();
 
-        stack.Push(_root);
-
-        while (stack.TryPop(out ParentNode? currentNode))
+        try
         {
-            if (!currentNode.HasInitializedEnvelope)
+            stack.Push(_root);
+
+            while (stack.TryPop(out ParentNode? currentNode))
             {
-                continue;
-            }
-            foreach (Node child in CollectionsMarshal.AsSpan(currentNode.Children))
-            {
-                if (TEnvelopeMath.Intersects(ref child.Envelope, ref aabb))
+                if (!currentNode.HasInitializedEnvelope)
                 {
-                    if (child is ParentNode childParentNode)
+                    continue;
+                }
+                foreach (Node child in CollectionsMarshal.AsSpan(currentNode.Children))
+                {
+                    if (TEnvelopeMath.Intersects(ref child.Envelope, ref aabb))
                     {
-                        stack.Push(childParentNode);
-                    }
-                    else if (child is LeafNode leafNode)
-                    {
-                        results.Add(leafNode.Element);
+                        if (child is ParentNode childParentNode)
+                        {
+                            stack.Push(childParentNode);
+                        }
+                        else if (child is LeafNode leafNode)
+                        {
+                            results.Add(leafNode.Element);
+                        }
                     }
                 }
             }
+        }
+        finally
+        {
+            stack.Clear();
+            ObjectPool<Stack<ParentNode>>.Instance.Return(stack);
         }
 
         return results;
@@ -42,32 +51,40 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 
     public IEnumerable<(TElement element, TValue distance)> GetNearestNeighbours(TPoint position)
     {
-        PriorityQueue<Node, TValue> queue = new();
-        queue.Enqueue(_root, TValue.Zero);
-
-        int count = 0;
-
-        while (queue.TryDequeue(out Node? currentNode, out TValue distance))
+        PriorityQueue<Node, TValue> queue = ObjectPool<PriorityQueue<Node, TValue>>.Instance.Rent();
+        try
         {
-            count++;
-            // Console.WriteLine($"Processing node {count} with distance {distance}");
-            if (currentNode is ParentNode parentNode)
+            queue.Enqueue(_root, TValue.Zero);
+
+            int count = 0;
+
+            while (queue.TryDequeue(out Node? currentNode, out TValue distance))
             {
+                count++;
+                // Console.WriteLine($"Processing node {count} with distance {distance}");
+                if (currentNode is ParentNode parentNode)
+                {
 #if NET9_0_OR_GREATER
-                foreach (Node child in CollectionsMarshal.AsSpan(parentNode.Children))
+                    foreach (Node child in CollectionsMarshal.AsSpan(parentNode.Children))
 #else
                     foreach (Node child in parentNode.Children)
 #endif
-                {
-                    TValue childDistance = TEnvelopeMath.DistanceToBoundary(ref child.Envelope, position);
+                    {
+                        TValue childDistance = TEnvelopeMath.DistanceToBoundary(ref child.Envelope, position);
 
-                    queue.Enqueue(child, childDistance);
+                        queue.Enqueue(child, childDistance);
+                    }
+                }
+                else if (currentNode is LeafNode leafNode)
+                {
+                    yield return (leafNode.Element, distance);
                 }
             }
-            else if (currentNode is LeafNode leafNode)
-            {
-                yield return (leafNode.Element, distance);
-            }
+        }
+        finally
+        {
+            queue.Clear();
+            ObjectPool<PriorityQueue<Node, TValue>>.Instance.Return(queue);
         }
     }
 }

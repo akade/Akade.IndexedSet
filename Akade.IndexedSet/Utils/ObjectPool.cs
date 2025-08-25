@@ -4,12 +4,11 @@ namespace Akade.IndexedSet.Utils;
 
 /// <summary>
 /// Concurrent object pool implementation with a fast single item slot for low contention scenarios
-/// Based on Microsoft.Extensions.ObjectPool
+/// Based on Microsoft.Extensions.ObjectPool (but only this code does not justify the dependency)
 /// </summary>
-internal class ObjectPool<T> where T : class, new()
+internal sealed class ObjectPool<T> where T : class, new()
 {
     public static ObjectPool<T> Instance { get; } = new();
-
 
     private readonly ConcurrentQueue<T> _values = new();
     private T? _fastItem;

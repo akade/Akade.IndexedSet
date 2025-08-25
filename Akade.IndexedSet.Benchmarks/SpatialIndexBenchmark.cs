@@ -2,7 +2,6 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using RBush;
-using System.ComponentModel;
 using System.Numerics;
 
 namespace Akade.IndexedSet.Benchmarks;
@@ -25,7 +24,7 @@ public class SpatialIndexBenchmark
     [GlobalSetup]
     public async Task SetupAsync()
     {
-        var swissZipCodes = await SwissZipCodes.LoadAsync("..\\..\\..\\..");
+        IEnumerable<SwissZipCode> swissZipCodes = await SwissZipCodes.LoadAsync("..\\..\\..\\..");
         _swissZipCodes = swissZipCodes.ToList();
         _setBulkLoaded = IndexedSetBuilder.Create(swissZipCodes)
                                           .WithSpatialIndex<Vector2>(x => x.Coordinates)
@@ -36,7 +35,6 @@ public class SpatialIndexBenchmark
                                              .Build();
 
         _rbushBulkLoaded.BulkLoad(swissZipCodes.Select(x => new SwissZipCodeRBushAdapter(x)));
-
 
         _swissZipCodes.ForEach(x =>
         {
@@ -57,6 +55,8 @@ public class SpatialIndexBenchmark
     [BenchmarkCategory("knn10")]
     public int Knn10Linq()
     {
+        // This is not entirely fair as both our R*Tree and RBush have rectangle comparisons to make
+        // but it is good to illustrate when to use and when not to
         return _swissZipCodes.OrderBy(x => Vector2.Distance(_min, x.Coordinates)).Take(10).Count();
     }
 
@@ -88,7 +88,6 @@ public class SpatialIndexBenchmark
         return _rbushNotBulkLoaded.Knn(10, _min.X, _min.Y).Count;
     }
 
-
     [Benchmark]
     [BenchmarkCategory("Area")]
     public int IndexedSet_Area_BulkLoaded()
@@ -116,13 +115,11 @@ public class SpatialIndexBenchmark
     {
         return _setNotBulkLoaded.NearestNeighbors<Vector2>(x => x.Coordinates, _min).Take(10).Count();
     }
-
-
 }
 
 public class SwissZipCodeRBushAdapter(SwissZipCode code) : ISpatialData
 {
-    private readonly Envelope _envelope = new Envelope(code.Coordinates.Easting, code.Coordinates.Northing, code.Coordinates.Easting, code.Coordinates.Northing);
+    private readonly Envelope _envelope = new(code.Coordinates.Easting, code.Coordinates.Northing, code.Coordinates.Easting, code.Coordinates.Northing);
 
     public ref readonly Envelope Envelope => ref _envelope;
 }

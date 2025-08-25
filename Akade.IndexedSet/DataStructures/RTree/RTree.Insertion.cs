@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Numerics;
 using System.Numerics.Tensors;
 using System.Runtime.InteropServices;
 
@@ -101,7 +100,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         node.Children.Add(child);
         return ResolveOverflowWithoutReinsertion(node);
     }
-     
+
     private InsertionResult RecursiveInsert(ParentNode node, LeafNode leafNode, int currentHeight)
     {
         node.MergeEnvelope(_getAABB(leafNode.Element));
