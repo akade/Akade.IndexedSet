@@ -41,7 +41,7 @@ public class RTreeTests
         foreach (SwissZipCode zipCode in zipCodeData)
         {
             VecRec2 zipCodeAABB = VecRec2.CreateFromPoint(zipCode.Coordinates);
-            if (Vector2Math.Contains(searchRect, zipCodeAABB))
+            if (Vector2Math.Contains(ref searchRect, ref zipCodeAABB))
             {
                 expectedResults.Add(zipCode);
             }

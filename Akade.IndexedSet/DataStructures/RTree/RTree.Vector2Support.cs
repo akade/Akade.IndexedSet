@@ -4,7 +4,7 @@ using System.Numerics;
 namespace Akade.IndexedSet.DataStructures.RTree;
 internal struct Vector2Math : IEnvelopeMath<Vector2, VecRec2, float>
 {
-    public static float Area(VecRec2 envelope)
+    public static float Area(ref VecRec2 envelope)
     {
         Vector2 size = envelope.Max - envelope.Min;
         return size.X * size.Y;
@@ -13,7 +13,7 @@ internal struct Vector2Math : IEnvelopeMath<Vector2, VecRec2, float>
     /// <summary>
     /// Checks if <paramref name="a"/> completely contains <paramref name="b"/>.
     /// </summary>
-    public static bool Contains(VecRec2 a, VecRec2 b)
+    public static bool Contains(ref VecRec2 a, ref VecRec2 b)
     {
         (Vector2 minA, Vector2 maxA) = a;
         (Vector2 minB, Vector2 maxB) = b;
@@ -21,7 +21,7 @@ internal struct Vector2Math : IEnvelopeMath<Vector2, VecRec2, float>
                minA.Y <= minB.Y && maxA.Y >= maxB.Y;
     }
 
-    public static void CopyCenterTo(VecRec2 envelope, Span<float> center)
+    public static void CopyCenterTo(ref VecRec2 envelope, Span<float> center)
     {
         (Vector2 a, Vector2 b) = envelope;
         Vector2 size = (b - a) / 2;
@@ -31,7 +31,7 @@ internal struct Vector2Math : IEnvelopeMath<Vector2, VecRec2, float>
         center[1] = centerPoint.Y;
     }
 
-    public static void CopyTo(VecRec2 envelope, ref VecRec2 target)
+    public static void CopyTo(ref VecRec2 envelope, ref VecRec2 target)
     {
         target.Min = envelope.Min;
         target.Max = envelope.Max;
@@ -58,12 +58,12 @@ internal struct Vector2Math : IEnvelopeMath<Vector2, VecRec2, float>
         return new VecRec2();
     }
 
-    public static int GetDimensions(VecRec2 memoryEnvelope)
+    public static int GetDimensions(ref VecRec2 memoryEnvelope)
     {
         return 2;
     }
 
-    public static float GetMax(VecRec2 envelope, int axis)
+    public static float GetMax(ref VecRec2 envelope, int axis)
     {
         return axis switch
         {
@@ -73,7 +73,7 @@ internal struct Vector2Math : IEnvelopeMath<Vector2, VecRec2, float>
         };
     }
 
-    public static float GetMin(VecRec2 envelope, int axis)
+    public static float GetMin(ref VecRec2 envelope, int axis)
     {
         return axis switch
         {
@@ -83,13 +83,13 @@ internal struct Vector2Math : IEnvelopeMath<Vector2, VecRec2, float>
         };
     }
 
-    public static float HalfPerimeter(VecRec2 envelope)
+    public static float HalfPerimeter(ref VecRec2 envelope)
     {
         Vector2 size = envelope.Size;
         return size.X + size.Y;
     }
 
-    public static float IntersectionArea(VecRec2 a, VecRec2 b)
+    public static float IntersectionArea(ref VecRec2 a, ref VecRec2 b)
     {
         (Vector2 minA, Vector2 maxA) = a;
         (Vector2 minB, Vector2 maxB) = b;
@@ -112,24 +112,24 @@ internal struct Vector2Math : IEnvelopeMath<Vector2, VecRec2, float>
                a.Min.Y <= b.Max.Y && a.Max.Y >= b.Min.Y;
     }
 
-    public static bool IsEmpty(VecRec2 memoryEnvelope)
+    public static bool IsEmpty(ref VecRec2 memoryEnvelope)
     {
         return memoryEnvelope.Min == memoryEnvelope.Max;
     }
 
-    public static void Merge(VecRec2 a, VecRec2 b, ref VecRec2 result)
+    public static void Merge(ref VecRec2 a, ref VecRec2 b, ref VecRec2 result)
     {
         result.Min = Vector2.Min(a.Min, b.Min);
         result.Max = Vector2.Max(a.Max, b.Max);
     }
 
-    public static void MergeInto(VecRec2 a, ref VecRec2 b)
+    public static void MergeInto(ref VecRec2 a, ref VecRec2 b)
     {
         b.Min = Vector2.Min(b.Min, a.Min);
         b.Max = Vector2.Max(b.Max, a.Max);
     }
 
-    public static string ToString(VecRec2 envelope)
+    public static string ToString(ref VecRec2 envelope)
     {
         return $"VecRec2(Min: {envelope.Min}, Max: {envelope.Max})";
     }

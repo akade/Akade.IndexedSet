@@ -32,11 +32,8 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         // pre allocate axis comparers for each axis
         _axisComparers = Enumerable.Range(0, _dimensions).Select(axis => new Comparison<Node>((x, y) =>
         {
-            TEnvelope aabbX = x.Envelope;
-            TEnvelope aabbY = y.Envelope;
-
-            TValue a = TEnvelopeMath.GetMin(aabbX, axis);
-            TValue b = TEnvelopeMath.GetMin(aabbY, axis);
+            TValue a = TEnvelopeMath.GetMin(ref x.Envelope, axis);
+            TValue b = TEnvelopeMath.GetMin(ref y.Envelope, axis);
 
             return a.CompareTo(b);
         })).ToArray();
@@ -75,9 +72,9 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             {
                 TEnvelope aabb = child.Envelope;
 
-                if (!TEnvelopeMath.Contains(parent, aabb))
+                if (!TEnvelopeMath.Contains(ref parent, ref aabb))
                 {
-                    throw new InvalidOperationException($"Child AABB {TEnvelopeMath.ToString(aabb)} is not contained in parent AABB {TEnvelopeMath.ToString(parent)}.");
+                    throw new InvalidOperationException($"Child AABB {TEnvelopeMath.ToString(ref aabb)} is not contained in parent AABB {TEnvelopeMath.ToString(ref parent)}.");
                 }
 
                 if (child is ParentNode parentChild)
@@ -95,41 +92,5 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         {
             throw new InvalidOperationException($"Count mismatch: Expected {Count}, but found {count} leaf nodes.");
         }
-    }
-
-    public TValue OverlapArea(ParentNode node)
-    {
-        TValue totalOverlap = TValue.Zero;
-
-        for (int i = 0; i < node.Children.Count; i++)
-        {
-            TEnvelope aabbA = node.Children[i].Envelope;
-            for (int j = i + 1; j < node.Children.Count; j++)
-            {
-                TEnvelope aabbB = node.Children[j].Envelope;
-                totalOverlap += TEnvelopeMath.IntersectionArea(aabbA, aabbB);
-            }
-        }
-        return totalOverlap;
-    }
-
-    public TValue TotalOverlapArea()
-    { 
-        TValue totalOverlap = TValue.Zero;
-        Stack<ParentNode> stack = new();
-        stack.Push(_root);
-
-        while (stack.TryPop(out ParentNode? node))
-        {
-            totalOverlap += OverlapArea(node);
-            foreach (Node child in node.Children)
-            {
-                if (child is ParentNode parentChild)
-                {
-                    stack.Push(parentChild);
-                }
-            }
-        }
-        return totalOverlap;
     }
 }

@@ -56,7 +56,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             ParentNode subParent = new();
             SplitAndAdd(subParent, elements);
             parent.Children.Add(subParent);
-            parent.MergeEnvelope(subParent.Envelope);
+            parent.MergeEnvelope(ref subParent.Envelope);
         }
         else
         {
