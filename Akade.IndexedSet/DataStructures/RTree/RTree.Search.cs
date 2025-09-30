@@ -70,6 +70,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
                     foreach (Node child in parentNode.Children)
 #endif
                     {
+                        // Todo: Distance squared?
                         TValue childDistance = TEnvelopeMath.DistanceToBoundary(ref child.Envelope, position);
 
                         queue.Enqueue(child, childDistance);

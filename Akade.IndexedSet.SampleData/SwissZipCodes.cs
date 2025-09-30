@@ -65,8 +65,11 @@ public sealed record class SwissZipCode
     public required int MunicipalityNumber { get; init; }
     public required string? CantonCode { get; init; }
     public required Coordinates Coordinates { get; init; }
+
     public required string Language { get; init; }
     public required string Validity { get; init; }
+    
+    public CoordinateRectangle CoordinateRectangle => new(Coordinates, Coordinates);
 
     public override string ToString()
     {
@@ -74,7 +77,6 @@ public sealed record class SwissZipCode
     }
 }
 
-[StructLayout(LayoutKind.Sequential, Pack = 0)]
 public readonly struct Coordinates
 {
     public readonly float Easting { get; }
@@ -94,5 +96,32 @@ public readonly struct Coordinates
     public static implicit operator Vector2(Coordinates coordinates)
     {
         return new Vector2(coordinates.Easting, coordinates.Northing);
+    }
+}
+
+public readonly struct CoordinateRectangle
+{
+    public readonly Coordinates Min { get; }
+
+    public readonly Coordinates Max { get; }
+
+    public CoordinateRectangle(Coordinates min, Coordinates max) : this()
+    {
+        Min = min;
+        Max = max;
+    }
+
+    public override string ToString()
+    {
+        return $"Min: {Min}, Max: {Max}";
+    }
+
+    public float DistanceTo(Vector2 point)
+    {
+        Vector2 min = Min;
+        Vector2 max = Max;
+        
+        var closestPoint = Vector2.Clamp(point, min, max);
+        return Vector2.Distance(closestPoint, point);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Akade.IndexedSet.SampleData;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Engines;
 using RBush;
 using System.Numerics;
 
@@ -20,6 +21,7 @@ public class SpatialIndexBenchmark
     private IndexedSet<SwissZipCode> _setNotBulkLoaded = null!;
     private readonly RBush<SwissZipCodeRBushAdapter> _rbushBulkLoaded = new(6);
     private readonly RBush<SwissZipCodeRBushAdapter> _rbushNotBulkLoaded = new(6);
+    private readonly Consumer _consumer = new();
 
     [GlobalSetup]
     public async Task SetupAsync()
@@ -45,75 +47,84 @@ public class SpatialIndexBenchmark
 
     [Benchmark(Baseline = true)]
     [BenchmarkCategory("Area")]
-    public int AreaLinq()
+    public void AreaLinq()
     {
-        return _swissZipCodes.Where(x => x.Coordinates.Easting >= _min.X && x.Coordinates.Northing >= _min.Y
-                                      && x.Coordinates.Easting <= _min.Y && x.Coordinates.Northing <= _max.Y).Count();
+        _swissZipCodes.Where(x => x.Coordinates.Easting >= _min.X && x.Coordinates.Northing >= _min.Y
+                               && x.Coordinates.Easting <= _min.Y && x.Coordinates.Northing <= _max.Y).Consume(_consumer);
     }
 
     [Benchmark(Baseline = true)]
     [BenchmarkCategory("knn10")]
-    public int Knn10Linq()
+    public void Knn10LinqPointBased()
     {
         // This is not entirely fair as both our R*Tree and RBush have rectangle comparisons to make
         // but it is good to illustrate when to use and when not to
-        return _swissZipCodes.OrderBy(x => Vector2.Distance(_min, x.Coordinates)).Take(10).Count();
-    }
-
-    [Benchmark]
-    [BenchmarkCategory("Area")]
-    public int RBush_Area_BulkLoaded()
-    {
-        return _rbushBulkLoaded.Search(new Envelope(_min.X, _min.Y, _max.X, _max.Y)).Count;
-    }
-
-    [Benchmark]
-    [BenchmarkCategory("Area")]
-    public int RBush_Area_NotBulkLoaded()
-    {
-        return _rbushNotBulkLoaded.Search(new Envelope(_min.X, _min.Y, _max.X, _max.Y)).Count;
+        _swissZipCodes.OrderBy(x => Vector2.Distance(_min, x.Coordinates)).Take(10).Consume(_consumer);
     }
 
     [Benchmark]
     [BenchmarkCategory("knn10")]
-    public int RBush_Knn10_BulkLoaded()
+    public void Knn10LinqRectangleBased()
     {
-        return _rbushBulkLoaded.Knn(10, _min.X, _min.Y).Count;
-    }
-
-    [Benchmark]
-    [BenchmarkCategory("knn10")]
-    public int RBush_Knn10_NotBulkLoaded()
-    {
-        return _rbushNotBulkLoaded.Knn(10, _min.X, _min.Y).Count;
+        // This is not entirely fair as both our R*Tree and RBush have rectangle comparisons to make
+        // but it is good to illustrate when to use and when not to
+        _swissZipCodes.OrderBy(x => x.CoordinateRectangle.DistanceTo(_min)).Take(10).Consume(_consumer);
     }
 
     [Benchmark]
     [BenchmarkCategory("Area")]
-    public int IndexedSet_Area_BulkLoaded()
+    public void RBush_Area_BulkLoaded()
     {
-        return _setBulkLoaded.Range<Vector2>(x => x.Coordinates, _min, _max).Count();
+        _rbushBulkLoaded.Search(new Envelope(_min.X, _min.Y, _max.X, _max.Y)).Consume(_consumer);
     }
 
     [Benchmark]
     [BenchmarkCategory("Area")]
-    public int IndexedSet_Area_NotBulkLoaded()
+    public void RBush_Area_NotBulkLoaded()
     {
-        return _setNotBulkLoaded.Range<Vector2>(x => x.Coordinates, _min, _max).Count();
+        _rbushNotBulkLoaded.Search(new Envelope(_min.X, _min.Y, _max.X, _max.Y)).Consume(_consumer);
     }
 
     [Benchmark]
     [BenchmarkCategory("knn10")]
-    public int IndexedSet_Knn10_BulkLoaded()
+    public void RBush_Knn10_BulkLoaded()
     {
-        return _setBulkLoaded.NearestNeighbors<Vector2>(x => x.Coordinates, _min).Take(10).Count();
+        _rbushBulkLoaded.Knn(10, _min.X, _min.Y).Consume(_consumer);
     }
 
     [Benchmark]
     [BenchmarkCategory("knn10")]
-    public int IndexedSet_Knn10_NotBulkLoaded()
+    public void RBush_Knn10_NotBulkLoaded()
     {
-        return _setNotBulkLoaded.NearestNeighbors<Vector2>(x => x.Coordinates, _min).Take(10).Count();
+        _rbushNotBulkLoaded.Knn(10, _min.X, _min.Y).Consume(_consumer);
+    }
+
+    [Benchmark]
+    [BenchmarkCategory("Area")]
+    public void IndexedSet_Area_BulkLoaded()
+    {
+        _setBulkLoaded.Range(x => x.Coordinates, _min, _max).Consume(_consumer);
+    }
+
+    [Benchmark]
+    [BenchmarkCategory("Area")]
+    public void IndexedSet_Area_NotBulkLoaded()
+    {
+        _setNotBulkLoaded.Range(x => x.Coordinates, _min, _max).Consume(_consumer);
+    }
+
+    [Benchmark]
+    [BenchmarkCategory("knn10")]
+    public void IndexedSet_Knn10_BulkLoaded()
+    {
+        _setBulkLoaded.NearestNeighbors(x => x.Coordinates, _min).Take(10).Consume(_consumer);
+    }
+
+    [Benchmark]
+    [BenchmarkCategory("knn10")]
+    public void IndexedSet_Knn10_NotBulkLoaded()
+    {
+        _setNotBulkLoaded.NearestNeighbors(x => x.Coordinates, _min).Take(10).Consume(_consumer);
     }
 }
 
