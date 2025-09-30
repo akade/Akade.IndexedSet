@@ -5,6 +5,7 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<IsPackable>false</IsPackable>
+    <DefineConstants>TEST</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -19,6 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Akade.IndexedSet.SampleData\Akade.IndexedSet.SampleData.csproj" />
 	  <ProjectReference Include="..\Akade.IndexedSet\Akade.IndexedSet.csproj" />
 	</ItemGroup>
 

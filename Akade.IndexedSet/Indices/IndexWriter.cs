@@ -1,4 +1,6 @@
 ﻿
+using Akade.IndexedSet.Utils;
+
 namespace Akade.IndexedSet.Indices;
 
 internal abstract class IndexWriter<TElement>
@@ -11,14 +13,22 @@ internal abstract class IndexWriter<TElement>
 }
 
 internal abstract class TypedIndexWriter<TElement, TIndexKey, TIndex> : IndexWriter<TElement>
+#if NET9_0_OR_GREATER
+    where TIndexKey : notnull, allows ref struct
+#else
     where TIndexKey : notnull
+#endif
     where TIndex : TypedIndex<TElement, TIndexKey>
 {
 
 }
 
 internal sealed class SingleKeyIndexWriter<TElement, TIndexKey, TIndex>(Func<TElement, TIndexKey> keyAccessor, TIndex index) : TypedIndexWriter<TElement, TIndexKey, TIndex>
+#if NET9_0_OR_GREATER
+    where TIndexKey : notnull, allows ref struct
+#else
     where TIndexKey : notnull
+#endif
     where TIndex : TypedIndex<TElement, TIndexKey>
 {
     private readonly Func<TElement, TIndexKey> _keyAccessor = keyAccessor;
@@ -31,7 +41,7 @@ internal sealed class SingleKeyIndexWriter<TElement, TIndexKey, TIndex>(Func<TEl
 
     internal override void AddRange(IEnumerable<TElement> elements)
     {
-        _index.AddRange(elements.Select(elem => KeyValuePair.Create(_keyAccessor(elem), elem)));
+        _index.AddRange(new KeyValueEnumerator<TIndexKey, TElement>(elements, _keyAccessor));
     }
 
     internal override void Remove(TElement element)
@@ -41,7 +51,11 @@ internal sealed class SingleKeyIndexWriter<TElement, TIndexKey, TIndex>(Func<TEl
 }
 
 internal sealed class MultiKeyIndexWriter<TElement, TIndexKey, TIndex>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, TIndex index) : TypedIndexWriter<TElement, TIndexKey, TIndex>
+#if NET9_0_OR_GREATER
+    where TIndexKey : notnull, allows ref struct
+#else
     where TIndexKey : notnull
+#endif
     where TIndex : TypedIndex<TElement, TIndexKey>
 {
     private readonly Func<TElement, IEnumerable<TIndexKey>> _keyAccessor = keyAccessor;
@@ -57,7 +71,7 @@ internal sealed class MultiKeyIndexWriter<TElement, TIndexKey, TIndex>(Func<TEle
 
     internal override void AddRange(IEnumerable<TElement> elements)
     {
-        _index.AddRange(elements.SelectMany(elem => _keyAccessor(elem).Select(key => KeyValuePair.Create(key, elem))));
+        _index.AddRange(new MultiKeyValueEnumerator<TIndexKey, TElement>(elements, _keyAccessor));
     }
 
     internal override void Remove(TElement element)

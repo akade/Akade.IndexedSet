@@ -1,4 +1,5 @@
 ﻿using Akade.IndexedSet.Indices;
+using Akade.IndexedSet.Utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Reflection;
 
@@ -37,7 +38,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
 
     protected void AddElements(TElement[] elements, TIndex index)
     {
-        index.AddRange(elements.Select(element => KeyValuePair.Create(_keyAccessor(element), element)));
+        index.AddRange(new KeyValueEnumerator<TIndexKey, TElement>(elements, _keyAccessor));
     }
 
     [BaseTestMethod]
