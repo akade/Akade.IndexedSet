@@ -18,7 +18,7 @@ internal struct Vector3Math : IEnvelopeMath<Vector3, VecRec3, float>
         (Vector3 minA, Vector3 maxA) = a;
         (Vector3 minB, Vector3 maxB) = b;
         return minA.X <= minB.X && maxA.X >= maxB.X && minA.Z <= minB.Z
-            && minA.Y <= minB.Y && maxA.Y >= maxB.Y && minA.Z >= minB.Z;
+            && minA.Y <= minB.Y && maxA.Y >= maxB.Y && maxA.Z >= maxB.Z;
     }
 
     public static void CopyCenterTo(ref VecRec3 envelope, Span<float> center)
