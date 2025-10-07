@@ -71,14 +71,14 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 #endif
                     {
                         // Todo: Distance squared?
-                        TValue childDistance = TEnvelopeMath.DistanceToBoundary(ref child.Envelope, position);
+                        TValue childDistance = TEnvelopeMath.DistanceToBoundarySquared(ref child.Envelope, position);
 
                         queue.Enqueue(child, childDistance);
                     }
                 }
                 else if (currentNode is LeafNode leafNode)
                 {
-                    yield return (leafNode.Element, distance);
+                    yield return (leafNode.Element, TValue.Sqrt(distance));
                 }
             }
         }

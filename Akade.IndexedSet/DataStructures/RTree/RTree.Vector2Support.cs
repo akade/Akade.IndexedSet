@@ -1,7 +1,7 @@
-﻿using System.Net.Http.Headers;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace Akade.IndexedSet.DataStructures.RTree;
+
 internal struct Vector2Math : IEnvelopeMath<Vector2, VecRec2, float>
 {
     public static float Area(ref VecRec2 envelope)
@@ -47,10 +47,10 @@ internal struct Vector2Math : IEnvelopeMath<Vector2, VecRec2, float>
         return VecRec2.CreateFromPoint(point);
     }
 
-    public static float DistanceToBoundary(ref VecRec2 envelope, Vector2 other)
+    public static float DistanceToBoundarySquared(ref VecRec2 envelope, Vector2 other)
     {
         var closestPoint = Vector2.Clamp(other, envelope.Min, envelope.Max);
-        return Vector2.Distance(closestPoint, other);
+        return Vector2.DistanceSquared(closestPoint, other);
     }
 
     public static VecRec2 Empty(int dimensions)

@@ -18,7 +18,7 @@ internal interface IEnvelopeMath<TPoint, TEnvelope, TValue>
 
     static abstract TValue Area(ref TEnvelope envelope);
     static abstract TValue HalfPerimeter(ref TEnvelope envelope);
-    static abstract TValue DistanceToBoundary(ref TEnvelope envelope, TPoint other);
+    static abstract TValue DistanceToBoundarySquared(ref TEnvelope envelope, TPoint other);
 
     static abstract void CopyCenterTo(ref TEnvelope envelope, Span<TValue> center);
 
