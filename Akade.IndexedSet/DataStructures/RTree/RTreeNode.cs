@@ -70,14 +70,9 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
         }
     }
 
-    internal sealed class LeafNode : Node
+    internal sealed class LeafNode(TElement element, TEnvelope envelope) : Node(envelope)
     {
-        public TElement Element { get; }
-
-        public LeafNode(TElement element, TEnvelope envelope) : base(envelope)
-        {
-            Element = element;
-        }
+        public TElement Element { get; } = element;
 
         public override string ToString()
         {

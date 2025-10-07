@@ -1,6 +1,5 @@
 ﻿using Akade.IndexedSet.Indices;
 using Akade.IndexedSet.Utils;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Reflection;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;

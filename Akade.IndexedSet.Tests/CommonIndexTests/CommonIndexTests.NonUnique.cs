@@ -1,5 +1,4 @@
 ﻿using Akade.IndexedSet.Indices;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
 
@@ -48,8 +47,8 @@ public partial class CommonIndexTests
         }
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(GetNonUniqueIndexTestMethods), DynamicDataSourceType.Method)]
+    [TestMethod]
+    [DynamicData(nameof(GetNonUniqueIndexTestMethods))]
     public void NonUniqueIndex(string method, object comparer)
     {
         BaseIndexTest.RunTest<NonUniqueIndexTest, IEqualityComparer<int>>(method, comparer);

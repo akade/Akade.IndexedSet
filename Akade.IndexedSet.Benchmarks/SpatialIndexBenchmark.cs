@@ -40,7 +40,7 @@ public class SpatialIndexBenchmark
 
         _swissZipCodes.ForEach(x =>
         {
-            _setNotBulkLoaded.Add(x);
+            _ = _setNotBulkLoaded.Add(x);
             _rbushNotBulkLoaded.Insert(new(x));
         });
     }

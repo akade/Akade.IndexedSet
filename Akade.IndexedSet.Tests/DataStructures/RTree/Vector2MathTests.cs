@@ -65,8 +65,8 @@ public class Vector2MathTests
     }
 
     [TestMethod]
-    [DataRow(1, 2, 4, 5, 0, 4)] 
-    [DataRow(1, 2, 4, 7, 1, 7)] 
+    [DataRow(1, 2, 4, 5, 0, 4)]
+    [DataRow(1, 2, 4, 7, 1, 7)]
     public void GetMax(float minX, float minY, float maxX, float maxY, int axis, float expectedValue)
     {
         VecRec2 env = new(new Vector2(minX, minY), new Vector2(maxX, maxY));
@@ -141,7 +141,7 @@ public class Vector2MathTests
         VecRec2 b = new(minB, maxB);
         VecRec2 result = new(min, max);
         Vector2Math.Merge(ref a, ref b, ref result);
-        
+
         Assert.AreEqual(min, result.Min);
         Assert.AreEqual(max, result.Max);
 

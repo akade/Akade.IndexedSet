@@ -10,15 +10,15 @@ namespace Akade.IndexedSet.SampleData;
 /// </summary>
 public static class SwissZipCodes
 {
-    private const string pathFromTests = "../../../../Akade.IndexedSet.SampleData/AMTOVZ_CSV_WGS84.csv";
+    private const string _pathFromTests = "../../../../Akade.IndexedSet.SampleData/AMTOVZ_CSV_WGS84.csv";
 
     public static async Task<IEnumerable<SwissZipCode>> LoadAsync(string? prefix = null)
     {
-        string path = pathFromTests;
+        string path = _pathFromTests;
 
         if (!string.IsNullOrEmpty(prefix))
         {
-            path = Path.Combine(prefix, pathFromTests);
+            path = Path.Combine(prefix, _pathFromTests);
             path = @"C:\Source\Repos\akade\Akade.IndexedSet\Akade.IndexedSet.SampleData\AMTOVZ_CSV_WGS84.csv";
         }
 

@@ -101,7 +101,7 @@ public class Vector3MathTests
 
     [TestMethod]
     // containing
-    [DataRow(1, 1, 1, 4, 5, 6, 2, 2, 2, 3, 3, 3, 1)] 
+    [DataRow(1, 1, 1, 4, 5, 6, 2, 2, 2, 3, 3, 3, 1)]
     // partial overlap
     [DataRow(0, 0, 0, 4, 3, 3, 2, 2, 2, 6, 6, 6, 2)]
     // no overlap

@@ -2,7 +2,6 @@ using Akade.IndexedSet.Concurrency;
 using Akade.IndexedSet.Tests.Data;
 using Akade.IndexedSet.Tests.TestUtilities;
 using Bogus;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.Concurrency;
 
@@ -26,7 +25,7 @@ public class ConcurrentSetTests
 
         Task[] tasks = _testData.Select(p => Task.Run(() => sut.Add(p))).ToArray();
         await Task.WhenAll(tasks);
-        Assert.AreEqual(_testData.Length, tasks.Length);
+        Assert.HasCount(_testData.Length, tasks);
         Assert.AreEqual(_testData.Length, sut.Count);
     }
 

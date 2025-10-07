@@ -23,15 +23,15 @@ public class AnalyzerAndCodeFixTests
         await VerifyCS.VerifyAnalyzerAsync(test);
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(AnalyzerTestCases), DynamicDataSourceType.Property)]
+    [TestMethod]
+    [DynamicData(nameof(AnalyzerTestCases))]
     public async Task Analyzer_reports_diagnostics(string input, DiagnosticResult diagnostic)
     {
         await VerifyCS.VerifyAnalyzerAsync(input, diagnostic);
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(CodeFixTestCases), DynamicDataSourceType.Property)]
+    [TestMethod]
+    [DynamicData(nameof(CodeFixTestCases))]
     public async Task Codefixes_work(string input, string fixedCode)
     {
         await VerifyCS.VerifyCodeFixAsync(input, fixedCode);

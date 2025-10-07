@@ -23,7 +23,7 @@ internal sealed class ObjectPool<T> where T : class, new()
         {
             if (_values.TryDequeue(out item))
             {
-                Interlocked.Decrement(ref _count);
+                _ = Interlocked.Decrement(ref _count);
                 return item;
             }
             return new T();
@@ -42,7 +42,7 @@ internal sealed class ObjectPool<T> where T : class, new()
             }
             else
             {
-                Interlocked.Decrement(ref _count);
+                _ = Interlocked.Decrement(ref _count);
             }
         }
     }

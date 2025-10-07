@@ -1,6 +1,4 @@
 ﻿using Akade.IndexedSet.DataStructures;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Akade.IndexedSet.Tests.DataStructures;
 
@@ -52,8 +50,6 @@ public class BinaryHeapTests
         Assert.AreEqual(8..9, _heap.GetRange(8));
         Assert.AreEqual(9..10, _heap.GetRange(9));
     }
-
-
 
     [TestMethod]
     public void Querying_by_single_values_returns_correct_position_with_zero_length_when_empty()

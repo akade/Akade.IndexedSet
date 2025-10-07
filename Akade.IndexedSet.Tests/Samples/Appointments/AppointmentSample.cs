@@ -112,7 +112,7 @@ public class AppointmentSample
     {
         // querying within the full-text-search index allows to perform a contains over a trie instead of comparing it on all elements
         Appointment meetingWith42InSubject = _appointments.Contains(x => x.Subject, "#42").Single();
-        Assert.IsTrue(meetingWith42InSubject.Subject.Contains("#42"));
+        Assert.Contains("#42", meetingWith42InSubject.Subject);
     }
 
     [TestMethod]
@@ -121,7 +121,7 @@ public class AppointmentSample
         // Fulltext and prefix indices support fuzzy matching to allow a certain number of errors (Levenshtein/edit distance)
         Appointment technicalDebtMeeting = _appointments.FuzzyContains(x => x.Subject, "Technical Det", 1).Single();
 
-        Assert.IsFalse(technicalDebtMeeting.Subject.Contains("Technical Det"));
-        Assert.IsTrue(technicalDebtMeeting.Subject.Contains("Technical Debt"));
+        Assert.DoesNotContain("Technical Det", technicalDebtMeeting.Subject);
+        Assert.Contains("Technical Debt", technicalDebtMeeting.Subject);
     }
 }

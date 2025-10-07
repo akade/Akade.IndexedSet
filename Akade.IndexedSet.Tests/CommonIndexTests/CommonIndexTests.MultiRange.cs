@@ -1,5 +1,4 @@
 ﻿using Akade.IndexedSet.Indices;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
 
@@ -50,8 +49,8 @@ public partial class CommonIndexTests
         }
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(GetMultiRangeIndexTestMethods), DynamicDataSourceType.Method)]
+    [TestMethod]
+    [DynamicData(nameof(GetMultiRangeIndexTestMethods))]
     public void MultiRangeIndex(string method, object comparer)
     {
         BaseIndexTest.RunTest<MultiRangeIndexTest, IComparer<int>>(method, comparer);

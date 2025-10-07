@@ -1,6 +1,5 @@
 ﻿using Akade.IndexedSet.Indices;
 using Akade.IndexedSet.StringUtilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
 
@@ -59,8 +58,8 @@ public partial class CommonIndexTests
         }
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(GetFullTextIndexTestMethods), DynamicDataSourceType.Method)]
+    [TestMethod]
+    [DynamicData(nameof(GetFullTextIndexTestMethods))]
     public void FullTextIndex(string method, object comparer)
     {
         BaseIndexTest.RunTest<FullTextIndexTest, IEqualityComparer<char>>(method, comparer);

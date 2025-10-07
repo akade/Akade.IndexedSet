@@ -1,6 +1,5 @@
 ﻿using Akade.IndexedSet.DataStructures.RTree;
 using Akade.IndexedSet.SampleData;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Numerics;
 
 namespace Akade.IndexedSet.Tests.DataStructures.RTree;
@@ -40,7 +39,7 @@ public class RTreeTests
         List<SwissZipCode> expectedResults = [];
         foreach (SwissZipCode zipCode in zipCodeData)
         {
-            VecRec2 zipCodeAABB = VecRec2.CreateFromPoint(zipCode.Coordinates);
+            var zipCodeAABB = VecRec2.CreateFromPoint(zipCode.Coordinates);
             if (Vector2Math.Contains(ref searchRect, ref zipCodeAABB))
             {
                 expectedResults.Add(zipCode);

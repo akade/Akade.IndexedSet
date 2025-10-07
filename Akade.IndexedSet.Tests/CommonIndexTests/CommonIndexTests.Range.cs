@@ -1,5 +1,4 @@
 ﻿using Akade.IndexedSet.Indices;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
 
@@ -25,7 +24,7 @@ public partial class CommonIndexTests
 
         protected override Container<int>[] GetNonUniqueData()
         {
-            if(_comparer == Comparer<int>.Default)
+            if (_comparer == Comparer<int>.Default)
             {
                 return
                 [
@@ -79,8 +78,8 @@ public partial class CommonIndexTests
         }
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(GetRangeIndexTestMethods), DynamicDataSourceType.Method)]
+    [TestMethod]
+    [DynamicData(nameof(GetRangeIndexTestMethods))]
     public void RangeIndex(string method, object comparer)
     {
         BaseIndexTest.RunTest<RangeIndexTest, IComparer<int>>(method, comparer);
