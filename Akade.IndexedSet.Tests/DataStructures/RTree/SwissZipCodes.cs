@@ -46,7 +46,7 @@ public class RTreeTests
             }
         }
 
-        IEnumerable<SwissZipCode> results = rTree.IntersectWith(searchRect);
+        IEnumerable<SwissZipCode> results = rTree.IntersectWith(searchRect, true);
         CollectionAssert.AreEquivalent(expectedResults, results.ToList());
     }
 

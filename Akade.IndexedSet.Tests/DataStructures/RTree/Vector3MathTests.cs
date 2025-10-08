@@ -119,17 +119,18 @@ public class Vector3MathTests
     }
 
     [TestMethod]
-    [DataRow(1, 1, 1, 4, 5, 6, 2, 2, 2, 3, 3, 3, true)] // containing
-    [DataRow(0, 0, 0, 4, 3, 3, 2, 2, 2, 6, 6, 6, true)] // partial overlap
+    [DataRow(1, 1, 1, 4, 5, 6, 2, 2, 2, 3, 3, 3, true, true)] // containing
+    [DataRow(0, 0, 0, 4, 3, 3, 2, 2, 2, 6, 6, 6, true, true)] // partial overlap
     [DataRow(0, 0, 0, 2, 2, 2, 3, 3, 3, 5, 5, 5, false)] // no overlap
     [DataRow(0, 0, 0, 2, 2, 2, 2, 0, 0, 4, 2, 2, true)] // touching edge
     public void Intersects(float minXA, float minYA, float minZA, float maxXA, float maxYA, float maxZA,
                            float minXB, float minYB, float minZB, float maxXB, float maxYB, float maxZB,
-                           bool intersects)
+                           bool intersects, bool intersectsWithBoundary = false)
     {
         VecRec3 a = new(new Vector3(minXA, minYA, minZA), new Vector3(maxXA, maxYA, maxZA));
         VecRec3 b = new(new Vector3(minXB, minYB, minZB), new Vector3(maxXB, maxYB, maxZB));
         Assert.AreEqual(intersects, Vector3Math.Intersects(ref a, ref b));
+        Assert.AreEqual(intersectsWithBoundary, Vector3Math.IntersectsWithoutBoundary(ref a, ref b));
     }
 
     [TestMethod]

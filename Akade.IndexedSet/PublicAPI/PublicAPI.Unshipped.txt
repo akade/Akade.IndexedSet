@@ -1,5 +1,7 @@
 ﻿#nullable enable
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Intersects<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, TIndexKey min, TIndexKey max, bool inclusiveBoundary = true, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
 Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.NearestNeighbors<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, TIndexKey value, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
+Akade.IndexedSet.IndexedSet<TElement>.Intersects<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, TIndexKey min, TIndexKey max, bool inclusiveBoundary = true, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
 Akade.IndexedSet.IndexedSet<TElement>.NearestNeighbors<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, TIndexKey value, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
 override Akade.IndexedSet.IndexedSetBuilder<TPrimaryKey, TElement>.WithSpatialIndex<TPoint>(System.Func<TElement, TPoint>! keyAccessor, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TPrimaryKey, TElement>!
 virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithSpatialIndex<TPoint>(System.Func<TElement, TPoint>! keyAccessor, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!

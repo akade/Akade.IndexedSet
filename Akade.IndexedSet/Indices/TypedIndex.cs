@@ -33,6 +33,11 @@ internal abstract class TypedIndex<TElement, TIndexKey>(string name) : Index<TEl
         throw new NotSupportedException($"Range queries are not supported on {GetType().Name}-indices. Use a range index to support this scenario.");
     }
 
+    internal virtual IEnumerable<TElement> Intersects(TIndexKey start, TIndexKey end, bool inclusiveBoundary)
+    {
+        throw new NotSupportedException($"Intersection queries are not supported on {GetType().Name}-indices. Use a spatial to support this scenario.");
+    }
+
     internal virtual IEnumerable<TElement> LessThan(TIndexKey value)
     {
         throw new NotSupportedException($"LessThan queries are not supported on {GetType().Name}-indices. Use a range index to support this scenario.");

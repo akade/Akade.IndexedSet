@@ -108,17 +108,20 @@ public class Vector2MathTests
     }
 
     [TestMethod]
-    [DataRow(1, 1, 4, 5, 2, 2, 3, 3, true)] // containing
-    [DataRow(0, 0, 4, 3, 2, 2, 6, 6, true)] // partial overlap
+    [DataRow(1, 1, 4, 5, 2, 2, 3, 3, true, true)] // containing
+    [DataRow(0, 0, 4, 3, 2, 2, 6, 6, true, true)] // partial overlap
     [DataRow(0, 0, 2, 2, 3, 3, 5, 5, false)] // no overlap
     [DataRow(0, 0, 2, 2, 2, 0, 4, 2, true)] // touching edge
+    [DataRow(0, 0, 2, 2, -2, -2, 0, 0, true)] // touching at min
+    [DataRow(0, 0, 2, 2, 2, 2, 4, 4, true)] // touching at max
     public void Intersects(float minXA, float minYA, float maxXA, float maxYA,
                              float minXB, float minYB, float maxXB, float maxYB,
-                             bool intersects)
+                             bool intersects, bool intersectsExcludingBoundary = false)
     {
         VecRec2 a = new(new Vector2(minXA, minYA), new Vector2(maxXA, maxYA));
         VecRec2 b = new(new Vector2(minXB, minYB), new Vector2(maxXB, maxYB));
         Assert.AreEqual(intersects, Vector2Math.Intersects(ref a, ref b));
+        Assert.AreEqual(intersectsExcludingBoundary, Vector2Math.IntersectsWithoutBoundary(ref a, ref b));
     }
 
     [TestMethod]

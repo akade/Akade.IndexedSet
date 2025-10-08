@@ -1,6 +1,9 @@
 ﻿namespace Akade.IndexedSet.Tests.CommonIndexTests;
 internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComparer>
 {
+    protected virtual bool SupportsStartsWithQueries => false;
+
+
     [BaseTestMethod]
     public void StartsWith_based_methods_should_throw_if_not_supported()
     {

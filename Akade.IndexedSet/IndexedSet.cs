@@ -276,6 +276,31 @@ public class IndexedSet<TElement>
     }
 
     /// <summary>
+    /// Returns a sequence of elements whose index values intersect the specified range. You can specify whether the range boundaries are inclusive or exclusive.
+    /// </summary>
+    /// <typeparam name="TIndexKey">The type of the index key</typeparam>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
+    /// Hence, the convention is to always use x as an identifier in case a lambda expression is used. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="min">The min corner of the boundary used for intersection. Use <paramref name="inclusiveBoundary"/> to control whether touching elements match.</param>
+    /// <param name="max">The max corner of the boundary used for intersection. Use <paramref name="inclusiveBoundary"/> to control whether touching elements match.</param>
+    /// <param name="inclusiveBoundary">True if touching elements should match, otherwise false.</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param> 
+    [Experimental(Experiments.IntersectionQuery, UrlFormat = Experiments.UrlTemplate)]
+    [ReadAccess]
+    public IEnumerable<TElement> Intersects<TIndexKey>(
+        Func<TElement, TIndexKey> indexAccessor,
+        TIndexKey min,
+        TIndexKey max,
+        bool inclusiveBoundary = true,
+        [CallerArgumentExpression(nameof(indexAccessor))] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        return typedIndex.Intersects(min, max, inclusiveBoundary);
+    }
+
+    /// <summary>
     /// Searches for multiple elements that are within a range via an index. You can specify whether the start/end are inclusive or exclusive
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the index key</typeparam>

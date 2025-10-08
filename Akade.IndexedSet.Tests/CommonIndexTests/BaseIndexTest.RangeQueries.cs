@@ -3,6 +3,9 @@
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
 internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComparer>
 {
+    protected virtual bool SupportsRangeBasedQueries => false;
+
+
     [BaseTestMethod]
     public void Range_based_methods_should_throw_if_not_supported()
     {

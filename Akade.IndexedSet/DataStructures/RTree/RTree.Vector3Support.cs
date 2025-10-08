@@ -120,6 +120,17 @@ internal struct Vector3Math : IEnvelopeMath<Vector3, VecRec3, float>
         return min.X <= max.X && min.Y <= max.Y && min.Z <= max.Z;
     }
 
+    public static bool IntersectsWithoutBoundary(ref VecRec3 a, ref VecRec3 b)
+    {
+        (Vector3 minA, Vector3 maxA) = a;
+        (Vector3 minB, Vector3 maxB) = b;
+
+        var min = Vector3.Max(minA, minB);
+        var max = Vector3.Min(maxA, maxB);
+
+        return min.X < max.X && min.Y < max.Y && min.Z < max.Z;
+    }
+
     public static bool IsEmpty(ref VecRec3 memoryEnvelope)
     {
         return memoryEnvelope.Min == memoryEnvelope.Max;

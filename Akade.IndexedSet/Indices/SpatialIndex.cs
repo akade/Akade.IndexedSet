@@ -43,13 +43,13 @@ internal sealed class SpatialIndex<TElement, TPoint, TEnvelope, TValue, TEnvelop
     internal override TElement Single(TPoint indexKey)
     {
         TEnvelope envelope = TEnvelopeMath.CreateFromPoint(indexKey);
-        return _tree.IntersectWith(envelope).SingleThrowingKeyNotFoundException();
+        return _tree.IntersectWith(envelope, true).SingleThrowingKeyNotFoundException();
     }
 
     internal override bool TryGetSingle(TPoint indexKey, out TElement? element)
     {
         TEnvelope envelope = TEnvelopeMath.CreateFromPoint(indexKey);
-        IEnumerable<TElement> allMatches = _tree.IntersectWith(envelope);
+        IEnumerable<TElement> allMatches = _tree.IntersectWith(envelope, true);
         IEnumerator<TElement> enumerator = allMatches.GetEnumerator();
 
         if (!enumerator.MoveNext())
@@ -65,14 +65,13 @@ internal sealed class SpatialIndex<TElement, TPoint, TEnvelope, TValue, TEnvelop
     internal override IEnumerable<TElement> Where(TPoint indexKey)
     {
         TEnvelope envelope = TEnvelopeMath.CreateFromPoint(indexKey);
-        return _tree.IntersectWith(envelope);
+        return _tree.IntersectWith(envelope, true);
     }
 
-    internal override IEnumerable<TElement> Range(TPoint start, TPoint end, bool inclusiveStart, bool inclusiveEnd)
+    internal override IEnumerable<TElement> Intersects(TPoint start, TPoint end, bool inclusiveBoundary)
     {
         TEnvelope bounds = TEnvelopeMath.Create(start, end);
-        // TODO: inclusivity is not handled yet
-        return _tree.IntersectWith(bounds);
+        return _tree.IntersectWith(bounds, inclusiveBoundary);
     }
 
     internal override IEnumerable<TElement> NearestNeighbors(TPoint indexKey)

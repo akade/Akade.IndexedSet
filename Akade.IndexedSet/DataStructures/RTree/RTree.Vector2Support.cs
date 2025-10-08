@@ -112,6 +112,12 @@ internal struct Vector2Math : IEnvelopeMath<Vector2, VecRec2, float>
                a.Min.Y <= b.Max.Y && a.Max.Y >= b.Min.Y;
     }
 
+    public static bool IntersectsWithoutBoundary(ref VecRec2 a, ref VecRec2 b)
+    {
+        return a.Min.X < b.Max.X && a.Max.X > b.Min.X &&
+               a.Min.Y < b.Max.Y && a.Max.Y > b.Min.Y;
+    }
+
     public static bool IsEmpty(ref VecRec2 memoryEnvelope)
     {
         return memoryEnvelope.Min == memoryEnvelope.Max;

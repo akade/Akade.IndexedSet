@@ -22,9 +22,6 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
 
     protected abstract bool SupportsNonUniqueKeys { get; }
 
-    protected virtual bool SupportsRangeBasedQueries => false;
-    protected virtual bool SupportsStartsWithQueries => false;
-    protected virtual bool SupportsContainsQueries => false;
 
     protected abstract TIndex CreateIndex();
 

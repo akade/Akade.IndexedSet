@@ -7,6 +7,8 @@ using System.Numerics;
 
 namespace Akade.IndexedSet.Benchmarks;
 
+#pragma warning disable AkadeIndexedSetEXP0002 
+
 [MemoryDiagnoser]
 [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net90)]
@@ -103,7 +105,7 @@ public class SpatialIndexBenchmark
     [BenchmarkCategory("Area")]
     public void IndexedSet_Area_BulkLoaded()
     {
-        _setBulkLoaded.Range(x => x.Coordinates, _min, _max).Consume(_consumer);
+        _setBulkLoaded.Intersects(x => x.Coordinates, _min, _max).Consume(_consumer);
     }
 
     [Benchmark]
@@ -134,3 +136,4 @@ public class SwissZipCodeRBushAdapter(SwissZipCode code) : ISpatialData
 
     public ref readonly Envelope Envelope => ref _envelope;
 }
+#pragma warning restore AkadeIndexedSetEXP0002

@@ -2,9 +2,10 @@
 using System.Runtime.InteropServices;
 
 namespace Akade.IndexedSet.DataStructures.RTree;
+
 internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath>
 {
-    public IEnumerable<TElement> IntersectWith(TEnvelope aabb)
+    public IEnumerable<TElement> IntersectWith(TEnvelope aabb, bool inclusiveBoundary)
     {
         if (Count == 0 || !TEnvelopeMath.Intersects(ref _root.Envelope, ref aabb))
         {
@@ -46,7 +47,18 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             ObjectPool<Stack<ParentNode>>.Instance.Return(stack);
         }
 
-        return results;
+        // This is a bit inefficient compared with having a different implementation each
+        // but using generic instantiation on struct strategy would make it both harder to understand
+        // as well as increase the code size, so this is a good trade-off for the common case
+        return inclusiveBoundary switch
+        {
+            true => results,
+            false => results.Where(elem =>
+            {
+                TEnvelope envelope = _getAABB(elem);
+                return TEnvelopeMath.IntersectsWithoutBoundary(ref envelope, ref aabb);
+            })
+        };
     }
 
     public IEnumerable<(TElement element, TValue distance)> GetNearestNeighbours(TPoint position)
@@ -70,7 +82,6 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
                     foreach (Node child in parentNode.Children)
 #endif
                     {
-                        // Todo: Distance squared?
                         TValue childDistance = TEnvelopeMath.DistanceToBoundarySquared(ref child.Envelope, position);
 
                         queue.Enqueue(child, childDistance);
