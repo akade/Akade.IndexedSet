@@ -1,5 +1,4 @@
 ﻿using Akade.IndexedSet.Concurrency;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.Samples;
 

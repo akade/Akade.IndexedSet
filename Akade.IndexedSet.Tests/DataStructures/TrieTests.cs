@@ -1,7 +1,5 @@
 ﻿using Akade.IndexedSet.DataStructures;
 using Akade.IndexedSet.StringUtilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Akade.IndexedSet.Tests.DataStructures;
 

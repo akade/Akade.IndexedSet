@@ -1,6 +1,4 @@
 ﻿using Akade.IndexedSet.Tests.TestUtilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Akade.IndexedSet.Tests.Samples.Appointments;
 

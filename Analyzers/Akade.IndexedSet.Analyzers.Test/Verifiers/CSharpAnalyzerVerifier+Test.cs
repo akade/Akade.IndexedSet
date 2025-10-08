@@ -5,7 +5,6 @@ using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 using System.Diagnostics;
-using System.IO;
 
 namespace Akade.IndexedSet.Analyzers.Test;
 
