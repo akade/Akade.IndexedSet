@@ -35,7 +35,7 @@ internal abstract class TypedIndex<TElement, TIndexKey>(string name) : Index<TEl
 
     internal virtual IEnumerable<TElement> Intersects(TIndexKey start, TIndexKey end, bool inclusiveBoundary)
     {
-        throw new NotSupportedException($"Intersection queries are not supported on {GetType().Name}-indices. Use a spatial to support this scenario.");
+        throw new NotSupportedException($"Intersection queries are not supported on {GetType().Name}-indices. Use a spatial index to support this scenario.");
     }
 
     internal virtual IEnumerable<TElement> LessThan(TIndexKey value)

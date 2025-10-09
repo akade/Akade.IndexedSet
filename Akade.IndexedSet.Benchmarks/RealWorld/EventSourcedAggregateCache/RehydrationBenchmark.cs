@@ -3,7 +3,6 @@ using BenchmarkDotNet.Attributes;
 
 namespace Akade.IndexedSet.Benchmarks.RealWorld.EventSourcedAggregateCache;
 
-[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net80)]
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net90)]
 public class RehydrationBenchmark
 {

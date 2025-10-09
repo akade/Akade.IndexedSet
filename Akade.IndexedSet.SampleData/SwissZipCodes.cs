@@ -18,7 +18,6 @@ public static class SwissZipCodes
         if (!string.IsNullOrEmpty(prefix))
         {
             path = Path.Combine(prefix, _pathFromTests);
-            path = @"C:\Source\Repos\akade\Akade.IndexedSet\Akade.IndexedSet.SampleData\AMTOVZ_CSV_WGS84.csv";
         }
 
         await using FileStream stream = File.OpenRead(path);

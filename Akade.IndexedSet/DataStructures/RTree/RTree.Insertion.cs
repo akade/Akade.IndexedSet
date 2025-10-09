@@ -373,7 +373,6 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
 
     private List<Node> GetNodesForReinsertaion(ParentNode node)
     {
-        // TODO: think about optimizing, maybe with an comparer that has preallocated buffers and can be initialized with the center of the AABB
         node.Children.Sort((left, right) =>
         {
             Span<TValue> center = stackalloc TValue[_dimensions];

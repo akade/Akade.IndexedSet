@@ -71,7 +71,7 @@ internal struct Vector3Math : IEnvelopeMath<Vector3, VecRec3, float>
             0 => envelope.Max.X,
             1 => envelope.Max.Y,
             2 => envelope.Max.Z,
-            _ => throw new ArgumentOutOfRangeException(nameof(axis), "Axis must be 0 or 1 for VecRec3.")
+            _ => throw new ArgumentOutOfRangeException(nameof(axis), "Axis must be 0, 1 or 2 for VecRec3.")
         };
     }
 
@@ -82,7 +82,7 @@ internal struct Vector3Math : IEnvelopeMath<Vector3, VecRec3, float>
             0 => envelope.Min.X,
             1 => envelope.Min.Y,
             2 => envelope.Min.Z,
-            _ => throw new ArgumentOutOfRangeException(nameof(axis), "Axis must be 0 or 1 for VecRec3.")
+            _ => throw new ArgumentOutOfRangeException(nameof(axis), "Axis must be 0, 1 or 2 for VecRec3.")
         };
     }
 

@@ -52,7 +52,7 @@ public class SpatialIndexBenchmark
     public void AreaLinq()
     {
         _swissZipCodes.Where(x => x.Coordinates.Easting >= _min.X && x.Coordinates.Northing >= _min.Y
-                               && x.Coordinates.Easting <= _min.Y && x.Coordinates.Northing <= _max.Y).Consume(_consumer);
+                               && x.Coordinates.Easting <= _max.Y && x.Coordinates.Northing <= _max.Y).Consume(_consumer);
     }
 
     [Benchmark(Baseline = true)]
@@ -112,7 +112,7 @@ public class SpatialIndexBenchmark
     [BenchmarkCategory("Area")]
     public void IndexedSet_Area_NotBulkLoaded()
     {
-        _setNotBulkLoaded.Range(x => x.Coordinates, _min, _max).Consume(_consumer);
+        _setNotBulkLoaded.Intersects(x => x.Coordinates, _min, _max).Consume(_consumer);
     }
 
     [Benchmark]
