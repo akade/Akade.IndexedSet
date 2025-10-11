@@ -1,6 +1,5 @@
 ﻿using Akade.IndexedSet.Indices;
 using Akade.IndexedSet.StringUtilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
 
@@ -60,8 +59,8 @@ public partial class CommonIndexTests
         }
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(GetPrefixIndexTestMethods), DynamicDataSourceType.Method)]
+    [TestMethod]
+    [DynamicData(nameof(GetPrefixIndexTestMethods))]
     public void PrefixIndex(string method, object comparer)
     {
         BaseIndexTest.RunTest<PrefixIndexTest, IEqualityComparer<char>>(method, comparer);

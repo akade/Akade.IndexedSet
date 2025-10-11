@@ -1,5 +1,6 @@
 ﻿using Akade.IndexedSet.DataStructures;
 using Akade.IndexedSet.Extensions;
+using Akade.IndexedSet.Utils;
 
 namespace Akade.IndexedSet.Indices;
 
@@ -7,7 +8,7 @@ namespace Akade.IndexedSet.Indices;
 /// O(log(n)) range queries based on <see cref="SortedLookup{TKey, TValue}"/>. Filters for distinct values as it is used
 /// for indices where elements can have multiple keys.
 /// </summary>
-internal class MultiRangeIndex<TElement, TIndexKey>(IComparer<TIndexKey> keyComparer, string name) : TypedIndex<TElement, TIndexKey>(name)
+internal sealed class MultiRangeIndex<TElement, TIndexKey>(IComparer<TIndexKey> keyComparer, string name) : TypedIndex<TElement, TIndexKey>(name)
     where TIndexKey : notnull
 {
     private readonly SortedLookup<TIndexKey, TElement> _lookup = new(keyComparer);
@@ -17,9 +18,9 @@ internal class MultiRangeIndex<TElement, TIndexKey>(IComparer<TIndexKey> keyComp
         _lookup.Add(key, value);
     }
 
-    internal override void AddRange(IEnumerable<KeyValuePair<TIndexKey, TElement>> elementsToAdd)
+    internal override void AddRange(IKeyValueEnumerator<TIndexKey, TElement> elementsToAdd)
     {
-        _lookup.AddRange(elementsToAdd);
+        _lookup.AddRange(elementsToAdd.AsEnumerable());
     }
 
     internal override void Remove(TIndexKey key, TElement value)

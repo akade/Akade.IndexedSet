@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace Akade.IndexedSet.Tests.Samples.Leaderboard;
+﻿namespace Akade.IndexedSet.Tests.Samples.Leaderboard;
 
 [TestClass]
 public class LeaderboardSample

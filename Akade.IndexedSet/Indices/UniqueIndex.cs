@@ -1,9 +1,11 @@
-﻿namespace Akade.IndexedSet.Indices;
+﻿using Akade.IndexedSet.Utils;
+
+namespace Akade.IndexedSet.Indices;
 
 /// <summary>
 /// Unique index providing O(1) retrieval and insertion as well as enforcing unqueness
 /// </summary>
-internal class UniqueIndex<TElement, TIndexKey>(IEqualityComparer<TIndexKey> equalityComparer, string name) : TypedIndex<TElement, TIndexKey>(name)
+internal sealed class UniqueIndex<TElement, TIndexKey>(IEqualityComparer<TIndexKey> equalityComparer, string name) : TypedIndex<TElement, TIndexKey>(name)
     where TIndexKey : notnull
 {
     private readonly Dictionary<TIndexKey, TElement> _data = new(equalityComparer);
@@ -20,9 +22,9 @@ internal class UniqueIndex<TElement, TIndexKey>(IEqualityComparer<TIndexKey> equ
         }
     }
 
-    internal override void AddRange(IEnumerable<KeyValuePair<TIndexKey, TElement>> elementsToAdd)
+    internal override void AddRange(IKeyValueEnumerator<TIndexKey, TElement> elementsToAdd)
     {
-        if (elementsToAdd.TryGetNonEnumeratedCount(out int count))
+        if (elementsToAdd.TryGetEstimatedCount(out int count))
         {
             _ = _data.EnsureCapacity(_data.Count + count);
         }

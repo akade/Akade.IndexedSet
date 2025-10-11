@@ -1,5 +1,4 @@
 using Akade.IndexedSet.Tests.Data;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests;
 

@@ -5,13 +5,14 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<IsPackable>false</IsPackable>
+    <DefineConstants>TEST</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Bogus" Version="35.6.3" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-		<PackageReference Include="MSTest.TestAdapter" Version="3.10.3" />
-		<PackageReference Include="MSTest.TestFramework" Version="3.10.4" />
+		<PackageReference Include="Bogus" Version="35.6.4" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
+		<PackageReference Include="MSTest.TestAdapter" Version="4.0.0" />
+		<PackageReference Include="MSTest.TestFramework" Version="4.0.0" />
 		<PackageReference Include="coverlet.collector" Version="6.0.4">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -19,6 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Akade.IndexedSet.SampleData\Akade.IndexedSet.SampleData.csproj" />
 	  <ProjectReference Include="..\Akade.IndexedSet\Akade.IndexedSet.csproj" />
 	</ItemGroup>
 

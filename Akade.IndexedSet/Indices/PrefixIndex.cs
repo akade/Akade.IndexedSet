@@ -2,7 +2,7 @@
 using Akade.IndexedSet.Extensions;
 
 namespace Akade.IndexedSet.Indices;
-internal class PrefixIndex<TElement>(IEqualityComparer<char> equalityComparer, string name) : TypedIndex<TElement, string>(name)
+internal sealed class PrefixIndex<TElement>(IEqualityComparer<char> equalityComparer, string name) : TypedIndex<TElement, string>(name)
 {
     private readonly Trie<TElement> _trie = new(equalityComparer);
 

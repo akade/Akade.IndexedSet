@@ -4,6 +4,7 @@ using Akade.IndexedSet.Concurrency;
 using Akade.IndexedSet.Indices;
 using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Akade.IndexedSet;
@@ -272,6 +273,31 @@ public class IndexedSet<TElement>
     {
         TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
         return typedIndex.Range(start, end, inclusiveStart, inclusiveEnd);
+    }
+
+    /// <summary>
+    /// Returns a sequence of elements whose index values intersect the specified range. You can specify whether the range boundaries are inclusive or exclusive.
+    /// </summary>
+    /// <typeparam name="TIndexKey">The type of the index key</typeparam>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
+    /// Hence, the convention is to always use x as an identifier in case a lambda expression is used. 
+    /// Is passed to <paramref name="indexName"/> using <see cref="CallerArgumentExpressionAttribute"/>.</param>
+    /// <param name="min">The min corner of the boundary used for intersection. Use <paramref name="inclusiveBoundary"/> to control whether touching elements match.</param>
+    /// <param name="max">The max corner of the boundary used for intersection. Use <paramref name="inclusiveBoundary"/> to control whether touching elements match.</param>
+    /// <param name="inclusiveBoundary">True if touching elements should match, otherwise false.</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param> 
+    [Experimental(Experiments.IntersectionQuery, UrlFormat = Experiments.UrlTemplate)]
+    [ReadAccess]
+    public IEnumerable<TElement> Intersects<TIndexKey>(
+        Func<TElement, TIndexKey> indexAccessor,
+        TIndexKey min,
+        TIndexKey max,
+        bool inclusiveBoundary = true,
+        [CallerArgumentExpression(nameof(indexAccessor))] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        return typedIndex.Intersects(min, max, inclusiveBoundary);
     }
 
     /// <summary>
@@ -728,6 +754,23 @@ public class IndexedSet<TElement>
         return typedIndex.FuzzyContains(infix, maxDistance);
     }
 
+
+    /// <summary>
+    /// Returns the nearest neighbors of the given value, lazily enumerating from the closest to the furthest neighbors.
+    /// Currently supports <see cref="Vector2"/> and <see cref="Vector3"/> as index keys.
+    /// </summary>
+    /// <typeparam name="TIndexKey"><see cref="Vector2"/> or <see cref="Vector3"/> </typeparam>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. </param>
+    /// <param name="value">The point to search the closest neighbors from</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
+    public IEnumerable<TElement> NearestNeighbors<TIndexKey>(Func<TElement, TIndexKey> indexAccessor, TIndexKey value, [CallerArgumentExpression(nameof(indexAccessor))] string? indexName = null)
+        where TIndexKey : notnull
+    {
+        TypedIndex<TElement, TIndexKey> typedIndex = GetIndex<TIndexKey>(indexName);
+        return typedIndex.NearestNeighbors(value);
+    }
+
     /// <summary>
     /// Returns all values by fully enumerating the entire set.
     /// </summary>
@@ -834,14 +877,22 @@ public class IndexedSet<TElement>
     }
 
     internal void AddIndex<TIndexKey, TIndex>(Func<TElement, TIndexKey> indexAccessor, TIndex index)
+#if NET9_0_OR_GREATER
+        where TIndexKey : notnull, allows ref struct
+#else
         where TIndexKey : notnull
+#endif
         where TIndex : TypedIndex<TElement, TIndexKey>
     {
         AddIndex(new SingleKeyIndexWriter<TElement, TIndexKey, TIndex>(indexAccessor, index), index);
     }
 
     internal void AddIndex<TIndexKey, TIndex>(Func<TElement, IEnumerable<TIndexKey>> indexAccessor, TIndex index)
+#if NET9_0_OR_GREATER
+        where TIndexKey : notnull, allows ref struct
+#else
         where TIndexKey : notnull
+#endif
         where TIndex : TypedIndex<TElement, TIndexKey>
     {
         AddIndex(new MultiKeyIndexWriter<TElement, TIndexKey, TIndex>(indexAccessor, index), index);

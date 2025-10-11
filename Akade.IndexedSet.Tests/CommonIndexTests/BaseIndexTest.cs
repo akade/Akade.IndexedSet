@@ -1,5 +1,5 @@
 ﻿using Akade.IndexedSet.Indices;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Akade.IndexedSet.Utils;
 using System.Reflection;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
@@ -22,9 +22,6 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
 
     protected abstract bool SupportsNonUniqueKeys { get; }
 
-    protected virtual bool SupportsRangeBasedQueries => false;
-    protected virtual bool SupportsStartsWithQueries => false;
-    protected virtual bool SupportsContainsQueries => false;
 
     protected abstract TIndex CreateIndex();
 
@@ -37,7 +34,7 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
 
     protected void AddElements(TElement[] elements, TIndex index)
     {
-        index.AddRange(elements.Select(element => KeyValuePair.Create(_keyAccessor(element), element)));
+        index.AddRange(new KeyValueEnumerator<TIndexKey, TElement>(elements, _keyAccessor));
     }
 
     [BaseTestMethod]

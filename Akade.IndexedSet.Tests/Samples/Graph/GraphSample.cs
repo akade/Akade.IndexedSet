@@ -1,8 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
-
-namespace Akade.IndexedSet.Tests.Samples.Graph;
+﻿namespace Akade.IndexedSet.Tests.Samples.Graph;
 
 [TestClass]
 public class GraphSample

@@ -1,19 +1,25 @@
-﻿namespace Akade.IndexedSet.Indices;
+﻿using Akade.IndexedSet.Utils;
+
+namespace Akade.IndexedSet.Indices;
 
 /// <summary>
 /// Fully-generic index including on the index key
 /// </summary>
 internal abstract class TypedIndex<TElement, TIndexKey>(string name) : Index<TElement>(name)
+#if NET9_0_OR_GREATER
+    where TIndexKey : notnull, allows ref struct
+#else
     where TIndexKey : notnull
+#endif
 {
     internal abstract void Add(TIndexKey key, TElement value);
     internal abstract void Remove(TIndexKey key, TElement value);
 
-    internal virtual void AddRange(IEnumerable<KeyValuePair<TIndexKey, TElement>> enumerable)
+    internal virtual void AddRange(IKeyValueEnumerator<TIndexKey, TElement> elementsToAdd)
     {
-        foreach (KeyValuePair<TIndexKey, TElement> kvp in enumerable)
+        while (elementsToAdd.MoveNext())
         {
-            Add(kvp.Key, kvp.Value);
+            Add(elementsToAdd.CurrentKey, elementsToAdd.CurrentValue);
         }
     }
 
@@ -25,6 +31,11 @@ internal abstract class TypedIndex<TElement, TIndexKey>(string name) : Index<TEl
     internal virtual IEnumerable<TElement> Range(TIndexKey start, TIndexKey end, bool inclusiveStart, bool inclusiveEnd)
     {
         throw new NotSupportedException($"Range queries are not supported on {GetType().Name}-indices. Use a range index to support this scenario.");
+    }
+
+    internal virtual IEnumerable<TElement> Intersects(TIndexKey start, TIndexKey end, bool inclusiveBoundary)
+    {
+        throw new NotSupportedException($"Intersection queries are not supported on {GetType().Name}-indices. Use a spatial index to support this scenario.");
     }
 
     internal virtual IEnumerable<TElement> LessThan(TIndexKey value)
@@ -95,6 +106,11 @@ internal abstract class TypedIndex<TElement, TIndexKey>(string name) : Index<TEl
     internal virtual IEnumerable<TElement> Contains(ReadOnlySpan<char> indexKey)
     {
         throw new NotSupportedException($"Contain queries are not supported on {GetType().Name}-indices. Use a full text to support this scenario.");
+    }
+
+    internal virtual IEnumerable<TElement> NearestNeighbors(TIndexKey indexKey)
+    {
+        throw new NotSupportedException($"Nearest queries are not supported on {GetType().Name}-indices. Use a spatial or vector index to support this scenario.");
     }
 
 }

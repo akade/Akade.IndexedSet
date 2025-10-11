@@ -1,6 +1,5 @@
 ﻿using Bogus;
 using Bogus.DataSets;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.Samples.Search;
 
@@ -44,8 +43,7 @@ public class NGramsSample
                                       .Distinct()
                                       .ToArray();
 
-
-        Assert.IsTrue(searchResult.Length > 0);
+        Assert.IsNotEmpty(searchResult);
     }
 }
 

@@ -1,9 +1,11 @@
 ﻿using Akade.IndexedSet.Tests.TestUtilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
 internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComparer>
 {
+    protected virtual bool SupportsRangeBasedQueries => false;
+
+
     [BaseTestMethod]
     public void Range_based_methods_should_throw_if_not_supported()
     {
@@ -16,9 +18,9 @@ internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComp
             _ = Assert.ThrowsExactly<NotSupportedException>(() => index.GreaterThan(GetNotExistingKey()));
             _ = Assert.ThrowsExactly<NotSupportedException>(() => index.GreaterThanOrEqual(GetNotExistingKey()));
             _ = Assert.ThrowsExactly<NotSupportedException>(() => index.Min());
-            _ = Assert.ThrowsExactly<NotSupportedException>(() => index.MinBy());
+            _ = Assert.ThrowsExactly<NotSupportedException>(index.MinBy);
             _ = Assert.ThrowsExactly<NotSupportedException>(() => index.Max());
-            _ = Assert.ThrowsExactly<NotSupportedException>(() => index.MaxBy());
+            _ = Assert.ThrowsExactly<NotSupportedException>(index.MaxBy);
             _ = Assert.ThrowsExactly<NotSupportedException>(() => index.OrderBy(0));
             _ = Assert.ThrowsExactly<NotSupportedException>(() => index.OrderByDescending(0));
         }

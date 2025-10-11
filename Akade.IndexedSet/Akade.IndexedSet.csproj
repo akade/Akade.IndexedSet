@@ -23,10 +23,10 @@
 		<EnablePackageValidation>true</EnablePackageValidation>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 	</PropertyGroup>
-	
+
 	<ItemGroup>
 		<None Include="..\README.md" Pack="true" PackagePath="\" />
-		<InternalsVisibleTo Include="Akade.IndexedSet.Tests" />
+    <InternalsVisibleTo Include="Akade.IndexedSet.Tests" />
 	</ItemGroup>
 	
 	<ItemGroup>
@@ -34,6 +34,7 @@
 	    <PrivateAssets>all</PrivateAssets>
 	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	  </PackageReference>
+	  <PackageReference Include="System.Numerics.Tensors" Version="9.0.9" />
 	</ItemGroup>
 	
 	<ItemGroup>
@@ -45,6 +46,8 @@
 	<ItemGroup Label="Package">
 		<None Include="..\Analyzers\Akade.IndexedSet.Analyzers\bin\$(Configuration)\netstandard2.0\Akade.IndexedSet.Analyzers.dll" PackagePath="analyzers/dotnet/cs" Pack="true" Visible="false" />
 		<None Include="..\Analyzers\Akade.IndexedSet.Analyzers.Fixes\bin\$(Configuration)\netstandard2.0\Akade.IndexedSet.Analyzers.Fixes.dll" PackagePath="analyzers/dotnet/cs" Pack="true" Visible="false" />
+		<None Include="DataStructures\RTree\RTree.Vector3Support.cs" />
+		<None Include="DataStructures\RTree\RTree.Vector2Support.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
