@@ -27,7 +27,6 @@ public class PrefixIndexBenchmarks
                               .WithPrefixIndex(x => x.FullName)
                               .Build();
 
-        
     }
 
     [GlobalSetup]
