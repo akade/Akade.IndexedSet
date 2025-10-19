@@ -1,4 +1,6 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿using Autypo;
+using Autypo.Configuration;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using Bogus;
 
@@ -11,6 +13,8 @@ public class PrefixIndexBenchmarks
 {
     private readonly List<Person> _persons;
     private readonly IndexedSet<Person> _indexedSet;
+    private IAutypoSearch<Person> _autoTypo = null!;
+    private IAutypoSearch<Person> _autoTypoFuzzy = null!;
 
     public PrefixIndexBenchmarks()
     {
@@ -22,7 +26,22 @@ public class PrefixIndexBenchmarks
         _indexedSet = _persons.ToIndexedSet()
                               .WithPrefixIndex(x => x.FullName)
                               .Build();
+
+        
     }
+
+    [GlobalSetup]
+    public async Task InitAsync()
+    {
+        _autoTypo = await AutypoFactory.CreateSearchAsync<Person>(config => 
+            config.WithDataSource(_persons)
+                  .WithIndex(x => x.FullName, x => x.WithFuzziness(0)));
+
+        _autoTypoFuzzy = await AutypoFactory.CreateSearchAsync<Person>(config =>
+            config.WithDataSource(_persons)
+                  .WithIndex(x => x.FullName, x => x.WithFuzziness(2)));
+    }
+
 
     [Benchmark(Baseline = true)]
     [BenchmarkCategory("StartsWith")]
@@ -38,6 +57,13 @@ public class PrefixIndexBenchmarks
         return _indexedSet.StartsWith(x => x.FullName, "Tiffany").ToArray();
     }
 
+    [Benchmark]
+    [BenchmarkCategory("StartsWith")]
+    public Person[] StartsWith_Autypo()
+    {
+        return _autoTypo.Search("Tiffany").Select(x => x.Value).ToArray();
+    }
+
     [Benchmark(Baseline = true)]
     [BenchmarkCategory("Fuzzy StartsWith")]
     public Person[] FuzzyStartsWith_Linq()
@@ -50,5 +76,12 @@ public class PrefixIndexBenchmarks
     public Person[] FuzzyStartsWith_IndexedSet()
     {
         return _indexedSet.FuzzyStartsWith(x => x.FullName, "Tiffany", 2).ToArray();
+    }
+
+    [Benchmark]
+    [BenchmarkCategory("Fuzzy StartsWith")]
+    public Person[] FuzzyStartsWith_Autypo()
+    {
+        return _autoTypoFuzzy.Search("Tiffany").Select(x => x.Value).ToArray();
     }
 }
