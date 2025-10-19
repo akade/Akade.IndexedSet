@@ -41,7 +41,6 @@ public class PrefixIndexBenchmarks
                   .WithIndex(x => x.FullName, x => x.WithFuzziness(2)));
     }
 
-
     [Benchmark(Baseline = true)]
     [BenchmarkCategory("StartsWith")]
     public Person[] StartsWith_Linq()
