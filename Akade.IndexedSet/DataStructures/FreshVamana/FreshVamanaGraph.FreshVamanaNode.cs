@@ -1,5 +1,5 @@
-﻿namespace Akade.IndexedSet.DataStructures.FreshVamana;
-#if NET9_0_OR_GREATER
+﻿#if NET9_0_OR_GREATER
+namespace Akade.IndexedSet.DataStructures.FreshVamana;
 
 internal partial class FreshVamanaGraph<TElement> where TElement : notnull
 {

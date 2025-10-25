@@ -1,7 +1,5 @@
 ﻿#if NET9_0_OR_GREATER
 using Akade.IndexedSet.DataStructures.FreshVamana;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 
 namespace Akade.IndexedSet.Tests.DataStructures;
 
@@ -33,7 +31,7 @@ public class FreshVamanaGraphTests
     [TestMethod]
     public void NearestNeighbors_returns_closest_items()
     {
-        FreshVamanaGraph<TestData> graph = new(x => x.Data.AsSpan());
+        FreshVamanaGraph<TestData> graph = new(x => x.Data.AsSpan(), FreshVamanaSettings.Default);
 
         foreach (TestData item in _randomTestData)
         {
@@ -67,7 +65,7 @@ public class FreshVamanaGraphTests
     [TestMethod]
     public void Stability_when_deleting_items()
     {
-        FreshVamanaGraph<TestData> graph = new(x => x.Data.AsSpan());
+        FreshVamanaGraph<TestData> graph = new(x => x.Data.AsSpan(), FreshVamanaSettings.Default);
 
         foreach (TestData item in _randomTestData)
         {

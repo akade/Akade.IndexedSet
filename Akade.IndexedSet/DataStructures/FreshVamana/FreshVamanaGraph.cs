@@ -1,15 +1,17 @@
-﻿using System.Diagnostics;
+﻿#if NET9_0_OR_GREATER
+using Akade.IndexedSet.Extensions;
+using System.Diagnostics;
 using System.Numerics.Tensors;
 
 namespace Akade.IndexedSet.DataStructures.FreshVamana;
-#if NET9_0_OR_GREATER
 
-internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<float>> accessor)
+internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<float>> accessor, FreshVamanaSettings settings)
     where TElement : notnull
 {
     private readonly HashSet<FreshVamanaNode> _nodes = new();
     private readonly Dictionary<TElement, FreshVamanaNode> _elementToNode = new();
     private readonly HashSet<FreshVamanaNode> _deletedNodes = new();
+    private readonly FreshVamanaSettings _settings = settings;
 
     private SearchList GreedySearch(FreshVamanaNode entryPoint, ReadOnlySpan<float> query, int k, int searchListSize)
     {
@@ -122,7 +124,7 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
 
         _deletedNodes.Add(node);
 
-        if (_deletedNodes.Count >= 0.05 * _nodes.Count)
+        if (_deletedNodes.Count >= _settings.DeletionThreshold * _nodes.Count)
         {
             Delete(_deletedNodes);
             _deletedNodes.Clear();
@@ -182,7 +184,7 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
         }
         else
         {
-            Insert(_nodes.First(), element, searchListSize: 50, alpha: 1.2f, outdegreeBound: 20);
+            Insert(_nodes.First(), element, _settings.SearchListSize, _settings.Alpha, _settings.OutDegreeBound);
         }
 
         return true;
@@ -190,10 +192,29 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
 
     internal IEnumerable<TElement> NeareastNeighbors(Span<float> query, int k)
     {
+        if (_nodes.Count - _deletedNodes.Count < _settings.FlatThreshold)
+        {
+            return FlatSearch(query, k);
+        }
+
         int searchListSize = _deletedNodes.Count + 50;
         return GreedySearch(_nodes.First(), query, k, searchListSize).GetClosestK(k);
     }
 
+    private IEnumerable<TElement> FlatSearch(Span<float> query, int k)
+    {
+        PriorityQueue<TElement, float> queue = new();
+        foreach (FreshVamanaNode node in _nodes)
+        {
+            if (_deletedNodes.Contains(node))
+                continue;
+
+            float distance = Distance(accessor(node.Element), query);
+            queue.Enqueue(node.Element, distance);
+        }
+
+        return queue.DequeueAsIEnumerable();
+    }
 
     private float Distance(ReadOnlySpan<float> x, ReadOnlySpan<float> y)
     {
