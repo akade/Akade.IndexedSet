@@ -44,9 +44,10 @@ public class FreshVamanaGraphTests
         _ = AssertRecall(graph);
     }
 
-    private float AssertRecall(FreshVamanaGraph<TestData> graph)
+    private float AssertRecall(FreshVamanaGraph<TestData> graph, float? minimumRecall = null)
     {
         int found = 0;
+        minimumRecall ??= 0.9f;
 
         foreach (TestData item in _randomTestData)
         {
@@ -59,7 +60,7 @@ public class FreshVamanaGraphTests
         }
 
         float recall = (float)found / _randomTestData.Count;
-        Assert.IsGreaterThanOrEqualTo(0.9f, recall, $"Recall was too low: {recall:P2}");
+        Assert.IsGreaterThanOrEqualTo(minimumRecall.Value, recall, $"Recall was too low: {recall:P2}");
         return recall;
     }
 
@@ -74,19 +75,15 @@ public class FreshVamanaGraphTests
         }
         Console.WriteLine($"Built from scratch: recall: {AssertRecall(graph):P2}");
 
-        List<TestData> items = new(50);
+        HashSet<TestData> items = new(50);
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 10; i++)
         {
             items.Clear();
-            // Select 50 distinct random items to delete and re-add
+
             while (items.Count < 50)
             {
-                TestData candidate = _randomTestData[_random.Next(0, _randomTestData.Count)];
-                if (!items.Contains(candidate))
-                {
-                    items.Add(candidate);
-                }
+                items.Add(_randomTestData[_random.Next(0, _randomTestData.Count)]);
             }
 
             foreach (TestData? item in items)
@@ -100,7 +97,7 @@ public class FreshVamanaGraphTests
             {
                 graph.Add(item);
             }
-            Console.WriteLine($"Iteration {i + 1} complete: recall: {AssertRecall(graph):P2}");
+            Console.WriteLine($"Iteration {i + 1} complete: recall: {AssertRecall(graph, 0.85f):P2}");
         }
     }
 

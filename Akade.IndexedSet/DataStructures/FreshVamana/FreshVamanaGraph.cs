@@ -1,5 +1,4 @@
-﻿using Akade.IndexedSet.Extensions;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Numerics.Tensors;
 
 namespace Akade.IndexedSet.DataStructures.FreshVamana;
@@ -10,6 +9,7 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
 {
     private readonly HashSet<FreshVamanaNode> _nodes = new();
     private readonly Dictionary<TElement, FreshVamanaNode> _elementToNode = new();
+    private readonly HashSet<FreshVamanaNode> _deletedNodes = new();
 
     private SearchList GreedySearch(FreshVamanaNode entryPoint, ReadOnlySpan<float> query, int k, int searchListSize)
     {
@@ -22,7 +22,7 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
         }
 
         SearchList searchList = new(searchListSize);
-        
+
         float entryDistance = Distance(accessor(entryPoint.Element), query);
         searchList.Add(entryPoint, entryDistance);
 
@@ -33,7 +33,7 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
             foreach (FreshVamanaNode neighbor in closest.Neighbors)
             {
                 float neighborDistance = Distance(accessor(neighbor.Element), query);
-                searchList.Add(neighbor, neighborDistance);
+                _ = searchList.Add(neighbor, neighborDistance);
             }
         }
 
@@ -113,10 +113,22 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
         }
     }
 
-    public void Delete(TElement element)
+    public bool Delete(TElement element)
     {
-        // TODO: batch deletion operations
-        Delete([_elementToNode[element]]);
+        if (!_elementToNode.TryGetValue(element, out FreshVamanaNode? node))
+        {
+            return false;
+        }
+
+        _deletedNodes.Add(node);
+
+        if (_deletedNodes.Count >= 0.05 * _nodes.Count)
+        {
+            Delete(_deletedNodes);
+            _deletedNodes.Clear();
+        }
+
+        return true;
     }
 
     private void Delete(HashSet<FreshVamanaNode> toDelete)
@@ -151,8 +163,18 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
         }
     }
 
-    public void Add(TElement element)
+    public bool Add(TElement element)
     {
+        if (_elementToNode.TryGetValue(element, out FreshVamanaNode? existingNode))
+        {
+            if (_deletedNodes.Remove(existingNode))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         if (_nodes.Count == 0)
         {
             _nodes.Add(new FreshVamanaNode(element));
@@ -162,11 +184,14 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
         {
             Insert(_nodes.First(), element, searchListSize: 50, alpha: 1.2f, outdegreeBound: 20);
         }
+
+        return true;
     }
 
     internal IEnumerable<TElement> NeareastNeighbors(Span<float> query, int k)
     {
-        return GreedySearch(_nodes.First(), query, k, searchListSize: 50).GetClosestK(k);
+        int searchListSize = _deletedNodes.Count + 50;
+        return GreedySearch(_nodes.First(), query, k, searchListSize).GetClosestK(k);
     }
 
 

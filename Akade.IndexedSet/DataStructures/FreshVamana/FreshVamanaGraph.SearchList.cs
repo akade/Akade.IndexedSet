@@ -15,12 +15,12 @@ internal partial class FreshVamanaGraph<TElement> where TElement : notnull
 
         public HashSet<FreshVamanaNode> Visited => _visited;
 
-        public void Add(FreshVamanaNode node, float distance)
+        public bool Add(FreshVamanaNode node, float distance)
         {
             if (_nodes.Count + 1 >= _maxSize
                 && distance > _distances[^1])
             {
-                return;
+                return false;
             }
 
             int index = _distances.BinarySearch(distance);
@@ -30,7 +30,7 @@ internal partial class FreshVamanaGraph<TElement> where TElement : notnull
             }
             else if (_nodes[index] == node)
             {
-                return;
+                return false;
             }
             _distances.Insert(index, distance);
             _nodes.Insert(index, node);
@@ -42,6 +42,8 @@ internal partial class FreshVamanaGraph<TElement> where TElement : notnull
             }
 
             _firstUnvisitedCandidate = Math.Min(_firstUnvisitedCandidate, index);
+
+            return true;
         }
 
         public bool AddVisisted(FreshVamanaNode node)
