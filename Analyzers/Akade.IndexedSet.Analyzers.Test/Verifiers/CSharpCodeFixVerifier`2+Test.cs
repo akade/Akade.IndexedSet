@@ -20,7 +20,7 @@ public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
             string config = "Release";
             SetVersion(ref config);
 
-            ReferenceAssemblies = ReferenceAssemblies = ReferenceAssemblies.Net.Net90;
+            ReferenceAssemblies = ReferenceAssemblies.Net.Net90;
 
             TestState.AdditionalReferences.Add(typeof(IndexedSet<>).Assembly);
 

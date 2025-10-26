@@ -190,7 +190,7 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
         return true;
     }
 
-    internal IEnumerable<TElement> NeareastNeighbors(Span<float> query, int k)
+    internal IEnumerable<TElement> NeareastNeighbors(ReadOnlySpan<float> query, int k)
     {
         if (_nodes.Count - _deletedNodes.Count < _settings.FlatThreshold)
         {
@@ -201,7 +201,7 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
         return GreedySearch(_nodes.First(), query, k, searchListSize).GetClosestK(k);
     }
 
-    private IEnumerable<TElement> FlatSearch(Span<float> query, int k)
+    private IEnumerable<TElement> FlatSearch(ReadOnlySpan<float> query, int k)
     {
         PriorityQueue<TElement, float> queue = new();
         foreach (FreshVamanaNode node in _nodes)
@@ -216,9 +216,16 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
         return queue.DequeueAsIEnumerable();
     }
 
-    private float Distance(ReadOnlySpan<float> x, ReadOnlySpan<float> y)
+    private static float Distance(ReadOnlySpan<float> x, ReadOnlySpan<float> y)
     {
         return 1 - TensorPrimitives.CosineSimilarity(x, y);
+    }
+
+    internal void Clear()
+    {
+        _nodes.Clear();
+        _elementToNode.Clear();
+        _deletedNodes.Clear();
     }
 }
 

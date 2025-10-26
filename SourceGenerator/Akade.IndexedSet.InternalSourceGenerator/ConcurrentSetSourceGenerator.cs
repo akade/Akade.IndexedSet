@@ -123,6 +123,12 @@ public class ConcurrentSetSourceGenerator : IIncrementalGenerator
                 _ = stringBuilder.AppendLine(";");
             }
         }
+
+        if (method.GetLeadingTrivia().Any(SyntaxKind.IfDirectiveTrivia))
+        {
+            _ = stringBuilder.AppendLine($"#endif");
+        }
+
     }
 
     private void WriteMethodHeader(MethodDeclarationSyntax method, IntendedStringBuilder stringBuilder)

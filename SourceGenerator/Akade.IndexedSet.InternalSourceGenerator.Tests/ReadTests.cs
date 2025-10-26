@@ -34,6 +34,28 @@ public class ReadTests : VerifyBase
     }
 
     [TestMethod]
+    public async Task Generates_net_version_compiler_directives()
+    {
+        await this.VerifySourceGen().ForSource<ConcurrentSetSourceGenerator>("""
+        #define NET9_0_OR_GREATER
+        public class IndexedSet<TElement>
+        {
+        #if NET9_0_OR_GREATER
+            /// <summary>
+            /// Returns the approximate k nearest neighbors of the given value.
+            /// </summary>
+            [Akade.IndexedSet.Concurrency.ReadAccess]
+            public IEnumerable<TElement> ApproximateNearestNeighbors(Func<TElement, ReadOnlySpan<float>> indexAccessor, ReadOnlySpan<float> value, int k, [CallerArgumentExpression(nameof(indexAccessor))] string? indexName = null)
+            {
+                TypedIndex<TElement, ReadOnlySpan<float>> typedIndex = GetIndex<ReadOnlySpan<float>>(indexName);
+                return typedIndex.ApproximateNearestNeighbors(value, k);
+            }
+        #endif
+        }
+        """);
+    }
+
+    [TestMethod]
     public async Task Generates_boolean_return_wrapped_in_read_lock_including_materialization()
     {
         await this.VerifySourceGen().ForSource<ConcurrentSetSourceGenerator>("""

@@ -21,6 +21,7 @@ public static class IndexedSetBuilder
         IEnumerable<TElement> initialContent,
         Func<TElement, TPrimaryKey> primaryKeyAccessor,
         [CallerArgumentExpression(nameof(primaryKeyAccessor))] string primaryKeyIndexName = "")
+        where TElement : notnull
         where TPrimaryKey : notnull
     {
         return new IndexedSetBuilder<TPrimaryKey, TElement>(primaryKeyAccessor, initialContent, primaryKeyIndexName);
@@ -33,6 +34,7 @@ public static class IndexedSetBuilder
         this IEnumerable<TElement> initialContent,
         Func<TElement, TPrimaryKey> primaryKeyAccessor,
         [CallerArgumentExpression(nameof(primaryKeyAccessor))] string primaryKeyIndexName = "")
+        where TElement : notnull
         where TPrimaryKey : notnull
     {
         return new IndexedSetBuilder<TPrimaryKey, TElement>(primaryKeyAccessor, initialContent, primaryKeyIndexName);
@@ -42,6 +44,7 @@ public static class IndexedSetBuilder
     /// Creates a new builder instance with the given initial content
     /// </summary>
     public static IndexedSetBuilder<TElement> Create<TElement>(IEnumerable<TElement> initialContent)
+        where TElement : notnull
     {
         return new IndexedSetBuilder<TElement>(null, initialContent);
     }
@@ -50,6 +53,7 @@ public static class IndexedSetBuilder
     /// Creates a new builder instance with the given initial content
     /// </summary>
     public static IndexedSetBuilder<TElement> ToIndexedSet<TElement>(this IEnumerable<TElement> initialContent)
+        where TElement : notnull
     {
         return new IndexedSetBuilder<TElement>(null, initialContent);
     }
@@ -59,6 +63,7 @@ public static class IndexedSetBuilder
 /// Helper class to support type inference for the primary key type for <see cref="IndexedSetBuilder{TPrimaryKey, TElement}"/>
 /// </summary>
 public class IndexedSetBuilder<TElement>
+    where TElement : notnull
 {
     private readonly IndexedSet<TElement> _result;
     private readonly IEnumerable<TElement>? _initialContent;
@@ -95,7 +100,7 @@ public class IndexedSetBuilder<TElement>
     /// The secondary key can be any expression that does not change while the element is within the indexed set, even
     /// tuples or calculated expressions. The name of the index is based on the string representation of the expression
     /// and passed by the compiler to <paramref name="indexName"/>. The convention is to always use x as a lambda parameter:
-    /// x => (x.Prop1, x.Prop2, x.Prop3). Alternativly, you can also always use the same method from a static class.
+    /// x => (x.Prop1, x.Prop2, x.Prop3). Alternatively, you can also always use the same method from a static class.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the key within the index</typeparam>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
@@ -119,7 +124,7 @@ public class IndexedSetBuilder<TElement>
     /// The secondary key can be any expression that does not change while the element is within the indexed set, even
     /// tuples or calculated expressions. The name of the index is based on the string representation of the expression
     /// and passed by the compiler to <paramref name="indexName"/>. The convention is to always use x as a lambda parameter:
-    /// x => (x.Prop1, x.Prop2, x.Prop3). Alternativly, you can also always use the same method from a static class.
+    /// x => (x.Prop1, x.Prop2, x.Prop3). Alternatively, you can also always use the same method from a static class.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the key within the index</typeparam>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
@@ -143,7 +148,7 @@ public class IndexedSetBuilder<TElement>
     /// The secondary key can be any expression that does not change while the element is within the indexed set, even
     /// tuples or calculated expressions. The name of the index is based on the string representation of the expression
     /// and passed by the compiler to <paramref name="indexName"/>. The convention is to always use x as a lambda parameter:
-    /// x => (x.Prop1, x.Prop2, x.Prop3). Alternativly, you can also always use the same method from a static class.
+    /// x => (x.Prop1, x.Prop2, x.Prop3). Alternatively, you can also always use the same method from a static class.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the key within the index</typeparam>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
@@ -167,7 +172,7 @@ public class IndexedSetBuilder<TElement>
     /// The secondary key can be any expression that does not change while the element is within the indexed set, even
     /// tuples or calculated expressions. The name of the index is based on the string representation of the expression
     /// and passed by the compiler to <paramref name="indexName"/>. The convention is to always use x as a lambda parameter:
-    /// x => (x.Prop1, x.Prop2, x.Prop3). Alternativly, you can also always use the same method from a static class.
+    /// x => (x.Prop1, x.Prop2, x.Prop3). Alternatively, you can also always use the same method from a static class.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the key within the index</typeparam>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
@@ -191,7 +196,7 @@ public class IndexedSetBuilder<TElement>
     /// The secondary key can be any expression that does not change while the element is within the indexed set, even
     /// tuples or calculated expressions. The name of the index is based on the string representation of the expression
     /// and passed by the compiler to <paramref name="indexName"/>. The convention is to always use x as a lambda parameter:
-    /// x => (x.Prop1, x.Prop2, x.Prop3). Alternativly, you can also always use the same method from a static class.
+    /// x => (x.Prop1, x.Prop2, x.Prop3). Alternatively, you can also always use the same method from a static class.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the key within the index</typeparam>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
@@ -215,7 +220,7 @@ public class IndexedSetBuilder<TElement>
     /// The secondary key can be any expression that does not change while the element is within the indexed set, even
     /// tuples or calculated expressions. The name of the index is based on the string representation of the expression
     /// and passed by the compiler to <paramref name="indexName"/>. The convention is to always use x as a lambda parameter:
-    /// x => (x.Prop1, x.Prop2, x.Prop3). Alternativly, you can also always use the same method from a static class.
+    /// x => (x.Prop1, x.Prop2, x.Prop3). Alternatively, you can also always use the same method from a static class.
     /// </summary>
     /// <typeparam name="TIndexKey">The type of the key within the index</typeparam>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
@@ -239,7 +244,7 @@ public class IndexedSetBuilder<TElement>
     /// supports fuzzy search on string startswith/contains queries. The secondary key can be any expression that does not change while 
     /// the element is within the indexed set. The name of the index is based on the 
     /// string representation of the expression and passed by the compiler to <paramref name="indexName"/>. 
-    /// The convention is to always use x as a lambda parameter: x => x.StringProp1. Alternativly, you can also always use the same method from a static class.
+    /// The convention is to always use x as a lambda parameter: x => x.StringProp1. Alternatively, you can also always use the same method from a static class.
     /// </summary>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
     /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
@@ -261,7 +266,7 @@ public class IndexedSetBuilder<TElement>
     /// supports fuzzy search on string startswith/contains queries. The secondary key can be any expression that does not change while 
     /// the element is within the indexed set. The name of the index is based on the 
     /// string representation of the expression and passed by the compiler to <paramref name="indexName"/>. 
-    /// The convention is to always use x as a lambda parameter: x => x.StringProp1. Alternativly, you can also always use the same method from a static class.
+    /// The convention is to always use x as a lambda parameter: x => x.StringProp1. Alternatively, you can also always use the same method from a static class.
     /// </summary>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
     /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
@@ -284,7 +289,7 @@ public class IndexedSetBuilder<TElement>
     /// supports fuzzy search on string startswith queries. The secondary key can be any expression that does not change while 
     /// the element is within the indexed set. The name of the index is based on the 
     /// string representation of the expression and passed by the compiler to <paramref name="indexName"/>. 
-    /// The convention is to always use x as a lambda parameter: x => x.StringProp1. Alternativly, you can also always use the same method from a static class.
+    /// The convention is to always use x as a lambda parameter: x => x.StringProp1. Alternatively, you can also always use the same method from a static class.
     /// </summary>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
     /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
@@ -306,7 +311,7 @@ public class IndexedSetBuilder<TElement>
     /// supports fuzzy search on string startswith queries. The secondary key can be any expression that does not change while 
     /// the element is within the indexed set. The name of the index is based on the 
     /// string representation of the expression and passed by the compiler to <paramref name="indexName"/>. 
-    /// The convention is to always use x as a lambda parameter: x => x.StringProp1. Alternativly, you can also always use the same method from a static class.
+    /// The convention is to always use x as a lambda parameter: x => x.StringProp1. Alternatively, you can also always use the same method from a static class.
     /// </summary>
     /// <param name="keyAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. 
     /// Hence, the convention is to always use x as an identifier in case a lambda expression is used.</param>
@@ -330,7 +335,7 @@ public class IndexedSetBuilder<TElement>
     /// 
     /// The secondary key can be any expression that does not change while the element is within the indexed set. The name of the index is based on the 
     /// string representation of the expression and passed by the compiler to <paramref name="indexName"/>. 
-    /// The convention is to always use x as a lambda parameter: x => x.Point. Alternativly, you can also always use the same method from a static class.
+    /// The convention is to always use x as a lambda parameter: x => x.Point. Alternatively, you can also always use the same method from a static class.
     /// </summary>
     public virtual IndexedSetBuilder<TElement> WithSpatialIndex<TPoint>(Func<TElement, TPoint> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
         where TPoint : struct
@@ -362,6 +367,23 @@ public class IndexedSetBuilder<TElement>
         return this;
     }
 
+#if NET9_0_OR_GREATER
+    /// <summary>
+    /// Configures the <see cref="IndexedSet{TElement}"/> to have a vector index based on a secondary key that 
+    /// supports approximate nearest neighbor queries using cosine similarity. Currently supports <see cref="ReadOnlySpan{T}"/> with <see cref="float" />.
+    /// 
+    /// The secondary key can be any expression that does not change while the element is within the indexed set. The name of the index is based on the 
+    /// string representation of the expression and passed by the compiler to <paramref name="indexName"/>. 
+    /// The convention is to always use x as a lambda parameter: x => x.Embedding. Alternatively, you can also always use the same method from a static class.
+    /// </summary>
+    public virtual IndexedSetBuilder<TElement> WithVectorIndex(Func<TElement, ReadOnlySpan<float>> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
+    {
+        ArgumentNullException.ThrowIfNull(indexName);
+        _result.AddIndex(keyAccessor, new VectorIndex<TElement>(keyAccessor, indexName));
+        return this;
+    }
+#endif
+
     /// <summary>
     /// Builds and returns the configured <see cref="IndexedSet{TPrimaryKey, TElement}"/>
     /// </summary>
@@ -389,6 +411,7 @@ public class IndexedSetBuilder<TElement>
 /// Use <see cref="IndexedSetBuilder{TElement}" /> and <see cref="IndexedSetBuilder{TPrimaryKey, TElement}"/> to obtain a builder.
 /// </summary>
 public class IndexedSetBuilder<TPrimaryKey, TElement> : IndexedSetBuilder<TElement>
+    where TElement : notnull
     where TPrimaryKey : notnull
 {
 
