@@ -213,7 +213,7 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
             queue.Enqueue(node.Element, distance);
         }
 
-        return queue.DequeueAsIEnumerable();
+        return queue.DequeueAsIEnumerable().Take(k);
     }
 
     private static float Distance(ReadOnlySpan<float> x, ReadOnlySpan<float> y)

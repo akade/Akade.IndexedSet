@@ -11,6 +11,7 @@
 	<ItemGroup>
 		<PackageReference Include="Bogus" Version="35.6.4" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
+		<PackageReference Include="Microsoft.SemanticKernel.Connectors.Onnx" Version="1.66.0-alpha" />
 		<PackageReference Include="MSTest.TestAdapter" Version="4.0.1" />
 		<PackageReference Include="MSTest.TestFramework" Version="4.0.1" />
 		<PackageReference Include="coverlet.collector" Version="6.0.4">

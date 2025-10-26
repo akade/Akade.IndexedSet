@@ -61,3 +61,9 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+###############################################################################
+# Git LFS: store large binary model files in LFS
+###############################################################################
+# ONNX model files
+*.onnx filter=lfs diff=lfs merge=lfs -binary
