@@ -2,6 +2,9 @@
 using Akade.IndexedSet.Extensions;
 using System.Diagnostics;
 using System.Numerics.Tensors;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Security.AccessControl;
 
 namespace Akade.IndexedSet.DataStructures.FreshVamana;
 
@@ -12,6 +15,59 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
     private readonly Dictionary<TElement, FreshVamanaNode> _elementToNode = new();
     private readonly HashSet<FreshVamanaNode> _deletedNodes = new();
     private readonly FreshVamanaSettings _settings = settings;
+
+    public bool IsEmpty => _nodes.Count == 0;
+
+    public void BulkLoad(IEnumerable<TElement> elements)
+    {
+        Random rand = new(_settings.BulkLoadingRandomSeed);
+        if (_nodes.Count > 0)
+        {
+            throw new InvalidOperationException("BulkLoad can only be called on an empty graph.");
+        }
+
+        List<FreshVamanaNode> elementNodes = [.. elements.Select(e => new FreshVamanaNode(e))];
+        _nodes.UnionWith(elementNodes);
+
+        // initialize each node with R outbound connection
+        foreach (FreshVamanaNode node in elementNodes)
+        {
+            _elementToNode.Add(node.Element, node);
+            while (node.Neighbors.Count < _settings.OutDegreeBound)
+            {
+                FreshVamanaNode neighbor = elementNodes[rand.Next(elementNodes.Count)];
+                if (neighbor != node)
+                {
+                    _ = node.Neighbors.Add(neighbor);
+                }
+            }
+        }
+
+        BulkLoadPass(1);
+        BulkLoadPass(_settings.Alpha);
+
+
+        void BulkLoadPass(float alpha)
+        {
+            rand.Shuffle(CollectionsMarshal.AsSpan(elementNodes));
+
+            foreach (FreshVamanaNode node in elementNodes)
+            {
+                RobustPrune(node, node.Neighbors, alpha, _settings.OutDegreeBound);
+
+                foreach (FreshVamanaNode j in node.Neighbors)
+                {
+                    _ = j.Neighbors.Add(node);
+                    if (j.Neighbors.Count > _settings.OutDegreeBound)
+                    {
+                        RobustPrune(j, j.Neighbors, alpha, _settings.OutDegreeBound);
+                    }
+                }
+            }
+        }
+
+
+    }
 
     private SearchList GreedySearch(FreshVamanaNode entryPoint, ReadOnlySpan<float> query, int k, int searchListSize)
     {

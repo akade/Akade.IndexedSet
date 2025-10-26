@@ -1,6 +1,7 @@
 ﻿#if NET9_0_OR_GREATER
 
 using Akade.IndexedSet.DataStructures.FreshVamana;
+using Akade.IndexedSet.Utils;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Akade.IndexedSet.Indices;
@@ -13,6 +14,16 @@ internal class VectorIndex<TElement>(Func<TElement, ReadOnlySpan<float>> keyAcce
     public override void Clear()
     {
         _graph.Clear();
+    }
+
+    internal override void AddRange(IKeyValueEnumerator<ReadOnlySpan<float>, TElement> elementsToAdd)
+    {
+        if(_graph.IsEmpty)
+        {
+            _graph.BulkLoad(elementsToAdd.GetRawValues());
+        }
+
+        base.AddRange(elementsToAdd);
     }
 
     internal override void Add(ReadOnlySpan<float> key, TElement value)
