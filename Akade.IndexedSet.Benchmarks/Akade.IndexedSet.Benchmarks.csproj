@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net9.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<IsPackable>false</IsPackable>
@@ -14,6 +14,7 @@
     <PackageReference Include="Bogus" Version="35.6.4" />
     <PackageReference Include="Fastenshtein" Version="1.0.11" />
     <PackageReference Include="RBush" Version="4.0.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Onnx" Version="1.66.0-alpha" />
   </ItemGroup>
 
   <ItemGroup>

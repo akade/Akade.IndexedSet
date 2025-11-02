@@ -18,7 +18,7 @@ public class SemanticSearch
 
 
     [TestMethod]
-    public async Task SampleTestAsync()
+    public async Task Semantic_search_via_BgeMicroV2()
     {
         ServiceCollection services = new();
         services.AddBertOnnxEmbeddingGenerator(

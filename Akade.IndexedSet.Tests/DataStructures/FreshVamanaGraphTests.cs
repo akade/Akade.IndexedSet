@@ -66,7 +66,7 @@ public class FreshVamanaGraphTests
     public void Stability_when_deleting_items()
     {
         FreshVamanaGraph<TestData> graph = new(x => x.Data.AsSpan(), FreshVamanaSettings.Default);
-
+        
         foreach (TestData item in _randomTestData)
         {
             graph.Add(item);

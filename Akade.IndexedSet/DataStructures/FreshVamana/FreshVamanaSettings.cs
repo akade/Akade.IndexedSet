@@ -14,7 +14,7 @@ namespace Akade.IndexedSet.DataStructures.FreshVamana;
 /// <param name="BulkLoadingRandomSeed">Seed used to initialize the initial random neighboorhood graph.</param>
 internal readonly record struct FreshVamanaSettings(int FlatThreshold, int SearchListSize, float Alpha, int OutDegreeBound, float DeletionThreshold, int BulkLoadingRandomSeed)
 {
-    public static readonly FreshVamanaSettings Default = new(FlatThreshold: 200, SearchListSize: 125, Alpha: 1.2f, OutDegreeBound: 70, DeletionThreshold: 0.1f, BulkLoadingRandomSeed: 1618);
+    public static readonly FreshVamanaSettings Default = new(FlatThreshold: 200, SearchListSize: 125, Alpha: 1.2f, OutDegreeBound: 70, DeletionThreshold: 0.05f, BulkLoadingRandomSeed: 1618);
 }
 
 #endif
