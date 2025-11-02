@@ -16,63 +16,56 @@ public class SemanticSearch
         public Embedding<float>? Embedding { get; set; }
     }
 
-
-    [TestMethod]
-    public async Task Semantic_search_via_BgeMicroV2()
+    private static ServiceProvider SetupServices()
     {
         ServiceCollection services = new();
         services.AddBertOnnxEmbeddingGenerator(
             onnxModelPath: "../../../Models/BgeMicroV2/model.onnx",
             vocabPath: "../../../Models/BgeMicroV2/vocab.txt");
+        return services.BuildServiceProvider();
+    }
 
-
-        using ServiceProvider sp = services.BuildServiceProvider();
-
-        var generator = sp.GetRequiredService<IEmbeddingGenerator<string, Embedding<float>>>();
-
-
+    private async Task<List<Product>> GenerateProductsAsync(IServiceProvider serviceProvider, int count)
+    {
+        IEmbeddingGenerator<string, Embedding<float>> generator = serviceProvider.GetRequiredService<IEmbeddingGenerator<string, Embedding<float>>>();
         Randomizer.Seed = new Random(42);
 
-        var productFaker = new Faker<Product>().CustomInstantiator(x => new(x.Commerce.ProductName()));
+        List<Product> products = new Faker<Product>().CustomInstantiator(x => new(x.Commerce.ProductName()))
+                                                     .Generate(500);
 
-        List<Product> allProducts = [];
-
-        // below the threshold for ANN indexing
-        allProducts.AddRange(await GenerateProductsAsync(100));
-        ConcurrentIndexedSet<Product> indexedSet = allProducts.ToIndexedSet()
-                                                              .WithVectorIndex(x => x.Embedding!.Vector.Span)
-                                                              .BuildConcurrent();
-
-
-        IEnumerable<Product> found = await SearchAsync("trousers", 5);
-        Assert.IsTrue(found.All(x => x.Name.Contains("pants", StringComparison.OrdinalIgnoreCase)));
-
-        // after the threshold for ANN indexing
-        allProducts.AddRange(await GenerateProductsAsync(1_000));
-        indexedSet.AddRange(allProducts[100..]);
-
-        found = await SearchAsync("trousers", 5);
-        Assert.IsTrue(found.All(x => x.Name.Contains("pants", StringComparison.OrdinalIgnoreCase)));
-
-
-        async Task<List<Product>> GenerateProductsAsync(int count)
+        GeneratedEmbeddings<Embedding<float>> embeddings = await generator.GenerateAsync(products.Select(x => x.Name));
+        foreach ((Product? product, Embedding<float>? embedding) in products.Zip(embeddings))
         {
-            List<Product> products = productFaker.Generate(count);
-            GeneratedEmbeddings<Embedding<float>> embeddings = await generator.GenerateAsync(products.Select(x => x.Name));
-
-            foreach ((Product? product, Embedding<float>? embedding) in products.Zip(embeddings))
-            {
-                product.Embedding = embedding;
-            }
-
-            return products;
+            product.Embedding = embedding;
         }
+        return products;
+    }
 
-        async Task<IEnumerable<Product>> SearchAsync(string search, int nearestNeighbors)
-        {
-            Embedding<float> embedding = await generator.GenerateAsync(search);
-            return indexedSet.ApproximateNearestNeighbors(x => x.Embedding!.Vector.Span, embedding.Vector.Span, nearestNeighbors);
-        }
+    [TestMethod]
+    [DataRow(100)]
+    [DataRow(1_000)]
+    public async Task Semantic_search_via_BgeMicroV2(int count)
+    {
+        using ServiceProvider sp = SetupServices();
+
+        List<Product> products = await GenerateProductsAsync(sp, count);
+
+
+        ConcurrentIndexedSet<Product> indexedSet = products.ToIndexedSet()
+                                                           .WithVectorIndex(x => x.Embedding!.Vector.Span)
+                                                           .BuildConcurrent();
+
+        ReadOnlyMemory<float> searchVector = await EmbedAsync(sp, "trousers");
+        IEnumerable<Product> found = indexedSet.ApproximateNearestNeighbors(x => x.Embedding!.Vector.Span, searchVector.Span, 5);
+
+        Assert.IsTrue(found.All(x => x.Name.Contains("pants", StringComparison.OrdinalIgnoreCase)));
+    }
+
+    private static async Task<ReadOnlyMemory<float>> EmbedAsync(ServiceProvider sp, string term)
+    {
+        IEmbeddingGenerator<string, Embedding<float>> generator = sp.GetRequiredService<IEmbeddingGenerator<string, Embedding<float>>>();
+        Embedding<float> searchEmbedding = await generator.GenerateAsync(term);
+        return searchEmbedding.Vector;
     }
 }
 
