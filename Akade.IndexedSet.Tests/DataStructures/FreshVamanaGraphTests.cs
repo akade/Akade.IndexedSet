@@ -49,7 +49,7 @@ public class FreshVamanaGraphTests
 
         foreach (TestData item in _randomTestData)
         {
-            IEnumerable<TestData> neighbors = graph.NeareastNeighbors(item.Data.AsSpan(), 5);
+            IEnumerable<TestData> neighbors = graph.ApproximateNearestNeighbors(item.Data.AsSpan(), 5);
 
             if (neighbors.Contains(item))
             {

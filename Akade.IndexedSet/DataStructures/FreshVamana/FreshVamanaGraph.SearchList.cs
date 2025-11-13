@@ -46,7 +46,7 @@ internal partial class FreshVamanaGraph<TElement>
             return true;
         }
 
-        public bool AddVisisted(FreshVamanaNode node)
+        public bool AddVisited(FreshVamanaNode node)
         {
             return _visited.Add(node);
         }

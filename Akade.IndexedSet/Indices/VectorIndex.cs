@@ -45,7 +45,7 @@ internal class VectorIndex<TElement>(Func<TElement, ReadOnlySpan<float>> keyAcce
     [DoesNotReturn]
     private static void ThrowNotSupportedExceptionDueToANN()
     {
-        throw new NotSupportedException("VectorIndex is uses approximate nearest neighbor search and hence, does not support finding item(s) with a specific key");
+        throw new NotSupportedException("VectorIndex uses approximate nearest neighbor search and hence, does not support finding item(s) with a specific key");
     }
 
     internal override bool TryGetSingle(ReadOnlySpan<float> indexKey, out TElement? element)
@@ -63,7 +63,7 @@ internal class VectorIndex<TElement>(Func<TElement, ReadOnlySpan<float>> keyAcce
 
     internal override IEnumerable<TElement> ApproximateNearestNeighbors(ReadOnlySpan<float> indexKey, int k)
     {
-        return _graph.NeareastNeighbors(indexKey, k);
+        return _graph.ApproximateNearestNeighbors(indexKey, k);
     }
 }
 

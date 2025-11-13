@@ -2,9 +2,7 @@
 using Akade.IndexedSet.Extensions;
 using System.Diagnostics;
 using System.Numerics.Tensors;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Security.AccessControl;
 
 namespace Akade.IndexedSet.DataStructures.FreshVamana;
 
@@ -86,7 +84,7 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
 
         while (searchList.GetClosestNotVisited() is FreshVamanaNode closest)
         {
-            _ = searchList.AddVisisted(closest);
+            _ = searchList.AddVisited(closest);
 
             foreach (FreshVamanaNode neighbor in closest.Neighbors)
             {
@@ -156,7 +154,7 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
 
             foreach ((FreshVamanaNode other, _) in queue.UnorderedItems)
             {
-                if (removedFromQueue.Contains(closest)) continue;
+                if (removedFromQueue.Contains(other)) continue;
 
                 ReadOnlySpan<float> otherPos = accessor(other.Element);
 
@@ -246,7 +244,7 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
         return true;
     }
 
-    internal IEnumerable<TElement> NeareastNeighbors(ReadOnlySpan<float> query, int k)
+    internal IEnumerable<TElement> ApproximateNearestNeighbors(ReadOnlySpan<float> query, int k)
     {
         if (_nodes.Count - _deletedNodes.Count < _settings.FlatThreshold)
         {
