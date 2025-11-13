@@ -202,13 +202,13 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
 
             if (node.Neighbors.Count < neighborCount)
             {
-                foreach (FreshVamanaNode neighbor in node.Neighbors.ToArray()) // TODO: optimize
+                foreach (FreshVamanaNode neighbor in node.Neighbors.ToArray())
                 {
                     node.Neighbors.UnionWith(neighbor.Neighbors);
                 }
                 node.Neighbors.ExceptWith(toDelete);
 
-                RobustPrune(node, node.Neighbors, alpha: 1.2f, outdegreeBound: 20);
+                RobustPrune(node, node.Neighbors, alpha: _settings.Alpha, outdegreeBound: _settings.OutDegreeBound);
             }
         }
 
@@ -251,7 +251,7 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
             return FlatSearch(query, k);
         }
 
-        int searchListSize = _deletedNodes.Count + 50;
+        int searchListSize = _deletedNodes.Count + _settings.SearchListSize;
         return GreedySearch(_nodes.First(), query, k, searchListSize).GetClosestK(k);
     }
 

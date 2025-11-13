@@ -92,7 +92,7 @@ public class VectorBenchmarks
     public void NearestNeighbor_Small_IndexedSet()
     {
         Product queryProduct = _smallProductCollection[0];
-        _indexedSetLarge.ApproximateNearestNeighbors(x => x.Embedding!.Vector.Span, queryProduct.Embedding!.Vector.Span, 10)
+        _indexedSetSmall.ApproximateNearestNeighbors(x => x.Embedding!.Vector.Span, queryProduct.Embedding!.Vector.Span, 10)
                         .Consume(_consumer);
     }
 

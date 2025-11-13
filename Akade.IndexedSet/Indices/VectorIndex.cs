@@ -18,7 +18,7 @@ internal class VectorIndex<TElement>(Func<TElement, ReadOnlySpan<float>> keyAcce
 
     internal override void AddRange(IKeyValueEnumerator<ReadOnlySpan<float>, TElement> elementsToAdd)
     {
-        if(_graph.IsEmpty)
+        if (_graph.IsEmpty)
         {
             _graph.BulkLoad(elementsToAdd.GetRawValues());
         }
