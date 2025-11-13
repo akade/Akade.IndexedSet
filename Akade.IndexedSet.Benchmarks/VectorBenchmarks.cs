@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Numerics.Tensors;
 
 namespace Akade.IndexedSet.Benchmarks;
+#pragma warning disable AkadeIndexedSetEXP0003 // The api for the vector indices is experimental
 
 [MemoryDiagnoser]
 [DisassemblyDiagnoser]

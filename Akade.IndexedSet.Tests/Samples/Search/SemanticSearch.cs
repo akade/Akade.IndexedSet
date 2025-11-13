@@ -1,4 +1,6 @@
 ﻿#if NET9_0_OR_GREATER
+#pragma warning disable AkadeIndexedSetEXP0003 // The api for the vector indices is experimental
+
 using Akade.IndexedSet.Concurrency;
 using Bogus;
 using Microsoft.Extensions.AI;

@@ -779,6 +779,7 @@ public class IndexedSet<TElement>
     /// <param name="value">The vector to approximately search the closest neighbors from</param>
     /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
     [ReadAccess]
+    [Experimental(Experiments.VectorIndex, UrlFormat = Experiments.UrlTemplate)]
     public IEnumerable<TElement> ApproximateNearestNeighbors(Func<TElement, ReadOnlySpan<float>> indexAccessor, ReadOnlySpan<float> value, int k, [CallerArgumentExpression(nameof(indexAccessor))] string? indexName = null)
     {
         TypedIndex<TElement, ReadOnlySpan<float>> typedIndex = GetIndex<ReadOnlySpan<float>>(indexName);

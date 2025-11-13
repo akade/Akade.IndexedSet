@@ -376,6 +376,7 @@ public class IndexedSetBuilder<TElement>
     /// string representation of the expression and passed by the compiler to <paramref name="indexName"/>. 
     /// The convention is to always use x as a lambda parameter: x => x.Embedding. Alternatively, you can also always use the same method from a static class.
     /// </summary>
+    [Experimental(Experiments.VectorIndex, UrlFormat = Experiments.UrlTemplate)]
     public virtual IndexedSetBuilder<TElement> WithVectorIndex(Func<TElement, ReadOnlySpan<float>> keyAccessor, [CallerArgumentExpression(nameof(keyAccessor))] string? indexName = null)
     {
         ArgumentNullException.ThrowIfNull(indexName);
