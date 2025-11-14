@@ -1,0 +1,104 @@
+﻿#if NET9_0_OR_GREATER
+using Akade.IndexedSet.DataStructures.FreshVamana;
+
+namespace Akade.IndexedSet.Tests.DataStructures;
+
+[TestClass]
+public class FreshVamanaGraphTests
+{
+    private class TestData(float[] data)
+    {
+        public float[] Data { get; } = data;
+    }
+
+    private readonly Random _random = new(42);
+    private readonly List<TestData> _randomTestData;
+
+    public FreshVamanaGraphTests()
+    {
+        _randomTestData = Enumerable.Range(0, 1000)
+            .Select(_ =>
+            {
+                float[] values = Enumerable.Range(0, 128)
+                    .Select(__ => _random.NextSingle())
+                    .ToArray();
+
+                return new TestData(values);
+            })
+            .ToList();
+    }
+
+    [TestMethod]
+    public void NearestNeighbors_returns_closest_items()
+    {
+        FreshVamanaGraph<TestData> graph = new(x => x.Data.AsSpan(), FreshVamanaSettings.Default);
+
+        foreach (TestData item in _randomTestData)
+        {
+            graph.Add(item);
+        }
+
+        // Calculate top 5 recall for every item
+        _ = AssertRecall(graph);
+    }
+
+    private float AssertRecall(FreshVamanaGraph<TestData> graph, float? minimumRecall = null)
+    {
+        int found = 0;
+        minimumRecall ??= 0.9f;
+
+        foreach (TestData item in _randomTestData)
+        {
+            IEnumerable<TestData> neighbors = graph.ApproximateNearestNeighbors(item.Data.AsSpan(), 5);
+
+            if (neighbors.Contains(item))
+            {
+                found++;
+            }
+        }
+
+        float recall = (float)found / _randomTestData.Count;
+        Assert.IsGreaterThanOrEqualTo(minimumRecall.Value, recall, $"Recall was too low: {recall:P2}");
+        return recall;
+    }
+
+    [TestMethod]
+    public void Stability_when_deleting_items()
+    {
+        FreshVamanaGraph<TestData> graph = new(x => x.Data.AsSpan(), FreshVamanaSettings.Default);
+        
+        foreach (TestData item in _randomTestData)
+        {
+            graph.Add(item);
+        }
+        Console.WriteLine($"Built from scratch: recall: {AssertRecall(graph):P2}");
+
+        HashSet<TestData> items = new(50);
+
+        for (int i = 0; i < 10; i++)
+        {
+            items.Clear();
+
+            while (items.Count < 50)
+            {
+                items.Add(_randomTestData[_random.Next(0, _randomTestData.Count)]);
+            }
+
+            foreach (TestData? item in items)
+            {
+                graph.Delete(item);
+            }
+
+            Console.WriteLine();
+
+            foreach (TestData? item in items)
+            {
+                graph.Add(item);
+            }
+            Console.WriteLine($"Iteration {i + 1} complete: recall: {AssertRecall(graph, 0.85f):P2}");
+        }
+    }
+
+}
+
+#endif

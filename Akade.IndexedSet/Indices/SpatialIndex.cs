@@ -5,7 +5,8 @@ using System.Numerics;
 
 namespace Akade.IndexedSet.Indices;
 
-internal sealed class SpatialIndex<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath>(Func<TElement, TEnvelope> getAABB, int dimensions, RTreeSettings settings, string name) : TypedIndex<TElement, TPoint>(name)
+internal sealed class SpatialIndex<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath>(Func<TElement, TEnvelope> getAABB, int dimensions, RTreeSettings settings, string name)
+    : TypedIndex<TElement, TPoint>(name)
     where TPoint : struct
     where TEnvelope : struct 
     where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>

@@ -20,3 +20,12 @@ on much more generalized axis-aligned bounding boxes. Therefore, the API might c
 a bounding box instead of min/max points.
 
 However, the feature itself is production-ready, supported and is here to stay.
+
+## AkadeIndexedSetEXP0003 
+:information_source: **Vector index (approximate nearest neighbor search)**
+
+The vector index provides approximate nearest neighbor (ANN) search for high-dimensional numeric vectors. It uses an in-memory graph-based index to efficiently find similar vectors and is optimized for read-heavy workloads.
+
+The feature is considered experimental because the public API and configuration options (distance metrics, normalization, indexing parameters) may change.
+
+However, the feature (an ANN index) itself is here to stay.

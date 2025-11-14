@@ -27,7 +27,7 @@ public static class TestHelper
     {
         private readonly TVerifyBase _verifyBase = verifyBase;
 
-        public Task ForSource<TSourceGen>(string source) where TSourceGen : IIncrementalGenerator, new()
+        public async Task ForSource<TSourceGen>(string source, [CallerFilePath] string sourceFile = "") where TSourceGen : IIncrementalGenerator, new()
         {
             SyntaxTree attributeSyntaxTree = CSharpSyntaxTree.ParseText(
                 """
@@ -55,7 +55,8 @@ public static class TestHelper
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
             driver = driver.RunGenerators(compilation);
 
-            return _verifyBase.Verify(driver);
+            var r = await _verifyBase.Verify(driver, sourceFile: sourceFile);
+            Assert.IsTrue(r.Files.Any());
         }
     }
 }

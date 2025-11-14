@@ -754,7 +754,6 @@ public class IndexedSet<TElement>
         return typedIndex.FuzzyContains(infix, maxDistance);
     }
 
-
     /// <summary>
     /// Returns the nearest neighbors of the given value, lazily enumerating from the closest to the furthest neighbors.
     /// Currently supports <see cref="Vector2"/> and <see cref="Vector3"/> as index keys.
@@ -771,6 +770,23 @@ public class IndexedSet<TElement>
         return typedIndex.NearestNeighbors(value);
     }
 
+#if NET9_0_OR_GREATER
+    /// <summary>
+    /// Returns the approximate k nearest neighbors of the given value.
+    /// </summary>
+    /// <param name="indexAccessor">Accessor for the indexed property. The expression as a string is used as an identifier for the index. Hence, the convention is to always use x as an identifier. </param>
+    /// <param name="k">The number of nearest neighbors to return</param>
+    /// <param name="value">The vector to approximately search the closest neighbors from</param>
+    /// <param name="indexName">The name of the index. Usually, you should not specify this as the expression in <paramref name="indexAccessor"/> is automatically passed by the compiler.</param>   
+    [ReadAccess]
+    [Experimental(Experiments.VectorIndex, UrlFormat = Experiments.UrlTemplate)]
+    public IEnumerable<TElement> ApproximateNearestNeighbors(Func<TElement, ReadOnlySpan<float>> indexAccessor, ReadOnlySpan<float> value, int k, [CallerArgumentExpression(nameof(indexAccessor))] string? indexName = null)
+    {
+        TypedIndex<TElement, ReadOnlySpan<float>> typedIndex = GetIndex<ReadOnlySpan<float>>(indexName);
+        return typedIndex.ApproximateNearestNeighbors(value, k);
+    }
+#endif
+
     /// <summary>
     /// Returns all values by fully enumerating the entire set.
     /// </summary>
@@ -781,7 +797,11 @@ public class IndexedSet<TElement>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private TypedIndex<TElement, TIndexKey> GetIndex<TIndexKey>(string? indexName)
+    #if NET9_0_OR_GREATER
+        where TIndexKey : notnull, allows ref struct
+    #else
         where TIndexKey : notnull
+    #endif
     {
         ArgumentNullException.ThrowIfNull(indexName);
 

@@ -53,5 +53,8 @@
 	<ItemGroup>
 		<AdditionalFiles Include="PublicAPI/PublicAPI.Shipped.txt" />
 		<AdditionalFiles Include="PublicAPI/PublicAPI.Unshipped.txt" />
+		<AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
+		<AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
+
 	</ItemGroup>
 </Project>

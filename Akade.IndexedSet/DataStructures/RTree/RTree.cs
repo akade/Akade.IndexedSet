@@ -7,8 +7,6 @@ namespace Akade.IndexedSet.DataStructures.RTree;
 /// Implemented based on https://github.com/georust/rstar/blob/master/rstar/src/algorithm/rstar.rs (MIT/Apache-2.0 License).
 /// Many thanks for the legwork
 /// </summary>
-
-// TODO: explore on how to specialize with minimal code duplication for Vector2 & Vector3
 internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath>
     where TPoint : struct
     where TEnvelope : struct
@@ -61,10 +59,6 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
             {
                 throw new InvalidOperationException("Node has an uninitialized AABB, which is not allowed.");
             }
-            //if ((_root != node && !isBulkLoaded && node.Children.Count < _settings.MinNodeEntries) || node.Children.Count > _settings.MaxNodeEntries)
-            //{
-            //    throw new InvalidOperationException($"Node has an invalid number of children: {node.Children.Count} [{_settings.MinNodeEntries} - {_settings.MaxNodeEntries}]");
-            //}
 
             TEnvelope parent = node.Envelope;
 

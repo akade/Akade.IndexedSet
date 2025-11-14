@@ -110,7 +110,12 @@ internal abstract class TypedIndex<TElement, TIndexKey>(string name) : Index<TEl
 
     internal virtual IEnumerable<TElement> NearestNeighbors(TIndexKey indexKey)
     {
-        throw new NotSupportedException($"Nearest queries are not supported on {GetType().Name}-indices. Use a spatial or vector index to support this scenario.");
+        throw new NotSupportedException($"Nearest queries are not supported on {GetType().Name}-indices. Use a spatial index to support this scenario.");
+    }
+
+    internal virtual IEnumerable<TElement> ApproximateNearestNeighbors(TIndexKey indexKey, int k)
+    {
+        throw new NotSupportedException($"Approximate nearest queries are not supported on {GetType().Name}-indices. Use a vector index to support this scenario.");
     }
 
 }
