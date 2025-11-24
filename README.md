@@ -33,10 +33,9 @@ through your data, expect huge [speedups](docs/Benchmarks.md) and much better sc
 
 ## Overview
 
-A sample showing different queries as you might want do for a report:
+A sample showing different indices and queries:
 
 ```csharp
-// typically, you would query this from the db
 var data = new Purchase[] {
         new(Id: 1, ProductId: 1, Amount: 1, UnitPrice: 5),
         new(Id: 2, ProductId: 1, Amount: 2, UnitPrice: 5),
@@ -97,15 +96,23 @@ Below, you find runtime complexities. Benchmarks can be found [here](docs/Benchm
 - r: number of items in result set
 
 | Query           | Prefix-Index | FullText-Index |
-| ----------------| ------------ | ---------------|
-| StartWith       | ✔ O(w+r)      | ✔ O(w+r)       |
-| Contains        | ❌           | ✔ O(w+r)        |
-| Fuzzy StartWith | ✔ O(w+D+r)    | ✔ O(w+D+r)     |
-| Fuzzy Contains  | ❌           | ✔ O(w+D+r)      |
+| ----------------| ------------ | -------------- |
+| StartWith       | ✔ O(w+r)     | ✔ O(w+r)     |
+| Contains        | ❌           | ✔ O(w+r)      |
+| Fuzzy StartWith | ✔ O(w+D+r)   | ✔ O(w+D+r)   |
+| Fuzzy Contains  | ❌           | ✔ O(w+D+r)    |
 
 > ℹ FullText indices use a lot more memory than prefix indices and are more expensive to construct. Only
 use FullText indices if you really require it.
 
+#### Spatial queries
+
+The spatial index is based on an R*Tree. Runtime complexity for search of kNN is ~O(max height of tree),
+if we assume a low degree of overlap of the bounding boxes. Worst case in theory is O(n), but in practice
+the performance is usually pretty decent. 
+
+> ℹ The performance of spatial queries depends heavily on the distribution of the data. Consider using
+bulk-loading (i.e. specify the data at indexedset creation) for best performance.
 
 ## Features
 
