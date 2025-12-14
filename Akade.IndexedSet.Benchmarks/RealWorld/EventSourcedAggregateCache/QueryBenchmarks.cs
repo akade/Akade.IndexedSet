@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 namespace Akade.IndexedSet.Benchmarks.RealWorld.EventSourcedAggregateCache;
 
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net90)]
+[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net10_0)]
 public class QueryBenchmarks
 {
     private readonly ConcurrentIndexedSet<AggregateId, Aggregate> _set = IndexedSetBuilder<Aggregate>.Create(x => x.Id)
