@@ -150,12 +150,14 @@ virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithRangeIndex<TIndexKey>(S
 virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithRangeIndex<TIndexKey>(System.Func<TElement, TIndexKey>! keyAccessor, System.Collections.Generic.IComparer<TIndexKey>? keyComparer = null, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!
 virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithUniqueIndex<TIndexKey>(System.Func<TElement, System.Collections.Generic.IEnumerable<TIndexKey>!>! keyAccessor, System.Collections.Generic.IEqualityComparer<TIndexKey>? keyComparer = null, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!
 virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithUniqueIndex<TIndexKey>(System.Func<TElement, TIndexKey>! keyAccessor, System.Collections.Generic.IEqualityComparer<TIndexKey>? keyComparer = null, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!
-
 Akade.IndexedSet.StringUtilities.CharEqualityComparer
 static Akade.IndexedSet.StringUtilities.CharEqualityComparer.IgnoreCase(System.Globalization.CultureInfo! cultureInfo) -> System.Collections.Generic.IEqualityComparer<char>!
 static Akade.IndexedSet.StringUtilities.CharEqualityComparer.OrdinalIgnoreCase.get -> System.Collections.Generic.IEqualityComparer<char>!
-
-
-
 override Akade.IndexedSet.IndexedSetBuilder<TPrimaryKey, TElement>.WithFullTextIndex(System.Func<TElement, System.Collections.Generic.IEnumerable<string!>!>! keyAccessor, System.Collections.Generic.IEqualityComparer<char>? comparer = null, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!
 override Akade.IndexedSet.IndexedSetBuilder<TPrimaryKey, TElement>.WithPrefixIndex(System.Func<TElement, System.Collections.Generic.IEnumerable<string!>!>! keyAccessor, System.Collections.Generic.IEqualityComparer<char>? comparer = null, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TPrimaryKey, TElement>!
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.Intersects<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, TIndexKey min, TIndexKey max, bool inclusiveBoundary = true, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.NearestNeighbors<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, TIndexKey value, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
+Akade.IndexedSet.IndexedSet<TElement>.Intersects<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, TIndexKey min, TIndexKey max, bool inclusiveBoundary = true, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
+Akade.IndexedSet.IndexedSet<TElement>.NearestNeighbors<TIndexKey>(System.Func<TElement, TIndexKey>! indexAccessor, TIndexKey value, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
+override Akade.IndexedSet.IndexedSetBuilder<TPrimaryKey, TElement>.WithSpatialIndex<TPoint>(System.Func<TElement, TPoint>! keyAccessor, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TPrimaryKey, TElement>!
+virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithSpatialIndex<TPoint>(System.Func<TElement, TPoint>! keyAccessor, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!

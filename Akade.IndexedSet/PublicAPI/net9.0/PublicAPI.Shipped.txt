@@ -1,0 +1,4 @@
+#nullable enable
+virtual Akade.IndexedSet.IndexedSetBuilder<TElement>.WithVectorIndex(System.Func<TElement, System.ReadOnlySpan<float>>! keyAccessor, string? indexName = null) -> Akade.IndexedSet.IndexedSetBuilder<TElement>!
+Akade.IndexedSet.Concurrency.ConcurrentIndexedSet<TElement>.ApproximateNearestNeighbors(System.Func<TElement, System.ReadOnlySpan<float>>! indexAccessor, System.ReadOnlySpan<float> value, int k, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!
+Akade.IndexedSet.IndexedSet<TElement>.ApproximateNearestNeighbors(System.Func<TElement, System.ReadOnlySpan<float>>! indexAccessor, System.ReadOnlySpan<float> value, int k, string? indexName = null) -> System.Collections.Generic.IEnumerable<TElement>!

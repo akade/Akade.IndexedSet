@@ -8,8 +8,8 @@
 
 	<PropertyGroup>
 		<Version>1.4.0</Version>
-		<Description>Provides an In-Memory data structure, the IndexedSet, that allows to easily add indices to allow efficient querying. Currently supports unique and non-unique indices, range indices as well as fuzzy string matching for single attributes, compound or computed keys.</Description>
-		<Copyright>Copyright © Akade 2024</Copyright>
+		<Description>Provides an In-Memory data structure, the IndexedSet, that allows to easily add indices to allow efficient querying. Currently supports unique and non-unique indices, range indices, fuzzy string matching, spatial and vector indices for properties, compound or computed keys.</Description>
+		<Copyright>Copyright © Akade 2025</Copyright>
 		<Authors>Akade</Authors>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RepositoryUrl>https://github.com/akade/Akade.IndexedSet</RepositoryUrl>
