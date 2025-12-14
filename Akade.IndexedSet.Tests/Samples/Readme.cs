@@ -10,7 +10,7 @@ public class Readme
     {
         public int MutableProperty { get; set; }
 
-        public int[] AlternativeKeys { get; set; } = [];
+        public IEnumerable<int> AlternativeKeys { get; set; } = [];
     }
 
     [TestMethod]
@@ -49,7 +49,7 @@ public class Readme
                                                    .Build();
 
         _ = set.Add(new(PrimaryKey: 1, SecondaryKey: 2) { AlternativeKeys = [3, 4] });
-        _ = set.Single(x => x.AlternativeKeys, 3); // returns above element
+        _ = set.Single(x => x.AlternativeKeys, contains: 3); // returns above element
     }
     private record GraphNode(int Id, IEnumerable<int> ConnectsTo);
 

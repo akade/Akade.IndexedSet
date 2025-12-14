@@ -216,7 +216,7 @@ IndexedSet<int, Data> set = IndexedSetBuilder<Data>.Create(a => a.PrimaryKey)
                                            .Build();
 
 _ = set.Add(new(PrimaryKey: 1, SecondaryKey: 2) { AlternativeKeys = [3, 4] });
-_ = set.Single(x => x.AlternativeKeys, 3); // returns above element
+_ = set.Single(x => x.AlternativeKeys, contains: 3); // returns above element
 ```
 <!-- end-snippet -->
 
