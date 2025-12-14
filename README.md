@@ -1,4 +1,4 @@
-﻿# Akade.IndexedSet
+# Akade.IndexedSet
 
 ![.Net Version](https://img.shields.io/badge/dynamic/xml?color=%23512bd4&label=version&query=%2F%2FTargetFrameworks%5B1%5D&url=https://raw.githubusercontent.com/akade/Akade.IndexedSet/main/Akade.IndexedSet/Akade.IndexedSet.csproj&logo=.net)
 [![CI Build](https://github.com/akade/Akade.IndexedSet/actions/workflows/ci-build.yml/badge.svg?branch=main)](https://github.com/akade/Akade.IndexedSet/actions/workflows/ci-build.yml)
@@ -15,6 +15,7 @@ through your data, expect huge [speedups](docs/Benchmarks.md) and much better sc
     - [Performance and Operation-Support of the different indices:](#performance-and-operation-support-of-the-different-indices)
       - [General queries](#general-queries)
       - [String queries](#string-queries)
+      - [Spatial queries](#spatial-queries)
   - [Features](#features)
     - [Unique index](#unique-index)
     - [Non-unique index](#non-unique-index)
@@ -33,16 +34,16 @@ through your data, expect huge [speedups](docs/Benchmarks.md) and much better sc
 
 ## Overview
 
-A sample showing different queries as you might want do for a report:
+A sample showing different indices and queries:
 
-```csharp
-// typically, you would query this from the db
+<!-- begin-snippet: Akade.IndexedSet.Tests/Samples/Readme.cs Overview(importer:cs?body-only=true) -->
+```cs
 var data = new Purchase[] {
-        new(Id: 1, ProductId: 1, Amount: 1, UnitPrice: 5),
-        new(Id: 2, ProductId: 1, Amount: 2, UnitPrice: 5),
-        new(Id: 6, ProductId: 4, Amount: 3, UnitPrice: 12),
-        new(Id: 7, ProductId: 4, Amount: 8, UnitPrice: 10) // discounted price
-        };
+    new(Id: 1, ProductId: 1, Amount: 1, UnitPrice: 5),
+    new(Id: 2, ProductId: 1, Amount: 2, UnitPrice: 5),
+    new(Id: 6, ProductId: 4, Amount: 3, UnitPrice: 12),
+    new(Id: 7, ProductId: 4, Amount: 8, UnitPrice: 10) // discounted price
+    };
 
 IndexedSet<int, Purchase> set = data.ToIndexedSet(x => x.Id)
                                     .WithIndex(x => x.ProductId)
@@ -53,13 +54,13 @@ IndexedSet<int, Purchase> set = data.ToIndexedSet(x => x.Id)
                                     .Build();
 
 // efficient queries on configured indices
-// in contrast to standard LINQ, they do not enumerate the entire list!
 _ = set.Where(x => x.ProductId, 4);
-_ = set.Range(x => x.Amount, 1, 3, inclusiveStart: true, inclusiveEnd: true); 
+_ = set.Range(x => x.Amount, 1, 3, inclusiveStart: true, inclusiveEnd: true);
 _ = set.GreaterThanOrEqual(x => x.UnitPrice, 10);
 _ = set.MaxBy(x => x.Amount * x.UnitPrice);
 _ = set.Where(x => (x.ProductId, x.UnitPrice), (4, 10));
 ```
+<!-- end-snippet -->
 
 ### Design Goals
 - Much faster solution than (naive) LINQ-based full-enumeration
@@ -97,22 +98,31 @@ Below, you find runtime complexities. Benchmarks can be found [here](docs/Benchm
 - r: number of items in result set
 
 | Query           | Prefix-Index | FullText-Index |
-| ----------------| ------------ | ---------------|
-| StartWith       | ✔ O(w+r)      | ✔ O(w+r)       |
-| Contains        | ❌           | ✔ O(w+r)        |
-| Fuzzy StartWith | ✔ O(w+D+r)    | ✔ O(w+D+r)     |
-| Fuzzy Contains  | ❌           | ✔ O(w+D+r)      |
+| ----------------| ------------ | -------------- |
+| StartWith       | ✔ O(w+r)     | ✔ O(w+r)     |
+| Contains        | ❌           | ✔ O(w+r)      |
+| Fuzzy StartWith | ✔ O(w+D+r)   | ✔ O(w+D+r)   |
+| Fuzzy Contains  | ❌           | ✔ O(w+D+r)    |
 
 > ℹ FullText indices use a lot more memory than prefix indices and are more expensive to construct. Only
 use FullText indices if you really require it.
 
+#### Spatial queries
+
+The spatial index is based on an R*Tree. Runtime complexity for search of kNN is ~O(max height of tree),
+if we assume a low degree of overlap of the bounding boxes. Worst case in theory is O(n), but in practice
+the performance is usually pretty decent. 
+
+> ℹ The performance of spatial queries depends heavily on the distribution of the data. Consider using
+bulk-loading (i.e. specify the data at indexedset creation) for best performance.
 
 ## Features
 
 ### Unique index
 Dictionary-based, O(1), access on keys:
 
-```csharp
+<!-- begin-snippet: Akade.IndexedSet.Tests/Samples/Readme.cs Features_UniqueIndex(importer:cs?body-only=true) -->
+```cs
 IndexedSet<int, Data> set = IndexedSetBuilder<Data>.Create(a => a.PrimaryKey)
                                                    .WithUniqueIndex(x => x.SecondaryKey)
                                                    .Build();
@@ -125,6 +135,7 @@ Data data = set[1];
 // fast access via secondary key
 data = set.Single(x => x.SecondaryKey, 5);
 ```
+<!-- end-snippet -->
 
 > ℹ Entities do not require a primary key. `IndexedSet<TPrimaryKey, TData>` inherits from `IndexedSet<TData>`
 but provides convenient access to the automatically added unique index: `set[primaryKey]` instead 
@@ -134,20 +145,23 @@ of `set.Single(x => x.PrimaryKey, primaryKey)`.
 ### Non-unique index
 Dictionary-based, O(1), access on keys (single value) with multiple values (multiple keys):
 
-```csharp
-IndexedSet<int, Data> set = new Data[] { new(PrimaryKey: 1, SecondaryKey: 5), new(PrimaryKey: 2, SecondaryKey: 5) }
-        .ToIndexedSet(x => x.PrimaryKey)
-        .WithIndex(x => x.SecondaryKey)
-        .Build();
+<!-- begin-snippet: Akade.IndexedSet.Tests/Samples/Readme.cs Features_NonUniqueIndex_SingleKey(importer:cs?body-only=true) -->
+```cs
+IndexedSet<int, Data>? set = new Data[] { new(PrimaryKey: 1, SecondaryKey: 5), new(PrimaryKey: 2, SecondaryKey: 5) }
+    .ToIndexedSet(x => x.PrimaryKey)
+    .WithIndex(x => x.SecondaryKey)
+    .Build();
 
 // fast access via secondary key
 IEnumerable<Data> data = set.Where(x => x.SecondaryKey, 5);
 ```
+<!-- end-snippet -->
 
 ### Range index
 Binary-heap based O(log(n)) access for range based, smaller than (or equals) or bigger than (or equals) and orderby queries. Also useful to do paging sorted on exactly one index.
 
-```csharp
+<!-- begin-snippet: Akade.IndexedSet.Tests/Samples/Readme.cs Features_RangeIndex(importer:cs?body-only=true) -->
+```cs
 IndexedSet<Data> set = IndexedSetBuilder.Create(new Data[] { new(1, SecondaryKey: 3), new(2, SecondaryKey: 4) })
                                         .WithRangeIndex(x => x.SecondaryKey)
                                         .Build();
@@ -165,46 +179,51 @@ data = set.LessThan(x => x.SecondaryKey, 4);
 // fast ordering & paging
 data = set.OrderBy(x => x.SecondaryKey, skip: 10).Take(10); // second page of 10 elements
 ```
+<!-- end-snippet -->
 
 ### String indices and fuzzy matching
 Prefix- & Suffix-Trie based indices for efficient StartWith & String-Contains queries including support
 for fuzzy matching.
 
-```csharp
+<!-- begin-snippet: Akade.IndexedSet.Tests/Samples/Readme.cs Features_StringQueries(importer:cs?body-only=true) -->
+```cs
 IndexedSet<Type> data = typeof(object).Assembly.GetTypes()
                                                .ToIndexedSet()
                                                .WithPrefixIndex(x => x.Name)
-                                               .WithFullTextIndex(x => x.FullName)
+                                               .WithFullTextIndex(x => x.FullName!)
                                                .Build();
 
 // fast prefix or contains queries via indices
 _ = data.StartsWith(x => x.Name, "Int");
-_ = data.Contains(x => x.FullName, "Int");
+_ = data.Contains(x => x.FullName!, "Int");
 
 // fuzzy searching is supported by prefix and full text indices
 // the following will also match "String"
 _ = data.FuzzyStartsWith(x => x.Name, "Strang", 1);
-_ = data.FuzzyContains(x => x.FullName, "Strang", 1);
+_ = data.FuzzyContains(x => x.FullName!, "Strang", 1);
 ```
+<!-- end-snippet -->
 
 ### Multi-key indices: All indices can be used with multiple keys
 There are overloads for all indices that allow to use multiple keys. 
 
 You can have a unique index where each element can have multiple keys:
 
-```csharp
-
+<!-- begin-snippet: Akade.IndexedSet.Tests/Samples/Readme.cs Features_UniqueIndex_MultipleKeys(importer:cs?body-only=true) -->
+```cs
 IndexedSet<int, Data> set = IndexedSetBuilder<Data>.Create(a => a.PrimaryKey)
-												   .WithUniqueIndex(x => x.AlternativeKeys) // Where AlternativeKeys returns an IEnumerable<int>
-												   .Build();
+                                           .WithUniqueIndex(x => x.AlternativeKeys) // Where AlternativeKeys returns an IEnumerable<int>
+                                           .Build();
 
-_ = set.Add(new(PrimaryKey: 1, AlternativeKeys: new[] { 3, 4 }));
-set.Single(x => x.AlternativeKeys, 3); // returns above element
+_ = set.Add(new(PrimaryKey: 1, SecondaryKey: 2) { AlternativeKeys = [3, 4] });
+_ = set.Single(x => x.AlternativeKeys, contains: 3); // returns above element
 ```
+<!-- end-snippet -->
 
-The same applies for all other index types, for example for non-unique indices:
+The same applies for most other index types, for example for non-unique indices:
 
-```csharp
+<!-- begin-snippet: Akade.IndexedSet.Tests/Samples/Readme.cs Features_NonUniqueIndex_MultipleKeys(importer:cs?body-only=true) -->
+```cs
 IndexedSet<int, GraphNode> set = IndexedSetBuilder<GraphNode>.Create(a => a.Id)
                                                              .WithIndex(x => x.ConnectsTo) // Where ConnectsTo returns an IEnumerable<int>
                                                              .Build();
@@ -215,10 +234,10 @@ IndexedSet<int, GraphNode> set = IndexedSetBuilder<GraphNode>.Create(a => a.Id)
 //    \|
 //     4
 
-_ = set.Add(new(Id: 1, ConnectsTo: new[] { 3, 4 }));
-_ = set.Add(new(Id: 2, ConnectsTo: new[] { 3 }));
-_ = set.Add(new(Id: 3, ConnectsTo: new[] { 1, 2, 3 }));
-_ = set.Add(new(Id: 4, ConnectsTo: new[] { 1, 3 }));
+_ = set.Add(new(Id: 1, ConnectsTo: [3, 4]));
+_ = set.Add(new(Id: 2, ConnectsTo: [3]));
+_ = set.Add(new(Id: 3, ConnectsTo: [1, 2, 3]));
+_ = set.Add(new(Id: 4, ConnectsTo: [1, 3]));
 
 // For readability, it is recommended to write the name for the parameter contains
 IEnumerable<GraphNode> nodesThatConnectTo1 = set.Where(x => x.ConnectsTo, contains: 1); // returns nodes 3 & 4
@@ -227,6 +246,7 @@ IEnumerable<GraphNode> nodesThatConnectTo3 = set.Where(x => x.ConnectsTo, contai
 // Non-optimized Where(x => x.Contains(...)) query:
 nodesThatConnectTo1 = set.FullScan().Where(x => x.ConnectsTo.Contains(1)); // returns nodes 3 & 4, but enumerates through the entire set
 ```
+<!-- end-snippet -->
 
 > :information_source: For range queries, this introduces a small overhead as the results are filtered to be distinct: 
 > i.e. `O(log n + m log m)` instead of `O(log n + m)`.
@@ -238,7 +258,8 @@ nodesThatConnectTo1 = set.FullScan().Where(x => x.ConnectsTo.Contains(1)); // re
 
 The data structure also allows to use computed or compound keys:
 
-```csharp
+<!-- begin-snippet: Akade.IndexedSet.Tests/Samples/Readme.cs Features_ComputedOrCompoundKey(importer:cs?body-only=true) -->
+```cs
 var data = new RangeData[] { new(Start: 2, End: 10) };
 IndexedSet<RangeData> set = data.ToIndexedSet()
                                 .WithIndex(x => (x.Start, x.End))
@@ -250,6 +271,7 @@ IEnumerable<RangeData> result = set.Where(x => (x.Start, x.End), (2, 10));
 result = set.Where(x => x.End - x.Start, 8);
 result = set.Where(ComputedKey.SomeStaticMethod, 42);
 ```
+<!-- end-snippet -->
 > ℹ For more samples, take a look at the unit tests.
 
 ### Concurrency and Thread-Safety
@@ -257,11 +279,13 @@ result = set.Where(ComputedKey.SomeStaticMethod, 42);
 The "normal" indexedset is not thread-safe, however, a ReaderWriterLock-based implementation is available.
 Just call `BuildConcurrent()` instead of `Build()`:
 
-```csharp
-ConcurrentIndexedSet<RangeData> set = data.ToIndexedSet()
-                                          .WithIndex(x => (x.Start, x.End))
-                                          .BuildConcurrent();
+<!-- begin-snippet: Akade.IndexedSet.Tests/Samples/Readme.cs Features_Concurrency(importer:cs?body-only=true) -->
+```cs
+ConcurrentIndexedSet<Data> set = IndexedSetBuilder<Data>.Create()
+                                                        .WithIndex(x => x.SecondaryKey)
+                                                        .BuildConcurrent();
 ```
+<!-- end-snippet -->
 
 > ⚠ The concurrent implementation needs to materialize all query results.<br />
 > `OrderBy` and `OrderByDescending` take an additional `count` parameter to avoid unnecessary materialization.
@@ -292,9 +316,8 @@ Reasons
 
 Use "named" indices by using static methods:
 
-```csharp
-record Data(int PrimaryKey, int SecondaryKey);
-
+<!-- begin-snippet: Akade.IndexedSet.Tests/Samples/Readme.cs FAQ_MultipleIndicesForSameProperty(importer:cs?body-only=true) -->
+```cs
 IndexedSet<int, Data> set = IndexedSetBuilder<Data>.Create(x => x.PrimaryKey)
                                                    .WithUniqueIndex(DataIndices.UniqueIndex)
                                                    .WithRangeIndex(x => x.SecondaryKey)
@@ -305,6 +328,7 @@ Data data = set.Single(DataIndices.UniqueIndex, 4); // Uses the unique index
 Data data2 = set.Single(x => x.SecondaryKey, 4); // Uses the range index
 IEnumerable<Data> inRange = set.Range(x => x.SecondaryKey, 1, 10); // Uses the range index
 ```
+<!-- end-snippet -->
 
 > ℹ We recommend using the lambda syntax for "simple" properties and static methods for more complicated ones. It's easy to read, resembles "normal" LINQ-Queries and all the magic strings are compiler generated.
 
@@ -313,12 +337,17 @@ IEnumerable<Data> inRange = set.Range(x => x.SecondaryKey, 1, 10); // Uses the r
 You can manually remove, update and add an object. However, there are some helper methods for that - which is especially
 useful for the concurrent variant as it provides thread-safe serialized access.
 
-```csharp
+<!-- begin-snippet: Akade.IndexedSet.Tests/Samples/Readme.cs FAQ_UpdatingKeys(importer:cs?body-only=true) -->
+```cs
+IndexedSet<Data> set = IndexedSetBuilder<Data>.Create(x => x.PrimaryKey).Build();
+ConcurrentIndexedSet<Data> concurrentSet = IndexedSetBuilder<Data>.Create(x => x.PrimaryKey).BuildConcurrent();
+Data dataElement = new(1, 4);
+
 // updating a mutable property
 _ = set.Update(dataElement, e => e.MutableProperty = 7);
 // updating an immutable property
 _ = set.Update(dataElement, e => e with { SecondaryKey = 12 });
-// be careful: the dataElement still refers to the "old" record after the update method
+// be careful, the second time will do an add as dataElement still refers to the "old" record
 _ = set.Update(dataElement, e => e with { SecondaryKey = 12 });
 
 // updating in an concurrent set
@@ -328,17 +357,20 @@ concurrentSet.Update(set =>
     // in an multi-threaded environment
 });
 ```
+<!-- end-snippet -->
 
 ### How do I do case-insensitve (fuzzy) string matching (Prefix, FullTextIndex)?
 While you can use whatever index expression that you want (i.e. `.ToLowerInvariant()`), 
 using a comparer is recommended:
 
-```csharp
+<!-- begin-snippet: Akade.IndexedSet.Tests/Samples/Readme.cs FAQ_CaseInsensitiveFuzzyMatching(importer:cs?body-only=true) -->
+```cs
 IndexedSet<Data> set = IndexedSetBuilder<Data>.Create(x => x.PrimaryKey)
                                               .WithFullTextIndex(x => x.Text, CharEqualityComparer.OrdinalIgnoreCase)
                                               .Build();
 IEnumerable<Data> matches = set.FuzzyContains(x => x.Text, "Search", maxDistance: 2);
 ```
+<!-- end-snippet -->
 
 ## Roadmap
 Potential features (not ordered):

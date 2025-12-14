@@ -4,6 +4,7 @@ using BenchmarkDotNet.Attributes;
 namespace Akade.IndexedSet.Benchmarks.RealWorld.EventSourcedAggregateCache;
 
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net90)]
+[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net10_0)]
 public class RehydrationBenchmark
 {
     private readonly ConcurrentIndexedSet<AggregateId, Aggregate> _set = IndexedSetBuilder<Aggregate>.Create(x => x.Id)

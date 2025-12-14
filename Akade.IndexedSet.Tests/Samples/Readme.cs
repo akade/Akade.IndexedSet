@@ -1,4 +1,5 @@
 ﻿using Akade.IndexedSet.Concurrency;
+using Akade.IndexedSet.StringUtilities;
 
 namespace Akade.IndexedSet.Tests.Samples;
 
@@ -8,6 +9,8 @@ public class Readme
     private record Data(int PrimaryKey, int SecondaryKey, string Text = "")
     {
         public int MutableProperty { get; set; }
+
+        public IEnumerable<int> AlternativeKeys { get; set; } = [];
     }
 
     [TestMethod]
@@ -38,6 +41,16 @@ public class Readme
         IEnumerable<Data> data = set.Where(x => x.SecondaryKey, 5);
     }
 
+    [TestMethod]
+    public void Features_UniqueIndex_MultipleKeys()
+    {
+        IndexedSet<int, Data> set = IndexedSetBuilder<Data>.Create(a => a.PrimaryKey)
+                                                   .WithUniqueIndex(x => x.AlternativeKeys) // Where AlternativeKeys returns an IEnumerable<int>
+                                                   .Build();
+
+        _ = set.Add(new(PrimaryKey: 1, SecondaryKey: 2) { AlternativeKeys = [3, 4] });
+        _ = set.Single(x => x.AlternativeKeys, contains: 3); // returns above element
+    }
     private record GraphNode(int Id, IEnumerable<int> ConnectsTo);
 
     [TestMethod]
@@ -105,6 +118,14 @@ public class Readme
     }
 
     [TestMethod]
+    public void Features_Concurrency()
+    {
+        ConcurrentIndexedSet<Data> set = IndexedSetBuilder<Data>.Create()
+                                                                .WithIndex(x => x.SecondaryKey)
+                                                                .BuildConcurrent();
+    }
+
+    [TestMethod]
     public void Features_StringQueries()
     {
         IndexedSet<Type> data = typeof(object).Assembly.GetTypes()
@@ -141,9 +162,9 @@ public class Readme
     public void FAQ_CaseInsensitiveFuzzyMatching()
     {
         IndexedSet<Data> set = IndexedSetBuilder<Data>.Create(x => x.PrimaryKey)
-                                                      .WithFullTextIndex(x => x.Text.ToLowerInvariant())
+                                                      .WithFullTextIndex(x => x.Text, CharEqualityComparer.OrdinalIgnoreCase)
                                                       .Build();
-        IEnumerable<Data> matches = set.FuzzyContains(x => x.Text.ToLowerInvariant(), "Search", maxDistance: 2);
+        IEnumerable<Data> matches = set.FuzzyContains(x => x.Text, "Search", maxDistance: 2);
     }
 
     [TestMethod]

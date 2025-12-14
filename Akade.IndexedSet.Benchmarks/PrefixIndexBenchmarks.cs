@@ -8,6 +8,7 @@ namespace Akade.IndexedSet.Benchmarks;
 [MemoryDiagnoser]
 [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net90)]
+[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net10_0)]
 [JsonExporter]
 public class PrefixIndexBenchmarks
 {

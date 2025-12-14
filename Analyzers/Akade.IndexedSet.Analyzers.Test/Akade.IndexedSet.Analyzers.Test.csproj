@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
@@ -23,8 +23,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Akade.IndexedSet\Akade.IndexedSet.csproj" />
-	  <ProjectReference Include="..\Akade.IndexedSet.Analyzers\Akade.IndexedSet.Analyzers.csproj" />
-	  <ProjectReference Include="..\Akade.IndexedSet.Analyzers.Fixes\Akade.IndexedSet.Analyzers.Fixes.csproj" />
+    <ProjectReference Include="..\Akade.IndexedSet.Analyzers\Akade.IndexedSet.Analyzers.csproj" />
+    <ProjectReference Include="..\Akade.IndexedSet.Analyzers.Fixes\Akade.IndexedSet.Analyzers.Fixes.csproj" />
   </ItemGroup>
 
 </Project>
