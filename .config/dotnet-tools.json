@@ -6,7 +6,15 @@
       "version": "5.4.18",
       "commands": [
         "reportgenerator"
-      ]
+      ],
+      "rollForward": false
+    },
+    "akade.snippetlink": {
+      "version": "0.2.1",
+      "commands": [
+        "snippet-link"
+      ],
+      "rollForward": false
     }
   }
 }
