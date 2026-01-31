@@ -1,5 +1,6 @@
 ﻿using Akade.IndexedSet.Concurrency;
 using Akade.IndexedSet.StringUtilities;
+using System.Numerics;
 
 namespace Akade.IndexedSet.Tests.Samples;
 
@@ -143,6 +144,60 @@ public class Readme
         _ = data.FuzzyStartsWith(x => x.Name, "Strang", 1);
         _ = data.FuzzyContains(x => x.FullName!, "Strang", 1);
     }
+
+#pragma warning disable AkadeIndexedSetEXP0002
+    [TestMethod]
+    public void Features_SpatialIndex()
+    {
+        var locations = new Vector2[]
+        {
+            new(100, 150), 
+            new(250, 200), 
+            new(400, 500), 
+            new(50, 75)
+        };
+
+        IndexedSet<Vector2> spatialSet = locations.ToIndexedSet()
+                                                  .WithSpatialIndex(x => x)
+                                                  .Build();
+
+        Vector2 searchCenter = new(200, 200);
+        Vector2 areaMin = new(150, 150);
+        Vector2 areaMax = new(300, 250);
+
+        // fast spatial queries
+        IEnumerable<Vector2> pointsInArea = spatialSet.Intersects(x => x, areaMin, areaMax);
+        IEnumerable<Vector2> nearestPoints = spatialSet.NearestNeighbors(x => x, searchCenter).Take(2);
+    }
+#pragma warning restore AkadeIndexedSetEXP0002
+
+#if NET9_0_OR_GREATER
+    private record Document(string Title, ReadOnlyMemory<float> Embedding);
+
+#pragma warning disable AkadeIndexedSetEXP0003
+    [TestMethod]
+    public void Features_VectorIndex()
+    {
+        // Sample document vectors (simplified for example)
+        var documents = new Document[]
+        {
+            new("Machine Learning Basics", new float[] { 0.1f, 0.8f, 0.3f, 0.9f }),
+            new("Deep Learning Guide", new float[] { 0.2f, 0.9f, 0.4f, 0.8f }),
+            new("Cooking Recipes", new float[] { 0.9f, 0.1f, 0.8f, 0.2f }),
+            new("Travel Guide", new float[] { 0.3f, 0.2f, 0.9f, 0.1f })
+        };
+
+        IndexedSet<Document> vectorSet = documents.ToIndexedSet()
+                                                  .WithVectorIndex(x => x.Embedding.Span)
+                                                  .Build();
+
+        ReadOnlySpan<float> queryVector = [0.15f, 0.85f, 0.35f, 0.85f];
+
+        // fast approximate nearest neighbor search
+        IEnumerable<Document> similarDocuments = vectorSet.ApproximateNearestNeighbors(x => x.Embedding.Span, queryVector, k: 2);
+    }
+#pragma warning restore AkadeIndexedSetEXP0003
+#endif
 
     [TestMethod]
     public void FAQ_MultipleIndicesForSameProperty()

@@ -16,6 +16,7 @@ through your data, expect huge [speedups](docs/Benchmarks.md) and much better sc
       - [General queries](#general-queries)
       - [String queries](#string-queries)
       - [Spatial queries](#spatial-queries)
+      - [Vector queries](#vector-queries)
   - [Features](#features)
     - [Unique index](#unique-index)
     - [Non-unique index](#non-unique-index)
@@ -23,6 +24,8 @@ through your data, expect huge [speedups](docs/Benchmarks.md) and much better sc
     - [String indices and fuzzy matching](#string-indices-and-fuzzy-matching)
     - [Multi-key indices: All indices can be used with multiple keys](#multi-key-indices-all-indices-can-be-used-with-multiple-keys)
     - [Computed or compound key](#computed-or-compound-key)
+    - [Spatial index](#spatial-index)
+    - [Vector index](#vector-index)
     - [Concurrency and Thread-Safety](#concurrency-and-thread-safety)
     - [No reflection and no expressions - convention-based index naming](#no-reflection-and-no-expressions-convention-based-index-naming)
   - [FAQs](#faqs)
@@ -115,6 +118,12 @@ the performance is usually pretty decent.
 
 > ℹ The performance of spatial queries depends heavily on the distribution of the data. Consider using
 bulk-loading (i.e. specify the data at indexedset creation) for best performance.
+
+#### Vector queries
+
+Vector indices use approximate nearest neighbor (ANN) search based on a Fresh Vamana graph. This provides very fast
+similarity search for high-dimensional vectors, commonly used for similarity search or semantic search with embeddings.
+The runtime complexity for Fresh Vamana-ANN depends on the dataset, construction etc, but in practice is sub-linear and scales well to large datasets.
 
 ## Features
 
@@ -272,6 +281,69 @@ result = set.Where(x => x.End - x.Start, 8);
 result = set.Where(ComputedKey.SomeStaticMethod, 42);
 ```
 <!-- end-snippet -->
+> ℹ For more samples, take a look at the unit tests.
+
+### Spatial index
+R*Tree based spatial indices for efficient 2D/3D intersection & kNN queries.
+
+<!-- begin-snippet: Akade.IndexedSet.Tests/Samples/Readme.cs Features_SpatialIndex(importer:cs?body-only=true) -->
+```cs
+var locations = new Vector2[]
+{
+    new(100, 150),  // A point inside our query area
+    new(250, 200),  // Another point inside our query area
+    new(400, 500),  // A point outside our query area
+    new(50, 75)     // A point outside our query area
+};
+
+IndexedSet<Vector2> spatialSet = locations.ToIndexedSet()
+                                          .WithSpatialIndex(x => x)
+                                          .Build();
+
+Vector2 searchCenter = new(200, 200);
+Vector2 areaMin = new(150, 150);
+Vector2 areaMax = new(300, 250);
+
+// fast spatial range queries
+IEnumerable<Vector2> pointsInArea = spatialSet.Intersects(x => x, areaMin, areaMax);
+
+// fast nearest neighbor queries
+IEnumerable<Vector2> nearestPoints = spatialSet.NearestNeighbors(x => x, searchCenter).Take(2);
+```
+<!-- end-snippet -->
+
+> ⚠ For best performance, consider bulk-loading data at index creation time.
+> ℹ Spatial indices work with Vector2 & Vector3 at the moment. The tree implementation is generic and might be extended to support other types or opened up for custom types in the future.
+
+### Vector index
+(.NET 9+ only) High-performance approximate nearest neighbor search based on a Fresh Vamana graph.
+
+<!-- begin-snippet: Akade.IndexedSet.Tests/Samples/Readme.cs Features_VectorIndex(importer:cs?body-only=true) -->
+```cs
+// Sample document vectors (simplified for example)
+var documents = new Document[]
+{
+    new("Machine Learning Basics", new float[] { 0.1f, 0.8f, 0.3f, 0.9f }),
+    new("Deep Learning Guide", new float[] { 0.2f, 0.9f, 0.4f, 0.8f }),
+    new("Cooking Recipes", new float[] { 0.9f, 0.1f, 0.8f, 0.2f }),
+    new("Travel Guide", new float[] { 0.3f, 0.2f, 0.9f, 0.1f })
+};
+
+IndexedSet<Document> vectorSet = documents.ToIndexedSet()
+                                          .WithVectorIndex(x => x.Embedding.Span)
+                                          .Build();
+
+// query vector for "AI and machine learning"
+ReadOnlySpan<float> queryVector = new float[] { 0.15f, 0.85f, 0.35f, 0.85f };
+
+// fast approximate nearest neighbor search
+IEnumerable<Document> similarDocuments = vectorSet.ApproximateNearestNeighbors(x => x.Embedding.Span, queryVector, k: 2);
+```
+<!-- end-snippet -->
+
+> ⚠ Vector indices use approximate algorithms and don't support exact key lookup operations like `Where()` or `Single()`. 
+They are specifically designed for similarity search scenarios.
+
 > ℹ For more samples, take a look at the unit tests.
 
 ### Concurrency and Thread-Safety

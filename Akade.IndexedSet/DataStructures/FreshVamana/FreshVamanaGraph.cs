@@ -27,11 +27,14 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
         List<FreshVamanaNode> elementNodes = [.. elements.Select(e => new FreshVamanaNode(e))];
         _nodes.UnionWith(elementNodes);
 
+
+        int outboundConnections = Math.Min(_settings.OutDegreeBound, elementNodes.Count - 1);
+
         // initialize each node with R outbound connection
         foreach (FreshVamanaNode node in elementNodes)
         {
             _elementToNode.Add(node.Element, node);
-            while (node.Neighbors.Count < _settings.OutDegreeBound)
+            while (node.Neighbors.Count < outboundConnections)
             {
                 FreshVamanaNode neighbor = elementNodes[rand.Next(elementNodes.Count)];
                 if (neighbor != node)
