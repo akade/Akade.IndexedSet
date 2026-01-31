@@ -16,6 +16,7 @@ through your data, expect huge [speedups](docs/Benchmarks.md) and much better sc
       - [General queries](#general-queries)
       - [String queries](#string-queries)
       - [Spatial queries](#spatial-queries)
+      - [Vector queries](#vector-queries)
   - [Features](#features)
     - [Unique index](#unique-index)
     - [Non-unique index](#non-unique-index)
@@ -365,7 +366,7 @@ ConcurrentIndexedSet<Data> set = IndexedSetBuilder<Data>.Create()
 
 We are using the [CallerArgumentExpression](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.callerargumentexpressionattribute)-Feature 
 of .Net 6/C# 10 to provide convention-based naming of the indices:
-- `set.Where(x => (x.Prop1, x.Prop2), (1, 2))` tries to use an index named `"x => (x.Prop1, x.Prop2)"""
+- `set.Where(x => (x.Prop1, x.Prop2), (1, 2))` tries to use an index named `"x => (x.Prop1, x.Prop2)"`
 - `set.Where(ComputedKeys.NumberOfDays, 5)` tries to use an index named `"ComputedKeys.NumberOfDays"`
 - **Hence, be careful what you pass in. 
 > :information_source: The following naming conventions are recommended:
