@@ -1,5 +1,4 @@
 # Benchmarks
-Benchmarks measured on 27.07.2022:
 
 ## Environment
 ``` ini
