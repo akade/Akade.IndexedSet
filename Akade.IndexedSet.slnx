@@ -1,0 +1,31 @@
+<Solution>
+  <Folder Name="/Analyzer/">
+    <File Path="Analyzers/Readme.md" />
+    <Project Path="Analyzers/Akade.IndexedSet.Analyzers.Fixes/Akade.IndexedSet.Analyzers.Fixes.csproj" />
+    <Project Path="Analyzers/Akade.IndexedSet.Analyzers.Test/Akade.IndexedSet.Analyzers.Test.csproj" />
+    <Project Path="Analyzers/Akade.IndexedSet.Analyzers.Vsix/Akade.IndexedSet.Analyzers.Vsix.csproj" />
+    <Project Path="Analyzers/Akade.IndexedSet.Analyzers/Akade.IndexedSet.Analyzers.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".github/workflows/ci-build.yml" />
+    <File Path=".github/workflows/codeql-analysis.yml" />
+    <File Path=".github/workflows/publish-to-nuget-org.yml" />
+    <File Path=".gitignore" />
+    <File Path="docs/Benchmarks.md" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/Solution Items/Docs/">
+    <File Path="docs/Benchmarks.md" />
+    <File Path="docs/ExperimentalFeatures.md" />
+  </Folder>
+  <Folder Name="/SourceGenerator/">
+    <Project Path="SourceGenerator/Akade.IndexedSet.InternalSourceGenerator.Tests/Akade.IndexedSet.InternalSourceGenerator.Tests.csproj" />
+    <Project Path="SourceGenerator/Akade.IndexedSet.InternalSourceGenerator/Akade.IndexedSet.InternalSourceGenerator.csproj" />
+  </Folder>
+  <Project Path="Akade.IndexedSet.Benchmarks/Akade.IndexedSet.Benchmarks.csproj" />
+  <Project Path="Akade.IndexedSet.SampleData/Akade.IndexedSet.SampleData.csproj" />
+  <Project Path="Akade.IndexedSet.Tests/Akade.IndexedSet.Tests.csproj" />
+  <Project Path="Akade.IndexedSet/Akade.IndexedSet.csproj" />
+</Solution>
