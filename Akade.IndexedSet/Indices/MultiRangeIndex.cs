@@ -9,6 +9,7 @@ namespace Akade.IndexedSet.Indices;
 /// for indices where elements can have multiple keys.
 /// </summary>
 internal sealed class MultiRangeIndex<TElement, TIndexKey>(IComparer<TIndexKey> keyComparer, string name) : TypedIndex<TElement, TIndexKey>(name)
+    where TElement : notnull
     where TIndexKey : notnull
 {
     private readonly SortedLookup<TIndexKey, TElement> _lookup = new(keyComparer);
@@ -158,4 +159,6 @@ internal sealed class MultiRangeIndex<TElement, TIndexKey>(IComparer<TIndexKey> 
     {
         _lookup.Clear();
     }
+
+    public override int IndexTypeNumber => 4;
 }

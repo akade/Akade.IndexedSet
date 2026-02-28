@@ -3,6 +3,7 @@ using Akade.IndexedSet.Extensions;
 
 namespace Akade.IndexedSet.Indices;
 internal sealed class PrefixIndex<TElement>(IEqualityComparer<char> equalityComparer, string name) : TypedIndex<TElement, string>(name)
+    where TElement : notnull
 {
     private readonly Trie<TElement> _trie = new(equalityComparer);
 
@@ -57,4 +58,6 @@ internal sealed class PrefixIndex<TElement>(IEqualityComparer<char> equalityComp
     {
         _trie.Clear();
     }
+
+    public override int IndexTypeNumber => 5;
 }

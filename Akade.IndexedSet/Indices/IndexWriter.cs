@@ -4,6 +4,7 @@ using Akade.IndexedSet.Utils;
 namespace Akade.IndexedSet.Indices;
 
 internal abstract class IndexWriter<TElement>
+    where TElement : notnull
 {
     internal abstract void Add(TElement element);
 
@@ -13,6 +14,7 @@ internal abstract class IndexWriter<TElement>
 }
 
 internal abstract class TypedIndexWriter<TElement, TIndexKey, TIndex> : IndexWriter<TElement>
+    where TElement : notnull
 #if NET9_0_OR_GREATER
     where TIndexKey : notnull, allows ref struct
 #else
@@ -24,6 +26,7 @@ internal abstract class TypedIndexWriter<TElement, TIndexKey, TIndex> : IndexWri
 }
 
 internal sealed class SingleKeyIndexWriter<TElement, TIndexKey, TIndex>(Func<TElement, TIndexKey> keyAccessor, TIndex index) : TypedIndexWriter<TElement, TIndexKey, TIndex>
+    where TElement : notnull
 #if NET9_0_OR_GREATER
     where TIndexKey : notnull, allows ref struct
 #else
@@ -51,6 +54,7 @@ internal sealed class SingleKeyIndexWriter<TElement, TIndexKey, TIndex>(Func<TEl
 }
 
 internal sealed class MultiKeyIndexWriter<TElement, TIndexKey, TIndex>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, TIndex index) : TypedIndexWriter<TElement, TIndexKey, TIndex>
+    where TElement : notnull
 #if NET9_0_OR_GREATER
     where TIndexKey : notnull, allows ref struct
 #else

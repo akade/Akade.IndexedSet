@@ -7,6 +7,7 @@ namespace Akade.IndexedSet.Indices;
 
 internal sealed class SpatialIndex<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath>(Func<TElement, TEnvelope> getAABB, int dimensions, RTreeSettings settings, string name)
     : TypedIndex<TElement, TPoint>(name)
+    where TElement : notnull
     where TPoint : struct
     where TEnvelope : struct 
     where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>
@@ -80,4 +81,6 @@ internal sealed class SpatialIndex<TElement, TPoint, TEnvelope, TValue, TEnvelop
         TEnvelope envelope = TEnvelopeMath.CreateFromPoint(indexKey);
         return _tree.GetNearestNeighbours(indexKey).Select(x => x.element);
     }
+
+    public override int IndexTypeNumber => 7;
 }

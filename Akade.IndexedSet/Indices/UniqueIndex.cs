@@ -6,6 +6,7 @@ namespace Akade.IndexedSet.Indices;
 /// Unique index providing O(1) retrieval and insertion as well as enforcing unqueness
 /// </summary>
 internal sealed class UniqueIndex<TElement, TIndexKey>(IEqualityComparer<TIndexKey> equalityComparer, string name) : TypedIndex<TElement, TIndexKey>(name)
+    where TElement : notnull
     where TIndexKey : notnull
 {
     private readonly Dictionary<TIndexKey, TElement> _data = new(equalityComparer);
@@ -56,4 +57,6 @@ internal sealed class UniqueIndex<TElement, TIndexKey>(IEqualityComparer<TIndexK
     {
         return _data.TryGetValue(indexKey, out TElement? result) ? [result] : [];
     }
+
+    public override int IndexTypeNumber => 1;
 }

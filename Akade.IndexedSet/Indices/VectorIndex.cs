@@ -65,6 +65,8 @@ internal class VectorIndex<TElement>(Func<TElement, ReadOnlySpan<float>> keyAcce
     {
         return _graph.ApproximateNearestNeighbors(indexKey, k);
     }
+
+    public override int IndexTypeNumber => 8;
 }
 
 #endif

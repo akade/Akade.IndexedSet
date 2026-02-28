@@ -2,7 +2,9 @@
 
 using Akade.IndexedSet.Concurrency;
 using Akade.IndexedSet.Indices;
+using Akade.IndexedSet.Serialization;
 using System.Collections.Frozen;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -15,11 +17,12 @@ namespace Akade.IndexedSet;
 /// </summary>
 [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used as caller argument expression")]
 public class IndexedSet<TElement>
+    where TElement : notnull
 {
     private readonly HashSet<TElement> _data = [];
     private FrozenDictionary<string, Index<TElement>> _indices = FrozenDictionary<string, Index<TElement>>.Empty;
     private FrozenDictionary<string, IndexWriter<TElement>> _indexWriters = FrozenDictionary<string, IndexWriter<TElement>>.Empty;
-    
+
     /// <summary>
     /// Creates a new, empty instance of an <see cref="IndexedSet{TElement}"/>. 
     /// </summary>
@@ -61,6 +64,8 @@ public class IndexedSet<TElement>
 
         return true;
     }
+
+
 
     /// <summary>
     /// Adds multiple elements at once. In contrast to <see cref="Add(TElement)"/>, this method
@@ -797,11 +802,11 @@ public class IndexedSet<TElement>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private TypedIndex<TElement, TIndexKey> GetIndex<TIndexKey>(string? indexName)
-    #if NET9_0_OR_GREATER
+#if NET9_0_OR_GREATER
         where TIndexKey : notnull, allows ref struct
-    #else
+#else
         where TIndexKey : notnull
-    #endif
+#endif
     {
         ArgumentNullException.ThrowIfNull(indexName);
 
@@ -933,6 +938,21 @@ public class IndexedSet<TElement>
             throw new InvalidOperationException("The operation is not allowed if the set is not empty.");
         }
     }
+
+    internal bool AddWithoutIndexing(TElement element)
+    {
+        return _data.Add(element);
+    }
+
+    internal ImmutableArray<Index<TElement>> GetIndices()
+    {
+        return _indices.Values;
+    }
+
+    internal void FillIndexWithCurrentData(string name) 
+    {
+        _indexWriters[name].AddRange(_data);
+    }
 }
 
 /// <summary>
@@ -941,6 +961,7 @@ public class IndexedSet<TElement>
 /// </summary>
 public class IndexedSet<TPrimaryKey, TElement> : IndexedSet<TElement>
     where TPrimaryKey : notnull
+    where TElement : notnull
 {
     private readonly Func<TElement, TPrimaryKey> _primaryKeyAccessor;
     private readonly string _primaryKeyIndexName;

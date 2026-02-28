@@ -6,6 +6,7 @@ namespace Akade.IndexedSet.Indices;
 /// Nonunique index implementation based on <see cref="DataStructures.Lookup{TKey, TElement}"/>
 /// </summary>
 internal sealed class NonUniqueIndex<TElement, TIndexKey>(IEqualityComparer<TIndexKey> equalityComparer, string name) : TypedIndex<TElement, TIndexKey>(name)
+    where TElement : notnull
     where TIndexKey : notnull
 {
     private readonly DataStructures.Lookup<TIndexKey, TElement> _data = new(equalityComparer);
@@ -57,4 +58,6 @@ internal sealed class NonUniqueIndex<TElement, TIndexKey>(IEqualityComparer<TInd
     {
         return _data.GetValues(indexKey);
     }
+
+    public override int IndexTypeNumber => 2;
 }

@@ -6,6 +6,7 @@ using Akade.IndexedSet.Utils;
 namespace Akade.IndexedSet.Indices;
 
 internal sealed class FullTextIndex<TElement> : TypedIndex<TElement, string>
+    where TElement : notnull
 {
     private readonly SuffixTrie<TElement> _suffixTrie;
 
@@ -152,4 +153,6 @@ internal sealed class FullTextIndex<TElement> : TypedIndex<TElement, string>
     {
         _suffixTrie.Clear();
     }
+
+    public override int IndexTypeNumber => 6;
 }

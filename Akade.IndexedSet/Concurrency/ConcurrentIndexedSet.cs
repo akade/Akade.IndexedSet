@@ -8,6 +8,7 @@ namespace Akade.IndexedSet.Concurrency;
 /// 
 /// </summary>
 public partial class ConcurrentIndexedSet<TElement> : IDisposable
+    where TElement : notnull
 {
     private readonly ReaderWriterLockEx _lock = new();
     private readonly IndexedSet<TElement> _indexedSet;
@@ -249,6 +250,7 @@ public partial class ConcurrentIndexedSet<TElement> : IDisposable
 /// </summary>
 public partial class ConcurrentIndexedSet<TPrimaryKey, TElement> : ConcurrentIndexedSet<TElement>
     where TPrimaryKey : notnull
+    where TElement : notnull
 {
     private readonly IndexedSet<TPrimaryKey, TElement> _primaryKeyIndexedSet;
 

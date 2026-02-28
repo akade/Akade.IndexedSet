@@ -7,6 +7,7 @@ namespace Akade.IndexedSet.Indices;
 /// O(log(n)) range queries based on <see cref="SortedLookup{TKey, TValue}"/>.
 /// </summary>
 internal sealed class RangeIndex<TElement, TIndexKey>(IComparer<TIndexKey> keyComparer, string name) : TypedIndex<TElement, TIndexKey>(name)
+    where TElement : notnull
     where TIndexKey : notnull
 {
     private readonly SortedLookup<TIndexKey, TElement> _lookup = new(keyComparer);
@@ -144,4 +145,6 @@ internal sealed class RangeIndex<TElement, TIndexKey>(IComparer<TIndexKey> keyCo
     {
         _lookup.Clear();
     }
+
+    public override int IndexTypeNumber => 3;
 }
