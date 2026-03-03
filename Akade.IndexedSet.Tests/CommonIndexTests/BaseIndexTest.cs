@@ -5,6 +5,7 @@ using System.Reflection;
 namespace Akade.IndexedSet.Tests.CommonIndexTests;
 internal abstract partial class BaseIndexTest<TIndexKey, TElement, TIndex, TComparer>(Func<TElement, TIndexKey> keyAccessor, TComparer comparer)
     where TIndex : TypedIndex<TElement, TIndexKey>
+    where TElement : notnull
     where TIndexKey : notnull
     where TComparer : notnull
 {

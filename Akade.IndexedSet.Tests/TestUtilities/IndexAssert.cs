@@ -4,6 +4,7 @@ namespace Akade.IndexedSet.Tests.TestUtilities;
 internal static class IndexAssert
 {
     public static void AssertSingleItem<TElement, TIndexKey>(this IndexedSet<TElement> indexedSet, Func<TElement, TIndexKey> indexAccessor, TElement testData, [CallerArgumentExpression(nameof(indexAccessor))] string? indexName = null)
+        where TElement : notnull
         where TIndexKey : notnull
     {
         Assert.IsNotNull(indexName);
@@ -17,6 +18,7 @@ internal static class IndexAssert
     }
 
     public static void AssertSingleItem<TElement, TIndexKey>(this IndexedSet<TElement> indexedSet, Func<TElement, IEnumerable<TIndexKey>> indexAccessor, TElement testData, [CallerArgumentExpression(nameof(indexAccessor))] string? indexName = null)
+        where TElement : notnull
         where TIndexKey : notnull
     {
         Assert.IsNotNull(indexName);
@@ -32,6 +34,7 @@ internal static class IndexAssert
     }
 
     public static void AssertMultipleItems<TElement, TIndexKey>(this IndexedSet<TElement> indexedSet, Func<TElement, TIndexKey> indexAccessor, [CallerArgumentExpression(nameof(indexAccessor))] string? indexName = null, bool requireOrder = false, params TElement[] expectedElements)
+        where TElement : notnull
         where TIndexKey : notnull
     {
         if (expectedElements.Length < 2)
@@ -73,6 +76,7 @@ internal static class IndexAssert
         bool inclusiveEnd,
         [CallerArgumentExpression(nameof(indexAccessor))] string? indexName = null,
         params TElement[] expectedElements)
+        where TElement : notnull
         where TIndexKey : notnull
     {
         Assert.IsNotNull(indexName);
