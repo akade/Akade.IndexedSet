@@ -12,6 +12,8 @@ internal sealed class MultiRangeIndex<TElement, TIndexKey>(IComparer<TIndexKey> 
     where TElement : notnull
     where TIndexKey : notnull
 {
+    internal const int IndexTypeNumberValue = 4;
+
     private readonly SortedLookup<TIndexKey, TElement> _lookup = new(keyComparer);
 
     internal override void Add(TIndexKey key, TElement value)
@@ -160,5 +162,5 @@ internal sealed class MultiRangeIndex<TElement, TIndexKey>(IComparer<TIndexKey> 
         _lookup.Clear();
     }
 
-    public override int IndexTypeNumber => 4;
+    public override int IndexTypeNumber => IndexTypeNumberValue;
 }

@@ -10,6 +10,8 @@ internal sealed class RangeIndex<TElement, TIndexKey>(IComparer<TIndexKey> keyCo
     where TElement : notnull
     where TIndexKey : notnull
 {
+    internal const int IndexTypeNumberValue = 3;
+
     private readonly SortedLookup<TIndexKey, TElement> _lookup = new(keyComparer);
 
     internal override void Add(TIndexKey key, TElement value)
@@ -146,5 +148,5 @@ internal sealed class RangeIndex<TElement, TIndexKey>(IComparer<TIndexKey> keyCo
         _lookup.Clear();
     }
 
-    public override int IndexTypeNumber => 3;
+    public override int IndexTypeNumber => IndexTypeNumberValue;
 }

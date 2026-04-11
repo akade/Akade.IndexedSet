@@ -5,6 +5,8 @@ namespace Akade.IndexedSet.Indices;
 internal sealed class PrefixIndex<TElement>(IEqualityComparer<char> equalityComparer, string name) : TypedIndex<TElement, string>(name)
     where TElement : notnull
 {
+    internal const int IndexTypeNumberValue = 5;
+
     private readonly Trie<TElement> _trie = new(equalityComparer);
 
     internal override void Add(string key, TElement value)
@@ -59,5 +61,5 @@ internal sealed class PrefixIndex<TElement>(IEqualityComparer<char> equalityComp
         _trie.Clear();
     }
 
-    public override int IndexTypeNumber => 5;
+    public override int IndexTypeNumber => IndexTypeNumberValue;
 }

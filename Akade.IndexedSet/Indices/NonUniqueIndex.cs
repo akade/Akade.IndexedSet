@@ -9,6 +9,8 @@ internal sealed class NonUniqueIndex<TElement, TIndexKey>(IEqualityComparer<TInd
     where TElement : notnull
     where TIndexKey : notnull
 {
+    internal const int IndexTypeNumberValue = 2;
+
     private readonly DataStructures.Lookup<TIndexKey, TElement> _data = new(equalityComparer);
 
     internal override void Add(TIndexKey key, TElement value)
@@ -59,5 +61,5 @@ internal sealed class NonUniqueIndex<TElement, TIndexKey>(IEqualityComparer<TInd
         return _data.GetValues(indexKey);
     }
 
-    public override int IndexTypeNumber => 2;
+    public override int IndexTypeNumber => IndexTypeNumberValue;
 }

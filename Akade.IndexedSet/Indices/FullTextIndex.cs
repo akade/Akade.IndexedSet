@@ -8,6 +8,8 @@ namespace Akade.IndexedSet.Indices;
 internal sealed class FullTextIndex<TElement> : TypedIndex<TElement, string>
     where TElement : notnull
 {
+    internal const int IndexTypeNumberValue = 6;
+
     private readonly SuffixTrie<TElement> _suffixTrie;
 
     private delegate bool StartsWithCheck(ReadOnlySpan<char> key, ReadOnlySpan<char> startsWith);
@@ -154,5 +156,5 @@ internal sealed class FullTextIndex<TElement> : TypedIndex<TElement, string>
         _suffixTrie.Clear();
     }
 
-    public override int IndexTypeNumber => 6;
+    public override int IndexTypeNumber => IndexTypeNumberValue;
 }

@@ -13,6 +13,8 @@ internal sealed class SpatialIndex<TElement, TPoint, TEnvelope, TValue, TEnvelop
     where TValue : unmanaged, INumber<TValue>, IMinMaxValue<TValue>, IRootFunctions<TValue>
     where TEnvelopeMath : struct, IEnvelopeMath<TPoint, TEnvelope, TValue>
 {
+    internal const int IndexTypeNumberValue = 7;
+
     private readonly RTree<TElement, TPoint, TEnvelope, TValue, TEnvelopeMath> _tree = new(getAABB, dimensions, settings);
 
     public override void Clear()
@@ -82,5 +84,5 @@ internal sealed class SpatialIndex<TElement, TPoint, TEnvelope, TValue, TEnvelop
         return _tree.GetNearestNeighbours(indexKey).Select(x => x.element);
     }
 
-    public override int IndexTypeNumber => 7;
+    public override int IndexTypeNumber => IndexTypeNumberValue;
 }

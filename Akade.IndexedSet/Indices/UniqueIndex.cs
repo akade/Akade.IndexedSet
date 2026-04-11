@@ -9,6 +9,8 @@ internal sealed class UniqueIndex<TElement, TIndexKey>(IEqualityComparer<TIndexK
     where TElement : notnull
     where TIndexKey : notnull
 {
+    internal const int IndexTypeNumberValue = 1;
+
     private readonly Dictionary<TIndexKey, TElement> _data = new(equalityComparer);
 
     internal override void Add(TIndexKey key, TElement value)
@@ -58,5 +60,5 @@ internal sealed class UniqueIndex<TElement, TIndexKey>(IEqualityComparer<TIndexK
         return _data.TryGetValue(indexKey, out TElement? result) ? [result] : [];
     }
 
-    public override int IndexTypeNumber => 1;
+    public override int IndexTypeNumber => IndexTypeNumberValue;
 }

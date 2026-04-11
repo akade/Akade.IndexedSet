@@ -9,6 +9,8 @@ namespace Akade.IndexedSet.Indices;
 internal class VectorIndex<TElement>(Func<TElement, ReadOnlySpan<float>> keyAccessor, string name) : TypedIndex<TElement, ReadOnlySpan<float>>(name)
     where TElement : notnull
 {
+    internal const int IndexTypeNumberValue = 8;
+
     private readonly FreshVamanaGraph<TElement> _graph = new(keyAccessor, FreshVamanaSettings.Default);
 
     public override void Clear()
@@ -66,7 +68,7 @@ internal class VectorIndex<TElement>(Func<TElement, ReadOnlySpan<float>> keyAcce
         return _graph.ApproximateNearestNeighbors(indexKey, k);
     }
 
-    public override int IndexTypeNumber => 8;
+    public override int IndexTypeNumber => IndexTypeNumberValue;
 }
 
 #endif
