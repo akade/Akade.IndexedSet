@@ -22,7 +22,7 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.Analyzer.Testing" Version="1.1.4" />
     <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.CodeFix.Testing" Version="1.1.4" />
     <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.CodeRefactoring.Testing" Version="1.1.4" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
     <PackageVersion Include="Microsoft.SemanticKernel.Connectors.Onnx" Version="1.75.0-alpha" />
     <PackageVersion Include="Microsoft.VisualStudio.DiagnosticsHub.BenchmarkDotNetDiagnosers" Version="18.7.37220.1" />
     <PackageVersion Include="Microsoft.VSSDK.BuildTools" Version="18.5.40034" />
