@@ -8,10 +8,8 @@ using System.Text;
 
 namespace Akade.IndexedSet.Benchmarks;
 
-#pragma warning disable AkadeIndexedSetEXP0003
 
 [MemoryDiagnoser]
-[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net90)]
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net10_0)]
 [JsonExporter]
 public class SerializationBenchmarks
@@ -24,14 +22,15 @@ public class SerializationBenchmarks
     private byte[] _serializedData = [];
 
     [Params(
-        UniqueIndex<BenchmarkElement, int>.IndexTypeNumberValue,
-        NonUniqueIndex<BenchmarkElement, int>.IndexTypeNumberValue,
-        RangeIndex<BenchmarkElement, DateOnly>.IndexTypeNumberValue,
-        MultiRangeIndex<BenchmarkElement, DateOnly>.IndexTypeNumberValue,
-        PrefixIndex<BenchmarkElement>.IndexTypeNumberValue,
-        FullTextIndex<BenchmarkElement>.IndexTypeNumberValue,
-        SpatialIndex<BenchmarkElement, Vector2, VecRec2, float, Vector2Math>.IndexTypeNumberValue,
-        VectorIndex<BenchmarkElement>.IndexTypeNumberValue)]
+        UniqueIndex<BenchmarkElement, int>.IndexTypeNumberValue
+        //NonUniqueIndex<BenchmarkElement, int>.IndexTypeNumberValue
+        //RangeIndex<BenchmarkElement, DateOnly>.IndexTypeNumberValue
+        //MultiRangeIndex<BenchmarkElement, DateOnly>.IndexTypeNumberValue,
+        //PrefixIndex<BenchmarkElement>.IndexTypeNumberValue,
+        //FullTextIndex<BenchmarkElement>.IndexTypeNumberValue,
+        //SpatialIndex<BenchmarkElement, Vector2, VecRec2, float, Vector2Math>.IndexTypeNumberValue,
+        //VectorIndex<BenchmarkElement>.IndexTypeNumberValue
+        )]
     public int IndexTypeNumber { get; set; }
 
     [GlobalSetup]
@@ -107,35 +106,19 @@ public class SerializationBenchmarks
             ? IndexedSetBuilder<BenchmarkElement>.Create()
             : IndexedSetBuilder.Create(elements);
 
-        switch (IndexTypeNumber)
+        _ = IndexTypeNumber switch
         {
-            case UniqueIndex<BenchmarkElement, int>.IndexTypeNumberValue:
-                builder.WithUniqueIndex(x => x.Id);
-                break;
-            case NonUniqueIndex<BenchmarkElement, int>.IndexTypeNumberValue:
-                builder.WithIndex(x => x.Category);
-                break;
-            case RangeIndex<BenchmarkElement, DateOnly>.IndexTypeNumberValue:
-                builder.WithRangeIndex(x => x.Date);
-                break;
-            case MultiRangeIndex<BenchmarkElement, DateOnly>.IndexTypeNumberValue:
-                builder.WithRangeIndex(x => x.Dates);
-                break;
-            case PrefixIndex<BenchmarkElement>.IndexTypeNumberValue:
-                builder.WithPrefixIndex(x => x.Name);
-                break;
-            case FullTextIndex<BenchmarkElement>.IndexTypeNumberValue:
-                builder.WithFullTextIndex(x => x.Description);
-                break;
-            case SpatialIndex<BenchmarkElement, Vector2, VecRec2, float, Vector2Math>.IndexTypeNumberValue:
-                builder.WithSpatialIndex(x => x.Position);
-                break;
-            case VectorIndex<BenchmarkElement>.IndexTypeNumberValue:
-                builder.WithVectorIndex(x => x.Vector);
-                break;
-            default:
-                throw new InvalidOperationException($"Unsupported index type number: {IndexTypeNumber}");
-        }
+            UniqueIndex<BenchmarkElement, int>.IndexTypeNumberValue => builder.WithUniqueIndex(x => x.Id),
+            NonUniqueIndex<BenchmarkElement, int>.IndexTypeNumberValue => builder.WithIndex(x => x.Category),
+            RangeIndex<BenchmarkElement, DateOnly>.IndexTypeNumberValue => builder.WithRangeIndex(x => x.Date),
+            MultiRangeIndex<BenchmarkElement, DateOnly>.IndexTypeNumberValue => builder.WithRangeIndex(x => x.Dates),
+            PrefixIndex<BenchmarkElement>.IndexTypeNumberValue => builder.WithPrefixIndex(x => x.Name),
+            FullTextIndex<BenchmarkElement>.IndexTypeNumberValue => builder.WithFullTextIndex(x => x.Description),
+            SpatialIndex<BenchmarkElement, Vector2, VecRec2, float, Vector2Math>.IndexTypeNumberValue => builder.WithSpatialIndex(x => x.Position),
+#pragma warning disable AkadeIndexedSetEXP0003
+            VectorIndex<BenchmarkElement>.IndexTypeNumberValue => builder.WithVectorIndex(x => x.Vector),
+            _ => throw new InvalidOperationException($"Unsupported index type number: {IndexTypeNumber}")
+        };
 
         return builder.Build();
     }

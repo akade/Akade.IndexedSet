@@ -12,7 +12,7 @@ public static class IndexedSetSerializer
     public static async ValueTask SerializeAsync<TElement>(this IndexedSet<TElement> indexedSet, ISerializationAdapter serializationAdapter, Stream target, CancellationToken cancellationToken = default)
         where TElement : notnull
     {
-        IndexedSetSerializationContext<TElement> context = new(serializationAdapter);
+        IndexedSetSerializationContext<TElement> context = new(serializationAdapter, indexedSet.Count);
 
         using BinaryWriter writer = new(target, Encoding.UTF8, leaveOpen: true);
 
@@ -69,12 +69,14 @@ public static class IndexedSetSerializer
         VerifyMagicBytes(reader);
         VerifyVersion(reader);
 
-        IndexedSetSerializationContext<TElement> context = new(serializationAdapter);
 
 
         int numberOfElements = reader.ReadInt32();
         int numberOfIndices = reader.ReadInt32();
 
+        IndexedSetSerializationContext<TElement> context = new(serializationAdapter, numberOfElements);
+        indexedSet.EnsureElementNumberWithoutIndices(numberOfElements);
+        
         PartialReadOnlyStream elementStream = new(source);
 
         for (int i = 0; i < numberOfElements; i++)

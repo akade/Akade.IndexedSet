@@ -101,7 +101,7 @@ public class IndexedSet<TElement>
         {
             foreach (IndexWriter<TElement> writer in _indexWriters.Values)
             {
-                writer.AddRange(elements);
+                writer.AddRange(elementsToAdd);
             }
         }
         catch
@@ -944,6 +944,11 @@ public class IndexedSet<TElement>
         return _data.Add(element);
     }
 
+    internal void EnsureElementNumberWithoutIndices(int numberOfElements)
+    {
+        _data.EnsureCapacity(numberOfElements);
+    }
+
     internal ImmutableArray<Index<TElement>> GetIndices()
     {
         return _indices.Values;
@@ -953,6 +958,8 @@ public class IndexedSet<TElement>
     {
         _indexWriters[name].AddRange(_data);
     }
+
+    
 }
 
 /// <summary>

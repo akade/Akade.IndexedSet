@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 
 namespace Akade.IndexedSet.Tests.Serialization;
+#pragma warning disable AkadeIndexedSetEXP0003 // The api for the vector indices is experimental
 
 [TestClass]
 public class SerializationTests
@@ -162,6 +163,9 @@ public class SerializationTests
         }
     }
 
+    /// <summary>
+    /// "Buggy" serializer that only reads 1 byte from the stream i.e. does not consume all bytes of an element
+    /// </summary>
     private class ShortReadSerializer : ISerializationAdapter
     {
         public async ValueTask SerializeAsync<T>(T element, Stream stream, CancellationToken cancellationToken)
