@@ -5,7 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Actual package dependencies -->
-    <PackageVersion Include="System.Numerics.Tensors" Version="10.0.9" />
+    <PackageVersion Include="System.Numerics.Tensors" Version="10.0.10" />
     <!--Dependencies for testing etc... -->
     <PackageVersion Include="Autypo" Version="1.1.0" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
