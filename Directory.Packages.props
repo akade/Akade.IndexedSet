@@ -31,7 +31,7 @@
     <PackageVersion Include="PolySharp" Version="1.16.0" />
     <PackageVersion Include="RBush" Version="4.0.0" />
     <PackageVersion Include="System.Formats.Asn1" Version="10.0.10" />
-    <PackageVersion Include="Verify.DiffPlex" Version="3.2.0" />
+    <PackageVersion Include="Verify.DiffPlex" Version="3.3.1" />
     <PackageVersion Include="Verify.MSTest" Version="31.28.0" />
     <PackageVersion Include="Verify.SourceGenerators" Version="2.5.0" />
   </ItemGroup>
