@@ -1,4 +1,6 @@
-﻿namespace Akade.IndexedSet.DataStructures;
+﻿using System.Diagnostics;
+
+namespace Akade.IndexedSet.DataStructures;
 
 /// <summary>
 /// Sorted lookup using <see cref="BinaryHeap{TValue}"/> as sorted key storage and a "normal"
@@ -139,6 +141,12 @@ internal class SortedLookup<TKey, TValue>(IComparer<TKey> keyComparer)
         {
             yield return _sortedValues[_sortedValues.Count - offset - i];
         }
+    }
+
+    internal void UnsafeAppend(TKey key, TValue value)
+    {
+        _sortedKeys.UnsafeAppend(key);
+        _sortedValues.Add(value);
     }
 
     internal void Clear()

@@ -21,8 +21,7 @@ internal abstract class Index<TElement>(string name)
         throw new NotSupportedException($"Serialization is not supported on {GetType().Name}-indices.");
     }
 
-
-    internal virtual ValueTask DeserializeAsync(IndexedSetSerializationContext<TElement> context, Stream stream, CancellationToken cancellationToken)
+    internal virtual ValueTask DeserializeAsync(IndexedSetDeserializationContext<TElement> context, Stream stream, CancellationToken cancellationToken)
     {
         throw new NotSupportedException($"Deserialization is not supported on {GetType().Name}-indices.");
     }

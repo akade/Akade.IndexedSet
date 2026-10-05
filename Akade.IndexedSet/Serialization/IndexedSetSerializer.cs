@@ -1,6 +1,7 @@
 ﻿using Akade.IndexedSet.Indices;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Akade.IndexedSet.Serialization;
@@ -66,15 +67,9 @@ public static class IndexedSetSerializer
                                       .ToDictionary(x => x.Name);
 
         using BinaryReader reader = new(source, Encoding.UTF8, leaveOpen: true);
-        VerifyMagicBytes(reader);
-        VerifyVersion(reader);
+        VerifyHeader(reader, out int numberOfElements, out int numberOfIndices);
 
-
-
-        int numberOfElements = reader.ReadInt32();
-        int numberOfIndices = reader.ReadInt32();
-
-        IndexedSetSerializationContext<TElement> context = new(serializationAdapter, numberOfElements);
+        IndexedSetDeserializationContext<TElement> context = new(serializationAdapter, numberOfElements);
         indexedSet.EnsureElementNumberWithoutIndices(numberOfElements);
         
         PartialReadOnlyStream elementStream = new(source);
@@ -111,7 +106,9 @@ public static class IndexedSetSerializer
             {
                 ThrowInvalidIndexType(index, indexType);
             }
-
+            // TODO: How the f do we do this with multi key indices
+            // Require stable ordering of returned keys from accessors? (Doesn't work, as this is not the order of how they appear in the index)
+            // 
             await index.DeserializeAsync(context, source, cancellationToken);
             indicesByName.Remove(indexName);
         }
@@ -144,25 +141,35 @@ public static class IndexedSetSerializer
         throw new InvalidOperationException($"The element {element} was already present. Did you change the equality contract between serialization & deserialization?");
     }
 
-    private static void VerifyVersion(BinaryReader reader)
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void VerifyHeader(BinaryReader reader, out int numberOfElements, out int numberOfIndices)
     {
-        int version = reader.ReadInt32();
-        if (version != SerializationDataFormatVersion)
-        {
-            throw new InvalidOperationException($"Invalid version: {version}. Expected version: {SerializationDataFormatVersion}.");
-        }
-    }
-
-    private static void VerifyMagicBytes(BinaryReader reader)
-    {
-        Span<byte> bytes = stackalloc byte[16];
+        Span<byte> bytes = stackalloc byte[28];
         reader.ReadExactly(bytes);
 
-        if (!bytes.SequenceEqual("Akade.IndexedSet"u8))
+        if (!bytes[..16].SequenceEqual("Akade.IndexedSet"u8))
         {
             throw new InvalidOperationException("Expected magic bytes 'Akade.IndexedSet' but the found bytes did not match.");
         }
 
+        int version = ReadInt(bytes[16..20]);
+        if (version != SerializationDataFormatVersion)
+        {
+            throw new InvalidOperationException($"Invalid version: {version}. Expected version: {SerializationDataFormatVersion}.");
+        }
+
+        numberOfElements = ReadInt(bytes[20..24]);
+        numberOfIndices = ReadInt(bytes[24..28]);
+    }
+
+    private static void VerifyVersion(BinaryReader reader)
+    {
+        
+    }
+
+    private static int ReadInt(Span<byte> bytes)
+    {
+        return MemoryMarshal.Cast<byte, int>(bytes)[0];
     }
 
 #if !NET10_0_OR_GREATER

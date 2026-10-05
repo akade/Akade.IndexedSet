@@ -1,5 +1,7 @@
 ﻿using Akade.IndexedSet.DataStructures;
+using Akade.IndexedSet.Serialization;
 using Akade.IndexedSet.Utils;
+using System.Runtime.InteropServices;
 
 namespace Akade.IndexedSet.Indices;
 
@@ -146,6 +148,60 @@ internal sealed class RangeIndex<TElement, TIndexKey>(IComparer<TIndexKey> keyCo
     public override void Clear()
     {
         _lookup.Clear();
+    }
+
+    internal override bool SupportsSerialization => true;
+
+    internal override ValueTask SerializeAsync(IndexedSetSerializationContext<TElement> context, Stream stream, CancellationToken cancellationToken)
+    {
+        var min = _lookup.GetMinimumKey();
+        var max = _lookup.GetMaximumKey();
+
+        Span<int> buffer = stackalloc int[4096];
+        Span<byte> bufferAsBytes = MemoryMarshal.AsBytes(buffer);
+
+        int posInBuffer = 0;
+
+        foreach (var element in _lookup.GetValuesInRange(min, max, true, true))
+        {
+            buffer[posInBuffer] = context.GetOrAddElementId(element);
+            posInBuffer++;
+
+            if (posInBuffer == buffer.Length)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                stream.Write(bufferAsBytes);
+                posInBuffer = 0;
+            }
+        }
+
+        if (posInBuffer > 0)
+        {
+            stream.Write(bufferAsBytes[..posInBuffer]);
+        }
+
+        return ValueTask.CompletedTask;
+    }
+
+    internal override ValueTask DeserializeAsync(IndexedSetDeserializationContext<TElement> context, Stream stream, CancellationToken cancellationToken)
+    {
+        int elementCount = context.NumberOfElements;
+
+        Span<int> buffer = stackalloc int[4096];
+        Span<byte> bufferAsBytes = MemoryMarshal.AsBytes(buffer);
+
+        int chunks = elementCount / buffer.Length;
+
+        for (int i = 0; i < chunks; i++)
+        {
+            foreach (var elementId in buffer)
+            {
+                var element = context.GetElementById(elementId);
+                var key = _lookup.
+                _lookup.UnsafeAppend(key, element);
+            }
+        }
+        return ValueTask.CompletedTask;
     }
 
     public override int IndexTypeNumber => IndexTypeNumberValue;

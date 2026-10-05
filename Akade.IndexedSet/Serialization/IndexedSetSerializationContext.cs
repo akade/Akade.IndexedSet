@@ -47,8 +47,20 @@ internal record IndexedSetSerializationContext<TElement>(ISerializationAdapter S
         return id;
     }
 
+}
+
+internal record IndexedSetDeserializationContext<TElement>(ISerializationAdapter Serializer, int NumberOfElements)
+    where TElement : notnull
+{
+    private readonly Dictionary<int, TElement> _elementsById = new(NumberOfElements);
+
     internal void SetElementId(TElement element, int id)
     {
-        _elementIds[element] = id;
+        _elementsById[id] = element;
+    }
+
+    public TElement GetElementById(int id)
+    {
+        return _elementsById[id];
     }
 }

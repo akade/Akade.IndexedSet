@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics;
 
 namespace Akade.IndexedSet.DataStructures;
 
@@ -184,6 +185,12 @@ internal class BinaryHeap<TValue>(IComparer<TValue> comparer) : ICollection<TVal
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    internal void UnsafeAppend(TValue item)
+    {
+        Debug.Assert(Count == 0 || _comparer.Compare(item, this[^1]) >= 0, "UnsafeAppend can only be used to append elements in sorted order.");
+        _data.Add(item);
     }
 
     public TValue this[int index] => _data[index];

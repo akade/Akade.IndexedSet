@@ -5,6 +5,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using System.Numerics;
 using System.Text;
+using System.Text.Json;
 
 namespace Akade.IndexedSet.Benchmarks;
 
@@ -18,13 +19,13 @@ public class SerializationBenchmarks
     private static ReadOnlySpan<byte> MagicBytes => "Akade.IndexedSet"u8;
     private const int ElementCount = 10_000;
 
-    private readonly ISerializationAdapter _serializer = new BinarySerializer();
+    private readonly ISerializationAdapter _serializer = new JsonSerializationAdapter();
     private byte[] _serializedData = [];
 
     [Params(
-        UniqueIndex<BenchmarkElement, int>.IndexTypeNumberValue
+        //UniqueIndex<BenchmarkElement, int>.IndexTypeNumberValue
         //NonUniqueIndex<BenchmarkElement, int>.IndexTypeNumberValue
-        //RangeIndex<BenchmarkElement, DateOnly>.IndexTypeNumberValue
+        RangeIndex<BenchmarkElement, DateOnly>.IndexTypeNumberValue
         //MultiRangeIndex<BenchmarkElement, DateOnly>.IndexTypeNumberValue,
         //PrefixIndex<BenchmarkElement>.IndexTypeNumberValue,
         //FullTextIndex<BenchmarkElement>.IndexTypeNumberValue,
@@ -198,71 +199,30 @@ public class SerializationBenchmarks
         Vector2 Position,
         float[] Vector);
 
-    private sealed class BinarySerializer : ISerializationAdapter
+    private sealed class JsonSerializationAdapter : ISerializationAdapter
     {
-        public ValueTask SerializeAsync<T>(T element, Stream stream, CancellationToken cancellationToken)
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new(JsonSerializerDefaults.General);
+
+        public async ValueTask SerializeAsync<T>(T element, Stream stream, CancellationToken cancellationToken)
         {
             if (element is not BenchmarkElement benchmark)
             {
                 throw new InvalidOperationException($"Unsupported serialization type {typeof(T).Name}.");
             }
 
-            using BinaryWriter writer = new(stream, Encoding.UTF8, leaveOpen: true);
-            writer.Write(benchmark.Id);
-            writer.Write(benchmark.Category);
-            writer.Write(benchmark.Date.DayNumber);
-            writer.Write(benchmark.Dates.Length);
-            foreach (DateOnly date in benchmark.Dates)
-            {
-                writer.Write(date.DayNumber);
-            }
-
-            writer.Write(benchmark.Name);
-            writer.Write(benchmark.Description);
-            writer.Write(benchmark.Position.X);
-            writer.Write(benchmark.Position.Y);
-            writer.Write(benchmark.Vector.Length);
-            foreach (float value in benchmark.Vector)
-            {
-                writer.Write(value);
-            }
-
-            return ValueTask.CompletedTask;
+            await JsonSerializer.SerializeAsync(stream, element, _jsonSerializerOptions, cancellationToken);
         }
 
-        public ValueTask<TElement> DeserializeAsync<TElement>(Stream source, CancellationToken cancellationToken)
+        public async ValueTask<TElement> DeserializeAsync<TElement>(Stream source, CancellationToken cancellationToken)
             where TElement : notnull
         {
             if (typeof(TElement) != typeof(BenchmarkElement))
             {
                 throw new InvalidOperationException($"Unsupported serialization type {typeof(TElement).Name}.");
             }
+            return await JsonSerializer.DeserializeAsync<TElement>(source, _jsonSerializerOptions, cancellationToken)
+                ?? throw new InvalidOperationException($"Failed to deserialize {typeof(TElement).Name}.");
 
-            using BinaryReader reader = new(source, Encoding.UTF8, leaveOpen: true);
-            int id = reader.ReadInt32();
-            int category = reader.ReadInt32();
-            DateOnly date = DateOnly.FromDayNumber(reader.ReadInt32());
-            int datesCount = reader.ReadInt32();
-
-            DateOnly[] dates = new DateOnly[datesCount];
-            for (int i = 0; i < datesCount; i++)
-            {
-                dates[i] = DateOnly.FromDayNumber(reader.ReadInt32());
-            }
-
-            string name = reader.ReadString();
-            string description = reader.ReadString();
-            Vector2 position = new(reader.ReadSingle(), reader.ReadSingle());
-            int vectorLength = reader.ReadInt32();
-
-            float[] vector = new float[vectorLength];
-            for (int i = 0; i < vectorLength; i++)
-            {
-                vector[i] = reader.ReadSingle();
-            }
-
-            BenchmarkElement element = new(id, category, date, dates, name, description, position, vector);
-            return new ValueTask<TElement>((TElement)(object)element);
         }
     }
 }

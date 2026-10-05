@@ -1,15 +1,16 @@
 ﻿namespace Akade.IndexedSet.Serialization;
-
 internal class PartialReadOnlyStream(Stream underlyingStream) : Stream
 {
     private readonly Stream _underlyingStream = underlyingStream;
     private long _length = 0;
     private long _position = 0;
+    private long _remaining = 0;
 
     public void SetSegment(long length)
     {
         _length = length;
         _position = 0;
+        _remaining = length;
     }
 
     public override bool CanRead => _underlyingStream.CanRead;
@@ -43,26 +44,27 @@ internal class PartialReadOnlyStream(Stream underlyingStream) : Stream
 
     public override int Read(Span<byte> buffer)
     {
-        if (_position >= _length)
+        long remaining = _remaining;
+        if (remaining == 0)
         {
             return 0;
         }
 
-        long remaining = _length - _position;
-        int toRead = (int)Math.Min(remaining, buffer.Length);
-        if (toRead == 0)
+        int toRead = buffer.Length;
+        if (toRead > remaining)
         {
-            return 0;
+            toRead = (int)remaining;
         }
 
         int read = _underlyingStream.Read(buffer[..toRead]);
         _position += read;
+        _remaining = remaining - read;
         return read;
     }
 
     public override int ReadByte()
     {
-        if (_position >= _length)
+        if (_remaining == 0)
         {
             return -1;
         }
@@ -71,6 +73,7 @@ internal class PartialReadOnlyStream(Stream underlyingStream) : Stream
         if (value != -1)
         {
             _position++;
+            _remaining--;
         }
 
         return value;
@@ -83,20 +86,21 @@ internal class PartialReadOnlyStream(Stream underlyingStream) : Stream
 
     public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
     {
-        if (_position >= _length)
+        long remaining = _remaining;
+        if (remaining == 0)
         {
             return 0;
         }
 
-        long remaining = _length - _position;
-        int toRead = (int)Math.Min(remaining, buffer.Length);
-        if (toRead == 0)
+        int toRead = buffer.Length;
+        if (toRead > remaining)
         {
-            return 0;
+            toRead = (int)remaining;
         }
 
         int read = await _underlyingStream.ReadAsync(buffer[..toRead], cancellationToken).ConfigureAwait(false);
         _position += read;
+        _remaining = remaining - read;
         return read;
     }
 
