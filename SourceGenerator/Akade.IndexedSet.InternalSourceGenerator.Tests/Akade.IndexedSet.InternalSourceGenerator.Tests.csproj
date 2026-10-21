@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
 	  <TargetFrameworks>$(SupportedTargetFrameworks)</TargetFrameworks>
@@ -13,7 +13,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Verify.DiffPlex" />
     <PackageReference Include="Verify.MSTest" />
     <PackageReference Include="Verify.SourceGenerators" />
   </ItemGroup>
