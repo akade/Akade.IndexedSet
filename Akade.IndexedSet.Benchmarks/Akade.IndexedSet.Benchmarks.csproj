@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFrameworks>$(SupportedTargetFrameworks)</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 

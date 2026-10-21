@@ -9,16 +9,12 @@ namespace Akade.IndexedSet.SampleData;
 /// </summary>
 public static class SwissZipCodes
 {
-    private const string _pathFromTests = "../../../../Akade.IndexedSet.SampleData/AMTOVZ_CSV_WGS84.csv";
+    private const string _relativePath = "Akade.IndexedSet.SampleData/AMTOVZ_CSV_WGS84.csv";
 
-    public static async Task<IEnumerable<SwissZipCode>> LoadAsync(string? prefix = null)
+    public static async Task<IEnumerable<SwissZipCode>> LoadAsync()
     {
-        string path = _pathFromTests;
-
-        if (!string.IsNullOrEmpty(prefix))
-        {
-            path = Path.Combine(prefix, _pathFromTests);
-        }
+        string gitRoot = await PathHelper.GetGitRootPathAsync();
+        string path =  Path.Combine(gitRoot, _relativePath);
 
         await using FileStream stream = File.OpenRead(path);
         using StreamReader reader = new(stream);

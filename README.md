@@ -290,10 +290,10 @@ R*Tree based spatial indices for efficient 2D/3D intersection & kNN queries.
 ```cs
 var locations = new Vector2[]
 {
-    new(100, 150),  // A point inside our query area
-    new(250, 200),  // Another point inside our query area
-    new(400, 500),  // A point outside our query area
-    new(50, 75)     // A point outside our query area
+    new(100, 150), 
+    new(250, 200), 
+    new(400, 500), 
+    new(50, 75)
 };
 
 IndexedSet<Vector2> spatialSet = locations.ToIndexedSet()
@@ -304,10 +304,8 @@ Vector2 searchCenter = new(200, 200);
 Vector2 areaMin = new(150, 150);
 Vector2 areaMax = new(300, 250);
 
-// fast spatial range queries
+// fast spatial queries
 IEnumerable<Vector2> pointsInArea = spatialSet.Intersects(x => x, areaMin, areaMax);
-
-// fast nearest neighbor queries
 IEnumerable<Vector2> nearestPoints = spatialSet.NearestNeighbors(x => x, searchCenter).Take(2);
 ```
 <!-- end-snippet -->
@@ -333,8 +331,7 @@ IndexedSet<Document> vectorSet = documents.ToIndexedSet()
                                           .WithVectorIndex(x => x.Embedding.Span)
                                           .Build();
 
-// query vector for "AI and machine learning"
-ReadOnlySpan<float> queryVector = new float[] { 0.15f, 0.85f, 0.35f, 0.85f };
+ReadOnlySpan<float> queryVector = [0.15f, 0.85f, 0.35f, 0.85f];
 
 // fast approximate nearest neighbor search
 IEnumerable<Document> similarDocuments = vectorSet.ApproximateNearestNeighbors(x => x.Embedding.Span, queryVector, k: 2);

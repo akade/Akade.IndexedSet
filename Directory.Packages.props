@@ -8,7 +8,7 @@
     <PackageVersion Include="System.Numerics.Tensors" Version="10.0.10" />
     <!--Dependencies for testing etc... -->
     <PackageVersion Include="Autypo" Version="1.1.0" />
-    <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.16.0-preview.2" />
     <PackageVersion Include="Bogus" Version="35.6.5" />
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
     <PackageVersion Include="Fastenshtein" Version="1.0.12" />

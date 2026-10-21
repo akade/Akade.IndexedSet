@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿using Akade.IndexedSet.SampleData;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using Bogus;
 using Microsoft.Extensions.AI;
@@ -10,8 +11,8 @@ namespace Akade.IndexedSet.Benchmarks;
 
 [MemoryDiagnoser]
 [DisassemblyDiagnoser]
-[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net90)]
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net10_0)]
+[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net11_0)]
 [JsonExporter]
 public class VectorBenchmarks
 {
@@ -26,9 +27,12 @@ public class VectorBenchmarks
     public async Task SetupAsync()
     {
         ServiceCollection services = new();
+
+        string gitRoot = await PathHelper.GetGitRootPathAsync();
+
         services.AddBertOnnxEmbeddingGenerator(
-            onnxModelPath: "../../../../../../../../Akade.IndexedSet.Tests/Models/BgeMicroV2/model.onnx",
-            vocabPath: "../../../../../../../../Akade.IndexedSet.Tests/Models/BgeMicroV2/vocab.txt");
+            onnxModelPath: Path.Combine(gitRoot, "Akade.IndexedSet.Tests/Models/BgeMicroV2/model.onnx"),
+            vocabPath: Path.Combine(gitRoot, "Akade.IndexedSet.Tests/Models/BgeMicroV2/vocab.txt"));
 
 
         using ServiceProvider sp = services.BuildServiceProvider();

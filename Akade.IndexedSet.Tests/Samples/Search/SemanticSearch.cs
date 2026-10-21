@@ -1,6 +1,7 @@
 ﻿#pragma warning disable AkadeIndexedSetEXP0003 // The api for the vector indices is experimental
 
 using Akade.IndexedSet.Concurrency;
+using Akade.IndexedSet.SampleData;
 using Bogus;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,22 +18,24 @@ public class SemanticSearch
         public Embedding<float>? Embedding { get; set; }
     }
 
-    private static ServiceProvider SetupServices()
+    private static async Task<ServiceProvider> SetupServicesAsync()
     {
+        string gitRoot = await PathHelper.GetGitRootPathAsync();
+
         ServiceCollection services = new();
         services.AddBertOnnxEmbeddingGenerator(
-            onnxModelPath: "../../../Models/BgeMicroV2/model.onnx",
-            vocabPath: "../../../Models/BgeMicroV2/vocab.txt");
+            onnxModelPath: Path.Combine(gitRoot, "Akade.IndexedSet.Tests/Models/BgeMicroV2/model.onnx"),
+            vocabPath: Path.Combine(gitRoot, "Akade.IndexedSet.Tests/Models/BgeMicroV2/vocab.txt"));
         return services.BuildServiceProvider();
     }
 
-    private async Task<List<Product>> GenerateProductsAsync(IServiceProvider serviceProvider, int count)
+    private static async Task<List<Product>> GenerateProductsAsync(IServiceProvider serviceProvider, int count)
     {
         IEmbeddingGenerator<string, Embedding<float>> generator = serviceProvider.GetRequiredService<IEmbeddingGenerator<string, Embedding<float>>>();
         Randomizer.Seed = new Random(42);
 
         List<Product> products = new Faker<Product>().CustomInstantiator(x => new(x.Commerce.ProductName()))
-                                                     .Generate(500);
+                                                     .Generate(count);
 
         GeneratedEmbeddings<Embedding<float>> embeddings = await generator.GenerateAsync(products.Select(x => x.Name));
         foreach ((Product? product, Embedding<float>? embedding) in products.Zip(embeddings))
@@ -47,7 +50,7 @@ public class SemanticSearch
     [DataRow(1_000)]
     public async Task Semantic_search_via_BgeMicroV2(int count)
     {
-        using ServiceProvider sp = SetupServices();
+        using ServiceProvider sp = await SetupServicesAsync();
 
         List<Product> products = await GenerateProductsAsync(sp, count);
 
