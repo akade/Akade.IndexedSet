@@ -76,11 +76,7 @@ internal sealed partial class RTree<TElement, TPoint, TEnvelope, TValue, TEnvelo
                 // Console.WriteLine($"Processing node {count} with distance {distance}");
                 if (currentNode is ParentNode parentNode)
                 {
-#if NET9_0_OR_GREATER
                     foreach (Node child in CollectionsMarshal.AsSpan(parentNode.Children))
-#else
-                    foreach (Node child in parentNode.Children)
-#endif
                     {
                         TValue childDistance = TEnvelopeMath.DistanceToBoundarySquared(ref child.Envelope, position);
 

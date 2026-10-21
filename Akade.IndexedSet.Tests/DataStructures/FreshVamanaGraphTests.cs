@@ -1,5 +1,4 @@
-﻿#if NET9_0_OR_GREATER
-using Akade.IndexedSet.DataStructures.FreshVamana;
+﻿using Akade.IndexedSet.DataStructures.FreshVamana;
 
 namespace Akade.IndexedSet.Tests.DataStructures;
 
@@ -100,5 +99,3 @@ public class FreshVamanaGraphTests
     }
 
 }
-
-#endif

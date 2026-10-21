@@ -6,11 +6,7 @@ namespace Akade.IndexedSet.Indices;
 /// Fully-generic index including on the index key
 /// </summary>
 internal abstract class TypedIndex<TElement, TIndexKey>(string name) : Index<TElement>(name)
-#if NET9_0_OR_GREATER
     where TIndexKey : notnull, allows ref struct
-#else
-    where TIndexKey : notnull
-#endif
 {
     internal abstract void Add(TIndexKey key, TElement value);
     internal abstract void Remove(TIndexKey key, TElement value);

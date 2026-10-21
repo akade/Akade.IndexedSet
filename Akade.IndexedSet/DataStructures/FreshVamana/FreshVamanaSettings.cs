@@ -1,6 +1,4 @@
-﻿#if NET9_0_OR_GREATER
-
-namespace Akade.IndexedSet.DataStructures.FreshVamana;
+﻿namespace Akade.IndexedSet.DataStructures.FreshVamana;
 
 /// <summary>
 /// Settings for FreshVamana graph
@@ -16,5 +14,3 @@ internal readonly record struct FreshVamanaSettings(int FlatThreshold, int Searc
 {
     public static readonly FreshVamanaSettings Default = new(FlatThreshold: 200, SearchListSize: 125, Alpha: 1.2f, OutDegreeBound: 70, DeletionThreshold: 0.05f, BulkLoadingRandomSeed: 1618);
 }
-
-#endif

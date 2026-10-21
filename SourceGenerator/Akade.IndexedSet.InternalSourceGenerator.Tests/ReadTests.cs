@@ -40,7 +40,6 @@ public class ReadTests : VerifyBase
         #define NET9_0_OR_GREATER
         public class IndexedSet<TElement>
         {
-        #if NET9_0_OR_GREATER
             /// <summary>
             /// Returns the approximate k nearest neighbors of the given value.
             /// </summary>
@@ -50,7 +49,6 @@ public class ReadTests : VerifyBase
                 TypedIndex<TElement, ReadOnlySpan<float>> typedIndex = GetIndex<ReadOnlySpan<float>>(indexName);
                 return typedIndex.ApproximateNearestNeighbors(value, k);
             }
-        #endif
         }
         """);
     }

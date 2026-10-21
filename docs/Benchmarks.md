@@ -11,8 +11,7 @@ AMD Ryzen 9 5900X, 1 CPU, 24 logical and 12 physical cores
 ```
 
 All benchmarks are currenlty using *1k elements*. Benchmarks showing the scaling is on the roadmap - expect IndexedSet to scale much
-much better than the naive LINQ Queries. As .NET 9.0 brings in [a bunch of performance improvements](https://devblogs.microsoft.com/dotnet/performance-improvements-in-net-9/),
-the benchmarks are run against both .NET 8 and 9.
+much better than the naive LINQ Queries.
 
 ## Unique-Index
 <!-- begin-snippet: Akade.IndexedSet.Benchmarks UniqueIndexBenchmarks(importer:benchmarkdotnet) -->

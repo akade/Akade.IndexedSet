@@ -316,7 +316,7 @@ IEnumerable<Vector2> nearestPoints = spatialSet.NearestNeighbors(x => x, searchC
 > ℹ Spatial indices work with Vector2 & Vector3 at the moment. The tree implementation is generic and might be extended to support other types or opened up for custom types in the future.
 
 ### Vector index
-(.NET 9+ only) High-performance approximate nearest neighbor search based on a Fresh Vamana graph.
+High-performance approximate nearest neighbor search based on a Fresh Vamana graph.
 
 <!-- begin-snippet: Akade.IndexedSet.Tests/Samples/Readme.cs Features_VectorIndex(importer:cs?body-only=true) -->
 ```cs

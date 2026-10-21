@@ -1,5 +1,4 @@
-﻿#if NET9_0_OR_GREATER
-#pragma warning disable AkadeIndexedSetEXP0003 // The api for the vector indices is experimental
+﻿#pragma warning disable AkadeIndexedSetEXP0003 // The api for the vector indices is experimental
 
 using Akade.IndexedSet.Concurrency;
 using Bogus;
@@ -70,5 +69,3 @@ public class SemanticSearch
         return searchEmbedding.Vector;
     }
 }
-
-#endif

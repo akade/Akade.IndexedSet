@@ -1,5 +1,4 @@
-﻿#if NET9_0_OR_GREATER
-using Akade.IndexedSet.Extensions;
+﻿using Akade.IndexedSet.Extensions;
 using System.Diagnostics;
 using System.Numerics.Tensors;
 using System.Runtime.InteropServices;
@@ -285,5 +284,3 @@ internal partial class FreshVamanaGraph<TElement>(Func<TElement, ReadOnlySpan<fl
         _deletedNodes.Clear();
     }
 }
-
-#endif
