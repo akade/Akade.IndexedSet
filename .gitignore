@@ -365,3 +365,4 @@ FodyWeavers.xsd
 
 # Verify
 *.received.*
+/Akade.IndexedSet.Benchmarks/.bdn
