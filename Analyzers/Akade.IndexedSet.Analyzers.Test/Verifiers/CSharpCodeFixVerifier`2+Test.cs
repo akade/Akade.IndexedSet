@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
+using System;
 using System.Diagnostics;
 
 namespace Akade.IndexedSet.Analyzers.Test;
@@ -26,12 +27,12 @@ public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
 
             SolutionTransforms.Add((solution, projectId) =>
             {
-                Project project = solution.GetProject(projectId);
+                Project project = solution.GetProject(projectId) ?? throw new InvalidOperationException();
                 
-                var parseOptions = (CSharpParseOptions)project.ParseOptions;
+                var parseOptions = (CSharpParseOptions?)project.ParseOptions ?? throw new InvalidOperationException();
                 parseOptions = parseOptions.WithLanguageVersion(LanguageVersion.Latest);
 
-                CompilationOptions compilationOptions = project.CompilationOptions.WithOutputKind(OutputKind.ConsoleApplication);
+                CompilationOptions compilationOptions = project.CompilationOptions?.WithOutputKind(OutputKind.ConsoleApplication) ?? throw new InvalidOperationException();
                 compilationOptions = compilationOptions.WithSpecificDiagnosticOptions(
                     compilationOptions.SpecificDiagnosticOptions.SetItems(CSharpVerifierHelper.NullableWarnings)
                     );

@@ -6,6 +6,7 @@
     <TargetFramework>net472</TargetFramework>
     <RootNamespace>Akade.IndexedSet.Analyzers.Vsix</RootNamespace>
     <AssemblyName>Akade.IndexedSet.Analyzers.Vsix</AssemblyName>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup>
