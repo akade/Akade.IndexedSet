@@ -21,7 +21,6 @@ jobs:
         dotnet-version: |
            10.x
            11.x
-        include-prerelease: true
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
