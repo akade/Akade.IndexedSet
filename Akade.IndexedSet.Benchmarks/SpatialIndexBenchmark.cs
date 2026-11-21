@@ -11,8 +11,8 @@ namespace Akade.IndexedSet.Benchmarks;
 
 [MemoryDiagnoser]
 [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
-[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net90)]
 [SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net10_0)]
+[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net11_0)]
 [JsonExporter]
 public class SpatialIndexBenchmark
 {
@@ -29,7 +29,7 @@ public class SpatialIndexBenchmark
     [GlobalSetup]
     public async Task SetupAsync()
     {
-        IEnumerable<SwissZipCode> swissZipCodes = await SwissZipCodes.LoadAsync("..\\..\\..\\..");
+        IEnumerable<SwissZipCode> swissZipCodes = await SwissZipCodes.LoadAsync();
         _swissZipCodes = swissZipCodes.ToList();
         _setBulkLoaded = IndexedSetBuilder.Create(swissZipCodes)
                                           .WithSpatialIndex<Vector2>(x => x.Coordinates)

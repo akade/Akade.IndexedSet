@@ -171,7 +171,6 @@ public class Readme
     }
 #pragma warning restore AkadeIndexedSetEXP0002
 
-#if NET9_0_OR_GREATER
     private record Document(string Title, ReadOnlyMemory<float> Embedding);
 
 #pragma warning disable AkadeIndexedSetEXP0003
@@ -197,7 +196,6 @@ public class Readme
         IEnumerable<Document> similarDocuments = vectorSet.ApproximateNearestNeighbors(x => x.Embedding.Span, queryVector, k: 2);
     }
 #pragma warning restore AkadeIndexedSetEXP0003
-#endif
 
     [TestMethod]
     public void FAQ_MultipleIndicesForSameProperty()

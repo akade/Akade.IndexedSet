@@ -1,6 +1,4 @@
-﻿#if NET9_0_OR_GREATER
-
-using Akade.IndexedSet.DataStructures.FreshVamana;
+﻿using Akade.IndexedSet.DataStructures.FreshVamana;
 using Akade.IndexedSet.Utils;
 using System.Diagnostics.CodeAnalysis;
 
@@ -66,5 +64,3 @@ internal class VectorIndex<TElement>(Func<TElement, ReadOnlySpan<float>> keyAcce
         return _graph.ApproximateNearestNeighbors(indexKey, k);
     }
 }
-
-#endif

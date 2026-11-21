@@ -1,11 +1,7 @@
 ﻿namespace Akade.IndexedSet.Utils;
 
 internal sealed class KeyValueEnumerator<TKey, TValue>(IEnumerable<TValue> values, Func<TValue, TKey> keyAccessor) : IKeyValueEnumerator<TKey, TValue>, IDisposable
-#if NET9_0_OR_GREATER
     where TKey : notnull, allows ref struct
-#else
-    where TKey : notnull
-#endif
 {
     private IEnumerator<TValue> _enumerator = values.GetEnumerator();
     private readonly Func<TValue, TKey> _keyAccessor = keyAccessor;
@@ -39,11 +35,7 @@ internal sealed class KeyValueEnumerator<TKey, TValue>(IEnumerable<TValue> value
 }
 
 internal sealed class MultiKeyValueEnumerator<TKey, TValue>(IEnumerable<TValue> values, Func<TValue, IEnumerable<TKey>> keysAccessor) : IKeyValueEnumerator<TKey, TValue>, IDisposable
-#if NET9_0_OR_GREATER
     where TKey : notnull, allows ref struct
-#else
-    where TKey : notnull
-#endif
 {
     private readonly IEnumerator<TValue> _enumerator = values.GetEnumerator();
     private readonly Func<TValue, IEnumerable<TKey>> _keysAccessor = keysAccessor;

@@ -1,11 +1,7 @@
 ﻿namespace Akade.IndexedSet.Utils;
 
 internal interface IKeyValueEnumerator<out TKey, out TValue>
-#if NET9_0_OR_GREATER
     where TKey : notnull, allows ref struct
-#else
-    where TKey : notnull
-#endif
 {
     bool MoveNext();
     TKey CurrentKey { get; }

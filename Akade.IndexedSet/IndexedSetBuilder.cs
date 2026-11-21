@@ -367,7 +367,6 @@ public class IndexedSetBuilder<TElement>
         return this;
     }
 
-#if NET9_0_OR_GREATER
     /// <summary>
     /// Configures the <see cref="IndexedSet{TElement}"/> to have a vector index based on a secondary key that 
     /// supports approximate nearest neighbor queries using cosine similarity. Currently supports <see cref="ReadOnlySpan{T}"/> with <see cref="float" />.
@@ -383,7 +382,6 @@ public class IndexedSetBuilder<TElement>
         _result.AddIndex(keyAccessor, new VectorIndex<TElement>(keyAccessor, indexName));
         return this;
     }
-#endif
 
     /// <summary>
     /// Builds and returns the configured <see cref="IndexedSet{TPrimaryKey, TElement}"/>

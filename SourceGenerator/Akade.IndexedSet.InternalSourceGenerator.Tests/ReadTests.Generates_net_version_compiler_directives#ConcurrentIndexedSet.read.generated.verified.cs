@@ -7,7 +7,6 @@ namespace Akade.IndexedSet.Concurrency;
 #nullable enable
 public partial class ConcurrentIndexedSet<TElement>
 {
-    #if NET9_0_OR_GREATER
     /// <summary>
     /// Returns the approximate k nearest neighbors of the given value.
     /// </summary>
@@ -18,6 +17,5 @@ public partial class ConcurrentIndexedSet<TElement>
             return _indexedSet.ApproximateNearestNeighbors(indexAccessor, value, k, indexName).ToArray();
         }
     }
-    #endif
 }
 #nullable restore

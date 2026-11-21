@@ -770,7 +770,6 @@ public class IndexedSet<TElement>
         return typedIndex.NearestNeighbors(value);
     }
 
-#if NET9_0_OR_GREATER
     /// <summary>
     /// Returns the approximate k nearest neighbors of the given value.
     /// </summary>
@@ -785,7 +784,6 @@ public class IndexedSet<TElement>
         TypedIndex<TElement, ReadOnlySpan<float>> typedIndex = GetIndex<ReadOnlySpan<float>>(indexName);
         return typedIndex.ApproximateNearestNeighbors(value, k);
     }
-#endif
 
     /// <summary>
     /// Returns all values by fully enumerating the entire set.
@@ -797,11 +795,7 @@ public class IndexedSet<TElement>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private TypedIndex<TElement, TIndexKey> GetIndex<TIndexKey>(string? indexName)
-    #if NET9_0_OR_GREATER
         where TIndexKey : notnull, allows ref struct
-    #else
-        where TIndexKey : notnull
-    #endif
     {
         ArgumentNullException.ThrowIfNull(indexName);
 
@@ -897,22 +891,14 @@ public class IndexedSet<TElement>
     }
 
     internal void AddIndex<TIndexKey, TIndex>(Func<TElement, TIndexKey> indexAccessor, TIndex index)
-#if NET9_0_OR_GREATER
         where TIndexKey : notnull, allows ref struct
-#else
-        where TIndexKey : notnull
-#endif
         where TIndex : TypedIndex<TElement, TIndexKey>
     {
         AddIndex(new SingleKeyIndexWriter<TElement, TIndexKey, TIndex>(indexAccessor, index), index);
     }
 
     internal void AddIndex<TIndexKey, TIndex>(Func<TElement, IEnumerable<TIndexKey>> indexAccessor, TIndex index)
-#if NET9_0_OR_GREATER
         where TIndexKey : notnull, allows ref struct
-#else
-        where TIndexKey : notnull
-#endif
         where TIndex : TypedIndex<TElement, TIndexKey>
     {
         AddIndex(new MultiKeyIndexWriter<TElement, TIndexKey, TIndex>(indexAccessor, index), index);

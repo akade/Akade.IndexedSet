@@ -67,3 +67,4 @@
 ###############################################################################
 # ONNX model files
 *.onnx filter=lfs diff=lfs merge=lfs -binary
+*.verified.cs text eol=lf working-tree-encoding=UTF-8

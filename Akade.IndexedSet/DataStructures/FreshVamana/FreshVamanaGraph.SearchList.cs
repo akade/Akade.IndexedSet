@@ -1,6 +1,4 @@
-﻿#if NET9_0_OR_GREATER
-
-namespace Akade.IndexedSet.DataStructures.FreshVamana;
+﻿namespace Akade.IndexedSet.DataStructures.FreshVamana;
 
 internal partial class FreshVamanaGraph<TElement>
 {
@@ -71,5 +69,3 @@ internal partial class FreshVamanaGraph<TElement>
         }
     }
 }
-
-#endif

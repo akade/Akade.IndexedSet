@@ -6,13 +6,13 @@ namespace Akade.IndexedSet.Analyzers.Test;
 internal static class NetRefAssemblies
 {
     public static ReferenceAssemblies Current { get; } =
-#if NET8_0
-        ReferenceAssemblies.Net.Net80;
-#elif NET9_0
-        ReferenceAssemblies.Net.Net90;
-#elif NET10_0
+#if NET10_0
         new(targetFramework: "net10.0",
             referenceAssemblyPackage: new PackageIdentity("Microsoft.NETCore.App.Ref", "10.0.0"),
             referenceAssemblyPath: Path.Combine("ref", "net10.0"));
+#elif NET11_0
+        new(targetFramework: "net11.0",
+            referenceAssemblyPackage: new PackageIdentity("Microsoft.NETCore.App.Ref", "11.0.0-rc.2.26504.105"),
+            referenceAssemblyPath: Path.Combine("ref", "net11.0"));
 #endif
 }

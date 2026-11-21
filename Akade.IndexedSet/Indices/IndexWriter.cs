@@ -13,22 +13,14 @@ internal abstract class IndexWriter<TElement>
 }
 
 internal abstract class TypedIndexWriter<TElement, TIndexKey, TIndex> : IndexWriter<TElement>
-#if NET9_0_OR_GREATER
     where TIndexKey : notnull, allows ref struct
-#else
-    where TIndexKey : notnull
-#endif
     where TIndex : TypedIndex<TElement, TIndexKey>
 {
 
 }
 
 internal sealed class SingleKeyIndexWriter<TElement, TIndexKey, TIndex>(Func<TElement, TIndexKey> keyAccessor, TIndex index) : TypedIndexWriter<TElement, TIndexKey, TIndex>
-#if NET9_0_OR_GREATER
     where TIndexKey : notnull, allows ref struct
-#else
-    where TIndexKey : notnull
-#endif
     where TIndex : TypedIndex<TElement, TIndexKey>
 {
     private readonly Func<TElement, TIndexKey> _keyAccessor = keyAccessor;
@@ -51,11 +43,7 @@ internal sealed class SingleKeyIndexWriter<TElement, TIndexKey, TIndex>(Func<TEl
 }
 
 internal sealed class MultiKeyIndexWriter<TElement, TIndexKey, TIndex>(Func<TElement, IEnumerable<TIndexKey>> keyAccessor, TIndex index) : TypedIndexWriter<TElement, TIndexKey, TIndex>
-#if NET9_0_OR_GREATER
     where TIndexKey : notnull, allows ref struct
-#else
-    where TIndexKey : notnull
-#endif
     where TIndex : TypedIndex<TElement, TIndexKey>
 {
     private readonly Func<TElement, IEnumerable<TIndexKey>> _keyAccessor = keyAccessor;

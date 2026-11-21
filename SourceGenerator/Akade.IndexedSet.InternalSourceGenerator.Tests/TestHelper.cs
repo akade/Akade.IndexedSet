@@ -10,7 +10,6 @@ internal sealed class ModuleInitializer
     public static void Init()
     {
         VerifySourceGenerators.Initialize();
-        VerifyDiffPlex.Initialize();
     }
 }
 
