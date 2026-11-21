@@ -13,7 +13,7 @@
 		<Authors>Akade</Authors>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RepositoryUrl>https://github.com/akade/Akade.IndexedSet</RepositoryUrl>
-		<PackageTags>data structure;indices;range query;unique index;range index;non-unique index;multi-value;dictionary;collections;computed keys;fuzzy;fuzzy search;approximate string matching;search;concurrency;multiple keys; fast lookup;performance</PackageTags>
+		<PackageTags>data structure;indices;range query;unique index;range index;non-unique index;multi-value;dictionary;collections;computed keys;fuzzy;fuzzy search;approximate string matching;search;concurrency;multiple keys;fast lookup;performance;in-memory;indexed collection;unique index;non-unique index;range index;range query;multi-key;compound key;computed key;fuzzy search;prefix search;substring search;full text search;autocomplete;spatial index;spatial search;rtree;vector search;similarity search;approximate nearest neighbor;ANN;embeddings;aot</PackageTags>
 		<PackageReadmeFile>/README.md</PackageReadmeFile>
 	</PropertyGroup>
 

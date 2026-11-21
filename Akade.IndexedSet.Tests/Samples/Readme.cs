@@ -72,9 +72,9 @@ public class Readme
         _ = set.Add(new(Id: 3, ConnectsTo: [1, 2, 3]));
         _ = set.Add(new(Id: 4, ConnectsTo: [1, 3]));
 
-        // For readability, it is recommended to write the name for the parameter contains
+        // For readability, it is recommended to explicitly name the parameter contains as shown below.
         IEnumerable<GraphNode> nodesThatConnectTo1 = set.Where(x => x.ConnectsTo, contains: 1); // returns nodes 3 & 4
-        IEnumerable<GraphNode> nodesThatConnectTo3 = set.Where(x => x.ConnectsTo, contains: 1); // returns nodes 1 & 2 & 3
+        IEnumerable<GraphNode> nodesThatConnectTo3 = set.Where(x => x.ConnectsTo, contains: 3); // returns nodes 1, 2, 3 & 4
 
         // Non-optimized Where(x => x.Contains(...)) query:
         nodesThatConnectTo1 = set.FullScan().Where(x => x.ConnectsTo.Contains(1)); // returns nodes 3 & 4, but enumerates through the entire set

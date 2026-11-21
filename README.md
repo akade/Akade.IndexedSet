@@ -1,6 +1,6 @@
 # Akade.IndexedSet
 
-![.Net Version](https://img.shields.io/badge/dynamic/xml?color=%23512bd4&label=version&query=%2F%2FTargetFrameworks%5B1%5D&url=https://raw.githubusercontent.com/akade/Akade.IndexedSet/main/Akade.IndexedSet/Akade.IndexedSet.csproj&logo=.net)
+![.Net Version](https://img.shields.io/badge/dynamic/xml?color=%23512bd4&label=version&query=%2F%2FSupportedTargetFrameworks%5B1%5D&url=https://raw.githubusercontent.com/akade/Akade.IndexedSet/main/Directory.Build.props&logo=.net)
 [![CI Build](https://github.com/akade/Akade.IndexedSet/actions/workflows/ci-build.yml/badge.svg?branch=main)](https://github.com/akade/Akade.IndexedSet/actions/workflows/ci-build.yml)
 [![NuGet version (Akade.IndexedSet)](https://img.shields.io/nuget/v/Akade.IndexedSet.svg)](https://www.nuget.org/packages/Akade.IndexedSet/)
 [![MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/akade/Akade.IndexedSet#readme)
@@ -31,7 +31,7 @@ through your data, expect huge [speedups](docs/Benchmarks.md) and much better sc
   - [FAQs](#faqs)
     - [How do I use multiple index types for the same property?](#how-do-i-use-multiple-index-types-for-the-same-property)
     - [How do I update key values if the elements are already in the set?](#how-do-i-update-key-values-if-the-elements-are-already-in-the-set)
-    - [How do I do case-insensitve (fuzzy) string matching (Prefix, FullTextIndex)?](#how-do-i-do-case-insensitve-fuzzy-string-matching-prefix-fulltextindex)
+    - [How do I do case-insensitive (fuzzy) string matching (Prefix, FullTextIndex)?](#how-do-i-do-case-insensitive-fuzzy-string-matching-prefix-fulltextindex)
   - [Roadmap](#roadmap)
 <!--/TOC-->
 
@@ -248,9 +248,9 @@ _ = set.Add(new(Id: 2, ConnectsTo: [3]));
 _ = set.Add(new(Id: 3, ConnectsTo: [1, 2, 3]));
 _ = set.Add(new(Id: 4, ConnectsTo: [1, 3]));
 
-// For readability, it is recommended to write the name for the parameter contains
+// For readability, it is recommended to explicitly name the parameter contains as shown below.
 IEnumerable<GraphNode> nodesThatConnectTo1 = set.Where(x => x.ConnectsTo, contains: 1); // returns nodes 3 & 4
-IEnumerable<GraphNode> nodesThatConnectTo3 = set.Where(x => x.ConnectsTo, contains: 1); // returns nodes 1 & 2 & 3
+IEnumerable<GraphNode> nodesThatConnectTo3 = set.Where(x => x.ConnectsTo, contains: 3); // returns nodes 1, 2, 3 & 4
 
 // Non-optimized Where(x => x.Contains(...)) query:
 nodesThatConnectTo1 = set.FullScan().Where(x => x.ConnectsTo.Contains(1)); // returns nodes 3 & 4, but enumerates through the entire set
@@ -365,11 +365,11 @@ We are using the [CallerArgumentExpression](https://docs.microsoft.com/en-us/dot
 of .Net 6/C# 10 to provide convention-based naming of the indices:
 - `set.Where(x => (x.Prop1, x.Prop2), (1, 2))` tries to use an index named `"x => (x.Prop1, x.Prop2)"`
 - `set.Where(ComputedKeys.NumberOfDays, 5)` tries to use an index named `"ComputedKeys.NumberOfDays"`
-- **Hence, be careful what you pass in. 
+- **Hence, be careful what you pass in.**
 > :information_source: The following naming conventions are recommended:
-> - Use x as parameter name in any lambdas that determines an index name.
+> - Use `x` as the parameter name in any lambda that determines an index name.
 > - Do not use parentheses in any lambda that determines an index name.
-> - Do not use block bodied in any lambda that determines an index name. 
+> - Do not use block-bodied lambdas to determine an index name.
 > - For complex indices, use a static method.
 > [C# Analyzers](./Analyzers/Readme.md) are shipped with the package to spot incorrect index names.
 
@@ -428,8 +428,8 @@ concurrentSet.Update(set =>
 ```
 <!-- end-snippet -->
 
-### How do I do case-insensitve (fuzzy) string matching (Prefix, FullTextIndex)?
-While you can use whatever index expression that you want (i.e. `.ToLowerInvariant()`), 
+### How do I do case-insensitive (fuzzy) string matching (Prefix, FullTextIndex)?
+While you can use any index expression (for example, `.ToLowerInvariant()`),
 using a comparer is recommended:
 
 <!-- begin-snippet: Akade.IndexedSet.Tests/Samples/Readme.cs FAQ_CaseInsensitiveFuzzyMatching(importer:cs?body-only=true) -->
@@ -455,8 +455,9 @@ Potential features (not ordered):
 - [ ] Tree-based range index for better insertion performance
 - [ ] Aggregates (i.e. sum or average: interface based on state & add/removal state update functions)
 - [ ] Custom (equality) comparer for indices
-- [ ] Helper functions for search scenarios (Searching in multiple properties, text-reprocessing & result merging)
-- [ ] Becnhmark vs elastic search
+- [ ] Helper functions for search scenarios (searching multiple properties, text reprocessing, and merging results)
+- [ ] Benchmark vs. Elasticsearch
 
-If you have any suggestion or found a bug / unexpected behavior, open an issue! I will also review PRs and integrate them if they fit the project.
+If you have any suggestions or find a bug or unexpected behavior, open an issue! I will also review PRs and integrate them if they fit the project.
+However, if you want to add something substantial or big, please open an issue beforehand to discuss it.
 
