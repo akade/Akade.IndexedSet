@@ -8,9 +8,8 @@ public static class PathHelper
     {
         workingDirectory ??= Environment.CurrentDirectory;
 
-
         // Start git rev-parse --show-toplevel
-        Process process = new()
+        using Process process = new()
         {
             StartInfo = new()
             {
@@ -24,8 +23,16 @@ public static class PathHelper
             }
         };
 
-        process.Start();
+        _ = process.Start();
         string output = await process.StandardOutput.ReadToEndAsync();
+        string error = await process.StandardError.ReadToEndAsync();
+        await process.WaitForExitAsync();
+
+        if(process.ExitCode != 0)
+        {
+            throw new InvalidOperationException($"Git command failed with exit code {process.ExitCode}. Error: {error}");
+        }
+
         return output.Trim();
     }
 }
