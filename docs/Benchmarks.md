@@ -34,15 +34,15 @@ much better than the naive LINQ Queries.
 
 ## MultiValue-Index
 <!-- begin-snippet: Akade.IndexedSet.Benchmarks MultiValueIndexBenchmarks(importer:benchmarkdotnet) -->
-| Method                | Runtime   | Mean      | Error     | StdDev    | Ratio | Code Size | Gen0   | Allocated | Alloc Ratio |
-|---------------------- |---------- |----------:|----------:|----------:|------:|----------:|-------:|----------:|------------:|
-| MultiValue_Linq       | .NET 10.0 | 36.640 μs | 0.7197 μs | 0.6732 μs |  1.00 |   3,706 B | 0.0610 |    1680 B |        1.00 |
-| Multivalue_Lookup     | .NET 10.0 |  7.956 μs | 0.0419 μs | 0.0392 μs |  0.22 |   2,455 B | 0.0153 |     288 B |        0.17 |
-| Multivalue_IndexedSet | .NET 10.0 |  9.321 μs | 0.1108 μs | 0.1036 μs |  0.25 |   3,008 B | 0.0153 |     360 B |        0.21 |
-|                       |           |           |           |           |       |           |        |           |             |
-| MultiValue_Linq       | .NET 11.0 | 51.536 μs | 0.2483 μs | 0.2201 μs |  1.00 |   3,735 B | 0.0610 |    1600 B |        1.00 |
-| Multivalue_Lookup     | .NET 11.0 | 19.618 μs | 0.1160 μs | 0.1028 μs |  0.38 |   2,413 B |      - |     288 B |        0.18 |
-| Multivalue_IndexedSet | .NET 11.0 | 20.996 μs | 0.1067 μs | 0.0998 μs |  0.41 |   3,430 B |      - |     360 B |        0.23 |
+| Method                | Runtime   | Mean      | Error     | StdDev    | Ratio | Gen0   | Code Size | Allocated | Alloc Ratio |
+|---------------------- |---------- |----------:|----------:|----------:|------:|-------:|----------:|----------:|------------:|
+| MultiValue_Linq       | .NET 10.0 | 35.300 μs | 0.3124 μs | 0.2769 μs |  1.00 | 0.0610 |   3,979 B |    1680 B |        1.00 |
+| Multivalue_Lookup     | .NET 10.0 |  7.911 μs | 0.0405 μs | 0.0359 μs |  0.22 | 0.0153 |   2,457 B |     288 B |        0.17 |
+| Multivalue_IndexedSet | .NET 10.0 |  8.115 μs | 0.0458 μs | 0.0429 μs |  0.23 | 0.0153 |   3,019 B |     360 B |        0.21 |
+|                       |           |           |           |           |       |        |           |           |             |
+| MultiValue_Linq       | .NET 11.0 | 50.355 μs | 0.9908 μs | 1.0174 μs |  1.00 | 0.0610 |   4,035 B |    1600 B |        1.00 |
+| Multivalue_Lookup     | .NET 11.0 | 20.054 μs | 0.1756 μs | 0.1643 μs |  0.40 |      - |   2,423 B |     288 B |        0.18 |
+| Multivalue_IndexedSet | .NET 11.0 | 20.320 μs | 0.0876 μs | 0.0819 μs |  0.40 |      - |   3,432 B |     360 B |        0.23 |
 
 <!-- end-snippet -->
 
